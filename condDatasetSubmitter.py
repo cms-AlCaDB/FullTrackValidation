@@ -55,7 +55,7 @@ def createOptionParser():
                         action='store_true')
     parser.add_option("--Type",
                         help="Defines the type of the workflow",
-                        choices=['HLT','PR','PR+ALCA','RECO+HLT','HLT+RECO','HLT+RECO+ALCA'],
+                        choices=['HLT','PR','PR+ALCA','RECO+HLT','HLT+RECO', 'EXPR+RECO', 'HLT+RECO+ALCA'],
                         default='HLT')
     parser.add_option("--two_WFs",
                         default=False,
@@ -286,7 +286,7 @@ def getDriverDetails(Type, release, ds, B0T, HIon, pA, cosmics, recoRelease):
     elif Type == 'RECO+HLT':
         HLTBase.update({'base':HLTRECObase})
         return HLTBase
-    elif Type in ['HLT+RECO','HLT+RECO+ALCA']:
+    elif Type in ['HLT+RECO','HLT+RECO+ALCA', 'EXPR+RECO']:
         if options.HLT:
             HLTBase.update({"steps":"L1REPACK,HLT:%s" % (options.HLT),
                             "custcommands":"\ntry:\n\tif process.RatesMonitoring in process.schedule: process.schedule.remove( process.RatesMonitoring );\nexcept: pass",
@@ -299,13 +299,14 @@ def getDriverDetails(Type, release, ds, B0T, HIon, pA, cosmics, recoRelease):
                             "lumiToProcess":"step1_lumi_ranges.txt"})
 
         else:
-            HLTBase.update({"steps":"L1REPACK:Full,HLT",
+            HLTBase.update({"steps":"L1REPACK,HLT",
                             "custcommands":"\ntry:\n\tif process.RatesMonitoring in process.schedule: process.schedule.remove( process.RatesMonitoring );\nexcept: pass",
                             "custconditions":"",
                             #"datatier":"RAW",
                             #"eventcontent":"RAW",
                             "magfield":""})
 
+        if Type == 'EXPR+RECO': HLTBase.update({'reqtype': 'EXPRESS'})
         HLTRECObase = {"steps":"RAW2DIGI,L1Reco,RECO,EI,PAT,DQM:DQMOffline+offlineValidationHLTSource",
                         "procname":"reRECO",
                         "datatier":"RECO,DQMIO",

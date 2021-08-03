@@ -347,7 +347,8 @@ I will ask you some questions to fill the metadata file. For some of the questio
 
         try:
             if metadata['HLT_release']:
-                cond_submit_command += '|& tee cond_HLT.log'
+                wtype = 'EXPRESS' if metadata['options']['Type']=='EXPR+RECO' else 'HLT'
+                cond_submit_command += '|& tee cond_%s.log'%(wtype)
         except KeyError:
             cond_submit_command += '|& tee cond_PR.log'
 
@@ -374,8 +375,9 @@ I will ask you some questions to fill the metadata file. For some of the questio
 
         try:
             if metadata['HLT_release']:
-                commands.append('./wmcontrol.py --req_file %sConditionValidation_%s_%s_%s.conf |& tee wmc_HLT.log' % (
-                        'EXPRESS' if 'EXPR+RECO' in type else 'HLT', metadata['HLT_release'], metadata['options']['basegt'], run_label_for_fn))
+                wtype = 'EXPRESS' if metadata['options']['Type']=='EXPR+RECO' else 'HLT'
+                commands.append('./wmcontrol.py --req_file %sConditionValidation_%s_%s_%s.conf |& tee wmc_%s.log' % (
+                        wtype, metadata['HLT_release'], metadata['options']['basegt'], run_label_for_fn, wtype))
         except KeyError:
             commands.append('./wmcontrol.py --req_file PRConditionValidation_%s_%s_%s.conf |& tee wmc_PR.log' % (
                         metadata['PR_release'], metadata['options']['newgt'], run_label_for_fn))
