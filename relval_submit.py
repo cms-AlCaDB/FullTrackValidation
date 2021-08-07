@@ -15,7 +15,7 @@ __version__ = 1
 import os
 import sys
 import logging
-import optparse
+import argparse
 import json
 import errno
 import ast
@@ -101,11 +101,17 @@ def main():
     '''Entry point.
     '''
 
-    parser = optparse.OptionParser(usage='Usage: %prog <file> [<file> ...]\n')
-    (options, arguments) = parser.parse_args()
+    parser = argparse.ArgumentParser(description='Generate list of commands.')
+    parser.add_argument("-f", dest="filename", type=str, help="json file name as input")
+    parser.add_argument("--dry",
+                  action="store_true", dest="dry", default=False,
+                  help="Print list of commands for doing dry run")
+    arguments = parser.parse_args()
 
     try:
-        metadataFilename = arguments[0]
+        if arguments.filename==None: raise TypeError("Please provide input json file using -f option")
+        metadataFilename = arguments.filename
+        
     except IndexError:
         logging.error('Need to suply a metadata text file name')
         return -3
@@ -311,7 +317,7 @@ I will ask you some questions to fill the metadata file. For some of the questio
                 commands.append('scramv1 project %s' % (metadata['HLT_release']))
                 commands.append('cd %s/src' % (metadata['HLT_release']))
                 #commands.append('eval \'scramv1 runtime -sh\'')
-                commands.append('cmsenv')
+                commands.append('eval `scramv1 runtime -sh`')
                 commands.append('git cms-addpkg HLTrigger/Configuration')
                 #commands.append('eval \'scramv1 b\'')
                 commands.append('scramv1 b')
@@ -327,7 +333,7 @@ I will ask you some questions to fill the metadata file. For some of the questio
             commands.append('scramv1 project %s' % (metadata['PR_release']))
             commands.append('cd %s/src' % (metadata['PR_release']))
             #commands.append('eval \'scramv1 runtime -sh\'')
-            commands.append('cmsenv')
+            commands.append('eval `scramv1 runtime -sh`')
             #commands.append('voms-proxy-init --voms cms') # it is already in subSetup_slc6.sh
             commands.append('cd -')
 
@@ -344,6 +350,7 @@ I will ask you some questions to fill the metadata file. For some of the questio
                 cond_submit_command += '--%s "%s" ' % (key, val)
             else:
                 cond_submit_command += '--%s %s ' % (key, val)
+        if arguments.dry: cond_submit_command += '--dry '
 
         try:
             if metadata['HLT_release']:
@@ -353,7 +360,7 @@ I will ask you some questions to fill the metadata file. For some of the questio
             cond_submit_command += '|& tee cond_PR.log'
 
         #commands.append(' git clone -b master git@github.com:cms-PdmV/wmcontrol.git  master-my-local-name    (**make sure that that PdmV master is the one you want to use**)')
-        commands.append('cd wmcontrol')
+        commands.append('cd AlCaDB-WMControl')
         commands.append(cond_submit_command)
 
         # compose string representing runs, Which will be part of the filename
@@ -373,16 +380,19 @@ I will ask you some questions to fill the metadata file. For some of the questio
                     run_label_for_fn += '_'
                 run_label_for_fn += str(oneRun)
 
-        try:
-            if metadata['HLT_release']:
-                wtype = 'EXPRESS' if metadata['options']['Type']=='EXPR+RECO' else 'HLT'
-                commands.append('./wmcontrol.py --req_file %sConditionValidation_%s_%s_%s.conf |& tee wmc_%s.log' % (
-                        wtype, metadata['HLT_release'], metadata['options']['basegt'], run_label_for_fn, wtype))
-        except KeyError:
-            commands.append('./wmcontrol.py --req_file PRConditionValidation_%s_%s_%s.conf |& tee wmc_PR.log' % (
-                        metadata['PR_release'], metadata['options']['newgt'], run_label_for_fn))
-
-        commands.append('rm *.couchID')
+        if not arguments.dry:
+            try:
+                if metadata['HLT_release']:
+                    wtype = 'EXPRESS' if metadata['options']['Type']=='EXPR+RECO' else 'HLT'
+                    commands.append('./wmcontrol.py --req_file %sConditionValidation_%s_%s_%s.conf |& tee wmc_%s.log' % (
+                            wtype, metadata['HLT_release'], metadata['options']['basegt'], run_label_for_fn, wtype))
+            except KeyError:
+                commands.append('./wmcontrol.py --req_file PRConditionValidation_%s_%s_%s.conf |& tee wmc_PR.log' % (
+                            metadata['PR_release'], metadata['options']['newgt'], run_label_for_fn))
+            commands.append('rm *.couchID')
+        else:
+            commands.append('chmod +x cmsDrivers.sh')
+            commands.append('./cmsDrivers.sh')
 
         dryrun = True
         # now execute commands

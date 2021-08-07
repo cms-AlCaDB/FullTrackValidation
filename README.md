@@ -5,7 +5,13 @@
 
 Start with this command and it will help you proceed
 ```
-./relval_submit.py ../metadata.json
+./relval_submit.py -f ../metadata.json
 ```
+
+Perform a dry run using
+```
+./relval_submit.py -f ../metadata.json --dry
+```
+
 
 
