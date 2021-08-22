@@ -14,7 +14,7 @@ pipeline {
               recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']],
               subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
               to: 'physics.pritam@gmail.com',
-              attachLog: true, compressLog: true,
+              attachLog: true, compressLog: true
       }
   }
 }
