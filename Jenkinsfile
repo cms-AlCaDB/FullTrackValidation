@@ -3,7 +3,7 @@ pipeline {
   stages {
     stage('Test') {
       steps {
-        sh 'echo "This is a test. Ignore!!!!\\n"'
+        sh 'echo "This is a test. Ignore!!!\\n"'
       }
     }
 
