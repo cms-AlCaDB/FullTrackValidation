@@ -3,7 +3,7 @@ pipeline {
   stages {
     stage('Test') {
       steps {
-        sh('echo "This is a test. To see if collaborator who pushed changes can also receive an email of a build.\\n"')
+        sh('echo "This is a test. To see if collaborator who pushed changes can also receive an email of a build!\\n"')
       }
     }
 
