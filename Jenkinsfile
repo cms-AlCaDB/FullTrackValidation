@@ -6,7 +6,6 @@ pipeline {
         sh('echo "This is a test. To see if collaborator who pushed changes can also receive an email of a build! 2nd Test!!!!\\n"')
       }
     }
-
   }
   post {
       always {
@@ -15,6 +14,9 @@ pipeline {
               subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
               to: 'physics.pritam@gmail.com',
               attachLog: true
+      }
+      always {
+          archiveArtifacts artifacts: 'wmcontrol.py', fingerprint: true
       }
   }
 }
