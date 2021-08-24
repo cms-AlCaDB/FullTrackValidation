@@ -14,9 +14,8 @@ pipeline {
               subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
               to: 'physics.pritam@gmail.com',
               attachLog: true
-      }
-      always {
           archiveArtifacts artifacts: 'wmcontrol.py', fingerprint: true
       }
+
   }
 }
