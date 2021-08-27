@@ -7,9 +7,6 @@ class JiraAPI:
    key = '/afs/cern.ch/user/p/pkalbhor/private/userkey.pem'
    def __init__(self, args, username, password):
       self.args = args
-      print("Type of", type(username), type(password))
-      print(" ".join(username), " ".join(password))
-      print(username, password)
       self.connection = self.get_jira_client(username, password)
 
    def get_jira_client(self, username, password):

@@ -6,15 +6,17 @@ pipeline {
     JIRA_CREDENTIALS = credentials('jirapass')
   }
   agent any
+  options {
+    // This is required if you want to clean before build
+    skipDefaultCheckout(true)
+  }
   stages {
     stage('Input Processing') {
       steps{
+        cleanWs()
+        checkout scm
         sh('./process_input.py ${JIRA_CREDENTIALS_USR} ${JIRA_CREDENTIALS_PSW}')
-      }
-      post {
-        always {
-          archiveArtifacts(artifacts: '*.json', fingerprint: true)
-        }
+        stash includes: '*.json', name: 'json'
       }
     }
 
@@ -25,11 +27,14 @@ pipeline {
             label "lxplus1"
           }
           steps {
+            cleanWs()
+            checkout scm
+            unstash 'json'
             sh 'echo "This is a test. To see if collaborator who pushed changes can also receive an email of a build! 2nd Test!!!!\\n"'
           }
           post {
             always {
-              archiveArtifacts(artifacts: 'wmcontrol.py', fingerprint: true)
+              archiveArtifacts(artifacts: '*.log', fingerprint: true)
             }
           }
         }
@@ -39,11 +44,14 @@ pipeline {
             label "lxplus2"
           }
           steps {
+            cleanWs()
+            checkout scm
+            unstash 'json'
             echo 'Testing Express workflow'
           }
           post {
             always {
-              archiveArtifacts(artifacts: 'wmcontrol.py', fingerprint: true)
+              archiveArtifacts(artifacts: '*.log', fingerprint: true)
             }
           }
         }
@@ -53,11 +61,14 @@ pipeline {
             label "lxplus3"
           }
           steps {
+            cleanWs()
+            checkout scm
+            unstash 'json'
             echo 'Testing PR workflow'
           }
           post {
             always {
-              archiveArtifacts(artifacts: 'wmcontrol.py', fingerprint: true)
+              archiveArtifacts(artifacts: '*.log', fingerprint: true)
             }
           }
         }
