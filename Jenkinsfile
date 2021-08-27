@@ -1,6 +1,15 @@
 pipeline {
-  agent any
+  environment {
+    //This variable need be tested as string
+    doError = '0'
+    VOMS_CREDENTIALS = credentials('gridpass')
+    JIRA_CREDENTIALS = credentials('jirapass')
+  }
+  agent none
   stages {
+    stage('Input Processing') {
+      sh('./process_input.py ${VOMS_CREDENTIALS_USR} ${VOMS_CREDENTIALS_PSW}')
+    }
     stage('Test') {
       parallel {
         stage('HLT Test') {

@@ -4,3 +4,5 @@
 *.swp
 *.conf
 *.so
+*.json
+_NewValidation.txt
