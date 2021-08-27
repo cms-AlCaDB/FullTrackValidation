@@ -5,12 +5,9 @@ pipeline {
     VOMS_CREDENTIALS = credentials('gridpass')
     JIRA_CREDENTIALS = credentials('jirapass')
   }
-  agent none
+  agent any
   stages {
     stage('Input Processing') {
-      agent {
-        label any
-      }
       steps{
         sh('./process_input.py ${VOMS_CREDENTIALS_USR} ${VOMS_CREDENTIALS_PSW}')
       }
