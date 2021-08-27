@@ -8,8 +8,11 @@ pipeline {
   agent none
   stages {
     stage('Input Processing') {
-      sh('./process_input.py ${VOMS_CREDENTIALS_USR} ${VOMS_CREDENTIALS_PSW}')
+      steps{
+        sh('./process_input.py ${VOMS_CREDENTIALS_USR} ${VOMS_CREDENTIALS_PSW}')
+      }
     }
+
     stage('Test') {
       parallel {
         stage('HLT Test') {
