@@ -33,7 +33,7 @@ pipeline {
             sh 'echo "This is a test. To see if collaborator who pushed changes can also receive an email of a build! 2nd Test!!!!\\n"'
           }
           post {
-            always {
+            success {
               archiveArtifacts(artifacts: '*.log', fingerprint: true)
             }
           }
@@ -44,13 +44,13 @@ pipeline {
             label "lxplus2"
           }
           steps {
-            cleanWs()
+            preBuildCleanup()
             checkout scm
             unstash 'json'
             echo 'Testing Express workflow'
           }
           post {
-            always {
+            success {
               archiveArtifacts(artifacts: '*.log', fingerprint: true)
             }
           }
@@ -62,12 +62,12 @@ pipeline {
           }
           steps {
             cleanWs()
-            checkout scm
+            checkout scm  
             unstash 'json'
             echo 'Testing PR workflow'
           }
           post {
-            always {
+            success {
               archiveArtifacts(artifacts: '*.log', fingerprint: true)
             }
           }
