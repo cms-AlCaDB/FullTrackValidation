@@ -8,6 +8,9 @@ pipeline {
   agent none
   stages {
     stage('Input Processing') {
+      agent {
+        label any
+      }
       steps{
         sh('./process_input.py ${VOMS_CREDENTIALS_USR} ${VOMS_CREDENTIALS_PSW}')
       }
