@@ -34,7 +34,7 @@ pipeline {
           }
           post {
             success {
-              archiveArtifacts(artifacts: '*.log', fingerprint: true)
+              archiveArtifacts(artifacts: 'wmcontrol.py', fingerprint: true)
             }
           }
         }
@@ -44,14 +44,19 @@ pipeline {
             label "lxplus2"
           }
           steps {
-            preBuildCleanup()
+            wrapper {
+              preBuildCleanup {
+                deleteDirectories()
+                cleanupParameter('CLEANUP')
+              }
+            }
             checkout scm
             unstash 'json'
             echo 'Testing Express workflow'
           }
           post {
             success {
-              archiveArtifacts(artifacts: '*.log', fingerprint: true)
+              archiveArtifacts(artifacts: 'wmcontrol.py', fingerprint: true)
             }
           }
         }
@@ -68,7 +73,7 @@ pipeline {
           }
           post {
             success {
-              archiveArtifacts(artifacts: '*.log', fingerprint: true)
+              archiveArtifacts(artifacts: 'wmcontrol.py', fingerprint: true)
             }
           }
         }
