@@ -44,12 +44,7 @@ pipeline {
             label "lxplus2"
           }
           steps {
-            wrapper {
-              preBuildCleanup {
-                deleteDirectories()
-                cleanupParameter('CLEANUP')
-              }
-            }
+            cleanWs()
             checkout scm
             unstash 'json'
             echo 'Testing Express workflow'
