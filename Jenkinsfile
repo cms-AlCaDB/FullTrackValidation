@@ -9,8 +9,12 @@ pipeline {
   stages {
     stage('Input Processing') {
       steps{
-        sh("echo ${VOMS_CREDENTIALS_USR} ${VOMS_CREDENTIALS_PSW}")
         sh('./process_input.py ${JIRA_CREDENTIALS_USR} ${JIRA_CREDENTIALS_PSW}')
+      }
+      post {
+        always {
+          archiveArtifacts(artifacts: '*.json', fingerprint: true)
+        }
       }
     }
 
