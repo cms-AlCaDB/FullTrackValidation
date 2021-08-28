@@ -54,7 +54,7 @@ def build_HLT_workflow(args):
 		options['cosmics'] = ""
 	options['HLT'] 			 = "Custom"
 	options['Type'] 		 = "HLT+RECO"
-	options['HLTCustomMenu'] = "ofcoff:"+oms['hlt_key']
+	options['HLTCustomMenu'] = "orcoff:"+oms['hlt_key']
 	options['ds']			 = args['Dataset']
 	options['basegt']		 = args['ReferenceGT_PROMPT']
 	options['gt']			 = args['ReferenceGT_HLT']
@@ -79,7 +79,7 @@ def build_Express_workflow(args):
 		options['cosmics'] = ""
 	options['HLT'] 			 = "Custom"
 	options['Type'] 		 = "EXPR+RECO"
-	options['HLTCustomMenu'] = "ofcoff:"+oms['hlt_key']
+	options['HLTCustomMenu'] = "orcoff:"+oms['hlt_key']
 	options['ds']			 = args['Dataset']
 	options['basegt']		 = args['ReferenceGT_PROMPT']
 	options['gt']			 = args['ReferenceGT_EXPRESS']
@@ -111,6 +111,20 @@ def build_Prompt_workflow(args):
 	options['jira']		 	 = str(args['Jira'])
 	options['two_WFs']		 = ""
 	return prompt_dict
+
+def check_requirements():
+	import pkg_resources
+	required = list()
+	with open('requirements.txt', 'r') as f:
+		for line in f:
+			required.append(line.strip())
+
+	installed_packages = pkg_resources.working_set
+	packages = [i.key for i in installed_packages]
+	print(packages, required)
+	for pkg in required:
+		if not pkg in packages:
+			os.system("pip3 install {} --user".format(pkg))
 
 if __name__ == '__main__':
 	args  = get_arguments()

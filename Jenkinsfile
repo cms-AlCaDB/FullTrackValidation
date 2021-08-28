@@ -27,7 +27,6 @@ pipeline {
             label "lxplus1"
           }
           steps {
-            buildName "Clean before build!"
             cleanWs()
             checkout scm
             unstash 'json'

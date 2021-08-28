@@ -311,7 +311,7 @@ I will ask you some questions to fill the metadata file. For some of the questio
         try:
             if metadata['HLT_release']:
                 #commands.append('eval \'scramv1 project %s\'' % metadata['HLT_release'] )
-                commands.append('source /afs/cern.ch/cms/PPD/PdmV/tools/subSetupAuto.sh')
+                commands.append('source bash/wmsetup.sh')
                 commands.append('cd ..')
                 #commands.append('cd %s/..' % os.getcwd())
                 commands.append('scramv1 project %s' % (metadata['HLT_release']))
@@ -328,7 +328,7 @@ I will ask you some questions to fill the metadata file. For some of the questio
                     commands.append('scramv1 project %s' % (metadata['PR_release']))
         except KeyError:
             #commands.append('eval \'scramv1 project %s\'' % metadata['PR_release'] )
-            commands.append('source /afs/cern.ch/cms/PPD/PdmV/tools/subSetupAuto.sh') #subSetup_slc6.sh')
+            commands.append('source bash/wmsetup.sh') #subSetupAuto.sh') #subSetup_slc6.sh')
             commands.append('cd ..')
             commands.append('scramv1 project %s' % (metadata['PR_release']))
             commands.append('cd %s/src' % (metadata['PR_release']))
