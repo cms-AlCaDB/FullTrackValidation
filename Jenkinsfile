@@ -75,7 +75,22 @@ pipeline {
 
       }
     }
-
+    stage('Create Jira Ticket') {
+      when {
+        expression { doError == '1' }
+      }
+      steps {
+        echo "Creating a Jira ticket for further discussion"
+      }
+    }
+    stage('Email') {
+      when {
+        expression { doError == '1' }
+      }
+      steps {
+        echo "Sending email request to AlCa Hypernews"
+      }
+    }
   }
   post {
     always {
