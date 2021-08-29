@@ -82,7 +82,7 @@ pipeline {
     }
     stage('Create Jira Ticket') {
       when {
-        expression { doError == '0' }
+        expression { env.Validate == 'Yes' }
       }
       steps {
         echo "Creating a Jira ticket for further discussion"
@@ -90,7 +90,7 @@ pipeline {
     }
     stage('Email') {
       when {
-        expression { doError == '0' }
+        expression { env.Validate == 'No' }
       }
       steps {
         echo "Sending email request to AlCa Hypernews"
@@ -98,7 +98,7 @@ pipeline {
     }
     stage('Submission') {
       when {
-        expression { doError == '0' }
+        expression { env.Validate == 'Yes' }
       }
       steps {
         echo "Submitting request to Request Manager/WMAgent production tool."
@@ -106,7 +106,7 @@ pipeline {
     }
     stage('Twiki update') {
       when {
-        expression { doError == '0' }
+        expression { env.Validate == 'Yes' }
       }
       steps {
         echo "Creating validation report on dedicated Twiki"
