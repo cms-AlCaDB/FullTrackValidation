@@ -21,7 +21,7 @@ pipeline {
             def props = readProperties file: 'envs.properties' 
             env.Validate = props.Validate
         }
-        echo "The username  is $Username"
+        echo "The username  is ${Validate}"
       }
     }
 
