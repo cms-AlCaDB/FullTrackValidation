@@ -17,6 +17,11 @@ pipeline {
         checkout scm
         sh('./process_input.py ${JIRA_CREDENTIALS_USR} ${JIRA_CREDENTIALS_PSW}')
         stash includes: '*.json', name: 'json'
+        script {
+            def props = readProperties file: 'envs.properties' 
+            env.Validate = props.Validate
+        }
+        echo "The username  is $Username"
       }
     }
 
@@ -77,7 +82,7 @@ pipeline {
     }
     stage('Create Jira Ticket') {
       when {
-        expression { doError == '1' }
+        expression { doError == '0' }
       }
       steps {
         echo "Creating a Jira ticket for further discussion"
@@ -85,10 +90,26 @@ pipeline {
     }
     stage('Email') {
       when {
-        expression { doError == '1' }
+        expression { doError == '0' }
       }
       steps {
         echo "Sending email request to AlCa Hypernews"
+      }
+    }
+    stage('Submission') {
+      when {
+        expression { doError == '0' }
+      }
+      steps {
+        echo "Submitting request to Request Manager/WMAgent production tool."
+      }
+    }
+    stage('Twiki update') {
+      when {
+        expression { doError == '0' }
+      }
+      steps {
+        echo "Creating validation report on dedicated Twiki"
       }
     }
   }

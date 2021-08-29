@@ -145,4 +145,6 @@ if __name__ == '__main__':
 		rfile = open("metadata_{}.json".format(wid), 'w')
 		json.dump(data, rfile, indent=2)
 		rfile.close()
-			
+	
+	properties = open("envs.properties", "w")
+	properties.write("Validate = {}".format(args['Validate']))
