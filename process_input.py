@@ -158,5 +158,5 @@ if __name__ == '__main__':
 	
 	properties = open("envs.properties", "w")
 	properties.write("Validate = {}".format(args['Validate']))
-	properties.write("Title = {}".format(args['Title']))
+	properties.write("\nTitle = {}".format(args['Title']))
 	# properties.write("Week = {}".format(v if 'Week' in v for v in args['Lables']))
