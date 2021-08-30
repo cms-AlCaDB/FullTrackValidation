@@ -35,11 +35,12 @@ pipeline {
             cleanWs()
             checkout scm
             unstash 'json'
-            sh 'echo "This is a test. To see if collaborator who pushed changes can also receive an email of a build! 2nd Test!!!!\\n"'
+            sh('./relval_submit.py -f metadata_HLT.json --dry')
+            sh('./commands_in_one_go.sh')
           }
           post {
             success {
-              archiveArtifacts(artifacts: 'wmcontrol.py', fingerprint: true)
+              archiveArtifacts(artifacts: 'cmsDrivers_*.sh', fingerprint: true)
             }
           }
         }
@@ -52,11 +53,12 @@ pipeline {
             cleanWs()
             checkout scm
             unstash 'json'
-            echo 'Testing Express workflow'
+            sh('./relval_submit.py -f metadata_Express.json --dry')
+            sh('./commands_in_one_go.sh')
           }
           post {
             success {
-              archiveArtifacts(artifacts: 'wmcontrol.py', fingerprint: true)
+              archiveArtifacts(artifacts: 'cmsDrivers_*.sh', fingerprint: true)
             }
           }
         }
@@ -69,11 +71,12 @@ pipeline {
             cleanWs()
             checkout scm  
             unstash 'json'
-            echo 'Testing PR workflow'
+            sh('./relval_submit.py -f metadata_Prompt.json --dry')
+            sh('./commands_in_one_go.sh')
           }
           post {
             success {
-              archiveArtifacts(artifacts: 'wmcontrol.py', fingerprint: true)
+              archiveArtifacts(artifacts: 'cmsDrivers_*.sh', fingerprint: true)
             }
           }
         }
@@ -90,7 +93,7 @@ pipeline {
     }
     stage('Email') {
       when {
-        expression { env.Validate == 'No' }
+        expression { env.Validate == 'Yes' }
       }
       steps {
         echo "Sending email request to AlCa Hypernews"

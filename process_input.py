@@ -45,6 +45,9 @@ def build_HLT_workflow(args, run):
 	if args['HLT_release'] == 'None':
 		hlt_dict['HLT_release'] = oms['cmssw_version']
 		hlt_dict['PR_release'] = oms['cmssw_version']
+	else:
+		hlt_dict['HLT_release'] = args['HLT_release']
+		hlt_dict['PR_release'] = args['PR_release']
 	options = hlt_dict['options'] = dict()
 	if round(oms['b_field'])==0:
 		options['B0T'] = ""
@@ -68,6 +71,9 @@ def build_Express_workflow(args, run):
 	if args['HLT_release'] == 'None':
 		express_dict['HLT_release'] = oms['cmssw_version']
 		express_dict['PR_release'] = oms['cmssw_version']
+	else:
+		express_dict['HLT_release'] = args['HLT_release']
+		express_dict['PR_release'] = args['PR_release']
 	options = express_dict['options'] = dict()
 	if round(oms['b_field'])==0:
 		options['B0T'] = ""

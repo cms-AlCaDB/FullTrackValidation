@@ -393,6 +393,26 @@ I will ask you some questions to fill the metadata file. For some of the questio
         else:
             commands.append('chmod +x cmsDrivers.sh')
             commands.append('./cmsDrivers.sh')
+            if metadata['options']['Type']=='EXPR+RECO' or metadata['options']['Type']=='HLT+RECO':
+                commands.append('cp cmsDrivers.sh cmsDrivers_{}.sh'.format(metadata['options']['Type'].split('+')[0]))
+                commands.append('cmsRun NEWCONDITIONS0.py')
+                commands.append('cmsRun recodqm.py')
+                commands.append('cmsRun step4_newco_HARVESTING.py')
+                commands.append('mv DQM*.root {}_newco_DQMoutput.root'.format(metadata['options']['Type'].split('+')[0]))
+                commands.append('rm step*.root')
+                commands.append('cmsRun REFERENCE.py')
+                commands.append('cmsRun recodqm.py')
+                commands.append('cmsRun step4_refer_HARVESTING.py')
+                commands.append('mv DQM*.root {}_refer_DQMoutput.root'.format(metadata['options']['Type'].split('+')[0]))
+            elif metadata['options']['Type']=='PR':
+                commands.append('cp cmsDrivers.sh cmsDrivers_PR.sh')
+                commands.append('cmsRun NEWCONDITIONS0.py')
+                commands.append('cmsRun step4_newco_HARVESTING.py')
+                commands.append('mv DQM*.root PR_newco_DQMoutput.root')
+                commands.append('rm step*.root')
+                commands.append('cmsRun REFERENCE.py')
+                commands.append('cmsRun step4_refer_HARVESTING.py')
+                commands.append('mv DQM*.root PR_refer_DQMoutput.root')
 
         dryrun = True
         # now execute commands
@@ -407,6 +427,10 @@ I will ask you some questions to fill the metadata file. For some of the questio
             else:
                 command_comb += command
         print(command_comb)
+        with open("commands_in_one_go.sh", "w") as f:
+            f.write("#!/bin/bash\n")
+            f.write(command_comb)
+        os.system("chmod +x commands_in_one_go.sh")
 
 if __name__ == '__main__':
     logging.basicConfig(format='[%(asctime)s] %(levelname)s: %(message)s',
