@@ -11,7 +11,7 @@ TargetGT_EXPRESS        : 113X_dataRun3_Express_Candidate_2021_08_13_17_09_06
 TargetGT_PROMPT         : 113X_dataRun3_Prompt_Candidate_2021_08_13_17_08_32
 
 
-# Target GTs here
+# Reference GTs here
 #-------------------------------------------------------------------------------
 ReferenceGT_HLT         : 113X_dataRun3_HLT_v3
 ReferenceGT_EXPRESS     : 113X_dataRun3_HLT_v3
