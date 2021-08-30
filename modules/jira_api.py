@@ -15,22 +15,25 @@ class JiraAPI:
                   options={'check_update': False, 'verify': self.CERN_CA_BUNDLE, 'client_cert': (self.cert, self.key)})
 
    def create_issue(self):
-      jira = get_jira_client()
-      new_issue = jira.create_issue(project='CMSALCA', issuetype={'name': 'Task'})
+      """Create new JIRA ticket"""
+      pass
 
-      Summary = "[HLT/EXPRESS/PROMPT] Full track validation of "
-      Summary += Title
-      Summary += " (Week 32, 2021)"
-      new_issue.update(summary=Summary)
-      new_issue.update(description='Desciption comming soon!')
-      new_issue.update(assignee={'name': 'pkalbhor'})
+      # jira = get_jira_client()
+      # new_issue = jira.create_issue(project='CMSALCA', issuetype={'name': 'Task'})
+
+      # Summary = "[HLT/EXPRESS/PROMPT] Full track validation of "
+      # Summary += Title
+      # Summary += " (Week 32, 2021)"
+      # new_issue.update(summary=Summary)
+      # new_issue.update(description='Desciption comming soon!')
+      # new_issue.update(assignee={'name': 'pkalbhor'})
 
    def check_duplicate(self):
       # Summaries of my last 3 reported issues
       for issue in self.connection.search_issues('project=CMSALCA order by created desc', maxResults=5):
          labels = set(issue.fields.labels)
          if labels == set(self.args['Labels']):
-            print(">> Labels ", labels, " matching with ticket: ", issue.key, ". Not creating new ticket !")
+            print(">> Labels ", labels, " matching with ticket: ", issue.key, "!")
             return issue.key
       return False
 
@@ -40,6 +43,8 @@ class JiraAPI:
 
 if __name__ == '__main__':
    args = dict()
-   api = JiraAPI(args)
+   sysArgs = sys.argv
+   api = JiraAPI(args, sysArgs[1], sysArgs[2])
+   ticket = api.check_duplicate()
    # jira = api.get_jira_client()
    # issue = jira.issue("CMSALCA-135")

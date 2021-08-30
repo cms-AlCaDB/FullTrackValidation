@@ -1,7 +1,7 @@
 pipeline {
   environment {
     //This variable need be tested as string
-    doError = '0'
+    doTest = '0'
     VOMS_CREDENTIALS = credentials('gridpass')
     JIRA_CREDENTIALS = credentials('jirapass')
   }
@@ -20,16 +20,19 @@ pipeline {
         script {
             def props = readProperties file: 'envs.properties' 
             env.Validate = props.Validate
+            env.Title = props.Title
         }
-        echo "The username  is ${Validate}"
       }
     }
 
     stage('Test') {
       parallel {
         stage('HLT Test') {
+          when {
+            expression { doTest == '1' }
+          }
           agent {
-            label "lxplus1"
+            label "lxplus"
           }
           steps {
             cleanWs()
@@ -47,8 +50,11 @@ pipeline {
         }
 
         stage('Express Test') {
+          when {
+            expression { doTest == '1' }
+          }
           agent {
-            label "lxplus2"
+            label "lxplus"
           }
           steps {
             cleanWs()
@@ -66,8 +72,11 @@ pipeline {
         }
 
         stage('PR Test') {
+          when {
+            expression { doTest == '1' }
+          }
           agent {
-            label "lxplus3"
+            label "lxplus"
           }
           steps {
             cleanWs()
@@ -91,7 +100,7 @@ pipeline {
         expression { env.Validate == 'Yes' }
       }
       steps {
-        echo "Creating a Jira ticket for further discussion"
+        sh('./createTicket.py ${JIRA_CREDENTIALS_USR} ${JIRA_CREDENTIALS_PSW}')
       }
     }
     stage('Email') {
@@ -100,6 +109,7 @@ pipeline {
       }
       steps {
         echo "Sending email request to AlCa Hypernews"
+        emailext(body: "This is a TEST! Please ignore", subject: "[HLT/EXPRESS/PROMPT] Full track validation for ${env.Validate}", to: 'hn-cms-hnTest@cern.ch')
       }
     }
     stage('Submission') {
