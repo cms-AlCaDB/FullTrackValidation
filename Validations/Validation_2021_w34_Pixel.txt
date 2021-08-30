@@ -2,7 +2,7 @@ Title                   : Pixel gain calibrations for CRUZET
 
 # Labels: List of labels separated by comma. Keep it unique for given validation
 #-------------------------------------------------------------------------------
-Labels                  : PIXEL, Week27
+Labels                  : PIXEL, Week32
 
 # Target GTs here
 #-------------------------------------------------------------------------------
@@ -34,13 +34,11 @@ Validate                : Yes
 
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
-#------------------------------ OPTIONAL ---------------------------------------
+#------- OPTIONAL -------- OPTIONAL -------- OPTIONAL --------- OPTIONAL -------
 
-# Specify CMSSW release for HLT and EXPRESS workflow in HLT_release
-# If nothing specified then production version of the given run will be used
 #-------------------------------------------------------------------------------
-HLT_release             : None
-
-# Specify CMSSW release for PROMPT workflow in HLT_release
-#-------------------------------------------------------------------------------
-PR_release              : None
+HLT_release             : CMSSW_11_3_4
+PR_release              : CMSSW_11_3_4
+b_field                 : 0
+class                   : Cosmics21CRUZET
+hlt_key                 : /cdaq/cosmic/commissioning2021/CRUZET/Cosmics/V4

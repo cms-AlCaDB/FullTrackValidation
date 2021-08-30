@@ -38,15 +38,13 @@ def get_mappings():
 	mappings['ReferenceGT_PROMPT']  = 'gt'
 	mappings['Dataset']			= 'ds'
 
-def build_HLT_workflow(args):
+def build_HLT_workflow(args, run):
 	hlt_dict = dict()
-	run_number = args['Run'].split(":")[0].strip("{").strip("'")
-	run = get_run(run_number)
 	oms = run['oms_attributes']
 
 	if args['HLT_release'] == 'None':
-		hlt_dict['HLT_release'] = run['oms_attributes']['cmssw_version']
-		hlt_dict['PR_release'] = run['oms_attributes']['cmssw_version']
+		hlt_dict['HLT_release'] = oms['cmssw_version']
+		hlt_dict['PR_release'] = oms['cmssw_version']
 	options = hlt_dict['options'] = dict()
 	if round(oms['b_field'])==0:
 		options['B0T'] = ""
@@ -63,15 +61,13 @@ def build_HLT_workflow(args):
 	options['jira']		 	 = args['Jira']
 	return hlt_dict
 
-def build_Express_workflow(args):
+def build_Express_workflow(args, run):
 	express_dict = dict()
-	run_number = args['Run'].split(":")[0].strip("{").strip("'")
-	run = get_run(run_number)
 	oms = run['oms_attributes']
 
 	if args['HLT_release'] == 'None':
-		express_dict['HLT_release'] = run['oms_attributes']['cmssw_version']
-		express_dict['PR_release'] = run['oms_attributes']['cmssw_version']
+		express_dict['HLT_release'] = oms['cmssw_version']
+		express_dict['PR_release'] = oms['cmssw_version']
 	options = express_dict['options'] = dict()
 	if round(oms['b_field'])==0:
 		options['B0T'] = ""
@@ -88,14 +84,12 @@ def build_Express_workflow(args):
 	options['jira']		 	 = args['Jira']
 	return express_dict
 
-def build_Prompt_workflow(args):
+def build_Prompt_workflow(args, run):
 	prompt_dict = dict()
-	run_number = args['Run'].split(":")[0].strip("{").strip("'")
-	run = get_run(run_number)
 	oms = run['oms_attributes']
 
 	if args['PR_release'] == 'None':
-		prompt_dict['PR_release'] = run['oms_attributes']['cmssw_version']
+		prompt_dict['PR_release'] = oms['cmssw_version']
 	else:
 		prompt_dict['PR_release'] = args['PR_release']
 	options = prompt_dict['options'] = dict()
@@ -137,9 +131,19 @@ if __name__ == '__main__':
 	else:
 		args["Jira"] = int(ticket.split('-')[1].strip())
 
-	hlt_dict 	 = build_HLT_workflow(args)
-	express_dict = build_Express_workflow(args)
-	prompt_dict  = build_Prompt_workflow(args)
+	run_number = args['Run'].split(":")[0].strip("{").strip("'")
+	try:
+		run = get_run(run_number)
+	except:
+		run = {'class': args['class']}
+		run['oms_attributes'] = {'cmssw_version': args['HLT_release'],
+								 'b_field': int(args['b_field']),
+								 'hlt_key': args['hlt_key']
+								}
+
+	hlt_dict 	 = build_HLT_workflow(args, run)
+	express_dict = build_Express_workflow(args, run)
+	prompt_dict  = build_Prompt_workflow(args, run)
 
 	for data, wid in zip([hlt_dict, express_dict, prompt_dict], ['HLT', 'Express', 'Prompt']):
 		rfile = open("metadata_{}.json".format(wid), 'w')
