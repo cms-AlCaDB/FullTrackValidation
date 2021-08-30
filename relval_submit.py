@@ -312,7 +312,7 @@ I will ask you some questions to fill the metadata file. For some of the questio
             if metadata['HLT_release']:
                 #commands.append('eval \'scramv1 project %s\'' % metadata['HLT_release'] )
                 commands.append('source bash/wmsetup.sh')
-                commands.append('cd ..')
+                #commands.append('cd ..')
                 #commands.append('cd %s/..' % os.getcwd())
                 commands.append('scramv1 project %s' % (metadata['HLT_release']))
                 commands.append('cd %s/src' % (metadata['HLT_release']))
@@ -329,7 +329,7 @@ I will ask you some questions to fill the metadata file. For some of the questio
         except KeyError:
             #commands.append('eval \'scramv1 project %s\'' % metadata['PR_release'] )
             commands.append('source bash/wmsetup.sh') #subSetupAuto.sh') #subSetup_slc6.sh')
-            commands.append('cd ..')
+            #commands.append('cd ..')
             commands.append('scramv1 project %s' % (metadata['PR_release']))
             commands.append('cd %s/src' % (metadata['PR_release']))
             #commands.append('eval \'scramv1 runtime -sh\'')
@@ -360,7 +360,7 @@ I will ask you some questions to fill the metadata file. For some of the questio
             cond_submit_command += '|& tee cond_PR.log'
 
         #commands.append(' git clone -b master git@github.com:cms-PdmV/wmcontrol.git  master-my-local-name    (**make sure that that PdmV master is the one you want to use**)')
-        commands.append('cd AlCaDB-WMControl')
+        # commands.append('cd AlCaDB-WMControl')
         commands.append(cond_submit_command)
 
         # compose string representing runs, Which will be part of the filename

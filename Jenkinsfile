@@ -35,6 +35,7 @@ pipeline {
             cleanWs()
             checkout scm
             unstash 'json'
+            sh('echo ${VOMS_CREDENTIALS_PSW} | voms-proxy-init --rfc --voms cms --pwstdin')
             sh('./relval_submit.py -f metadata_HLT.json --dry')
             sh('./commands_in_one_go.sh')
           }
@@ -53,6 +54,7 @@ pipeline {
             cleanWs()
             checkout scm
             unstash 'json'
+            sh('echo ${VOMS_CREDENTIALS_PSW} | voms-proxy-init --rfc --voms cms --pwstdin')
             sh('./relval_submit.py -f metadata_Express.json --dry')
             sh('./commands_in_one_go.sh')
           }
@@ -71,6 +73,7 @@ pipeline {
             cleanWs()
             checkout scm  
             unstash 'json'
+            sh('echo ${VOMS_CREDENTIALS_PSW} | voms-proxy-init --rfc --voms cms --pwstdin')
             sh('./relval_submit.py -f metadata_Prompt.json --dry')
             sh('./commands_in_one_go.sh')
           }
