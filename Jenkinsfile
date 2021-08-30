@@ -26,6 +26,9 @@ pipeline {
     }
 
     stage('Test') {
+      when {
+        expression { doTest == '1' }
+      }
       parallel {
         stage('HLT Test') {
           when {
