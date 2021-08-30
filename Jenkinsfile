@@ -1,7 +1,7 @@
 pipeline {
   environment {
     //This variable need be tested as string
-    doTest = '0'
+    doTest = '1'
     VOMS_CREDENTIALS = credentials('gridpass')
     JIRA_CREDENTIALS = credentials('jirapass')
   }
