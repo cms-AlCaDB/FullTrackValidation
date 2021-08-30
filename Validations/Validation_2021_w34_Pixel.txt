@@ -1,4 +1,4 @@
-Title                   : Pixel gain calibrations for CRUZET
+Title                   : Pixel gain calibrations for CRUZET 2021
 
 # Labels: List of labels separated by comma. Keep it unique for given validation
 #-------------------------------------------------------------------------------
