@@ -1,7 +1,7 @@
 pipeline {
   environment {
     //This variable need be tested as string
-    doTest = '0'
+    doTest = '1'
     VOMS_CREDENTIALS = credentials('gridpass')
     JIRA_CREDENTIALS = credentials('jirapass')
   }
@@ -112,7 +112,7 @@ pipeline {
       }
       steps {
         echo "Sending email request to AlCa Hypernews"
-        emailext(body: "This is a TEST! Please ignore", subject: "[HLT/EXPRESS/PROMPT] Full track validation for ${env.Validate}", to: 'hn-cms-hnTest@cern.ch')
+        emailext(body: "This is a TEST! Please ignore", subject: "[HLT/EXPRESS/PROMPT] Full track validation for ${env.Validate}", to: 'hn-cms-hnTest@cern.ch, physics.pritam@cern.ch')
       }
     }
     stage('Submission') {
