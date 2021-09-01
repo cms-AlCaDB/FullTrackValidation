@@ -4,6 +4,7 @@ pipeline {
     doTest = '1'
     VOMS_CREDENTIALS = credentials('gridpass')
     JIRA_CREDENTIALS = credentials('jirapass')
+    TEST_RESULT = "/eos/user/p/pkalbhor/AlCaValidations"
   }
   agent any
   options {
@@ -21,16 +22,19 @@ pipeline {
             def props = readProperties file: 'envs.properties' 
             env.Validate = props.Validate
             env.Title = props.Title
+            env.Week = props.Week
+            env.Year = props.Year
+            env.Labels = props.Labels
         }
       }
     }
 
-    stage('Test') {
+    stage('Local Tests') {
       when {
         expression { doTest == '1' }
       }
       parallel {
-        stage('HLT Test') {
+        stage('HLT New Test') {
           agent {
             label "lxplus"
           }
@@ -39,8 +43,9 @@ pipeline {
             checkout scm
             unstash 'json'
             sh('echo ${VOMS_CREDENTIALS_PSW} | voms-proxy-init --rfc --voms cms --pwstdin')
-            sh('./relval_submit.py -f metadata_HLT.json --dry')
+            sh('./relval_submit.py -f metadata_HLT.json --dry --new')
             sh('./commands_in_one_go.sh')
+            sh('mkdir -p ${TEST_RESULT}/${Labels} && cp HLT_new*.root ${TEST_RESULT}/${Labels}/')
           }
           post {
             success {
@@ -49,7 +54,7 @@ pipeline {
           }
         }
 
-        stage('Express Test') {
+        stage('HLT Reference Test') {
           agent {
             label "lxplus"
           }
@@ -58,8 +63,24 @@ pipeline {
             checkout scm
             unstash 'json'
             sh('echo ${VOMS_CREDENTIALS_PSW} | voms-proxy-init --rfc --voms cms --pwstdin')
-            sh('./relval_submit.py -f metadata_Express.json --dry')
+            sh('./relval_submit.py -f metadata_HLT.json --dry --refer')
             sh('./commands_in_one_go.sh')
+            sh('mkdir -p ${TEST_RESULT}/${Labels} && cp HLT_refer*.root ${TEST_RESULT}/${Labels}/')
+          }
+        }
+
+        stage('Express New Test') {
+          agent {
+            label "lxplus"
+          }
+          steps {
+            cleanWs()
+            checkout scm
+            unstash 'json'
+            sh('echo ${VOMS_CREDENTIALS_PSW} | voms-proxy-init --rfc --voms cms --pwstdin')
+            sh('./relval_submit.py -f metadata_Express.json --dry --new')
+            sh('./commands_in_one_go.sh')
+            sh('mkdir -p ${TEST_RESULT}/${Labels} && cp EXPR_new*.root ${TEST_RESULT}/${Labels}/')
           }
           post {
             success {
@@ -68,7 +89,22 @@ pipeline {
           }
         }
 
-        stage('PR Test') {
+        stage('Express Reference Test') {
+          agent {
+            label "lxplus"
+          }
+          steps {
+            cleanWs()
+            checkout scm
+            unstash 'json'
+            sh('echo ${VOMS_CREDENTIALS_PSW} | voms-proxy-init --rfc --voms cms --pwstdin')
+            sh('./relval_submit.py -f metadata_Express.json --dry --refer')
+            sh('./commands_in_one_go.sh')
+            sh('mkdir -p ${TEST_RESULT}/${Labels} && cp EXPR_refer*.root ${TEST_RESULT}/${Labels}/')
+          }
+        }
+
+        stage('Prompt New Test') {
           agent {
             label "lxplus"
           }
@@ -77,13 +113,29 @@ pipeline {
             checkout scm  
             unstash 'json'
             sh('echo ${VOMS_CREDENTIALS_PSW} | voms-proxy-init --rfc --voms cms --pwstdin')
-            sh('./relval_submit.py -f metadata_Prompt.json --dry')
+            sh('./relval_submit.py -f metadata_Prompt.json --dry --new')
             sh('./commands_in_one_go.sh')
+            sh('mkdir -p ${TEST_RESULT}/${Labels} && cp PR_new*.root ${TEST_RESULT}/${Labels}/')
           }
           post {
             success {
               archiveArtifacts(artifacts: 'cmsDrivers_*.sh', fingerprint: true)
             }
+          }
+        }
+
+        stage('Prompt Reference Test') {
+          agent {
+            label "lxplus"
+          }
+          steps {
+            cleanWs()
+            checkout scm  
+            unstash 'json'
+            sh('echo ${VOMS_CREDENTIALS_PSW} | voms-proxy-init --rfc --voms cms --pwstdin')
+            sh('./relval_submit.py -f metadata_Prompt.json --dry --refer')
+            sh('./commands_in_one_go.sh')
+            sh('mkdir -p ${TEST_RESULT}/${Labels} && cp PR_refer*.root ${TEST_RESULT}/${Labels}/')
           }
         }
 
@@ -103,7 +155,7 @@ pipeline {
       }
       steps {
         echo "Sending email request to AlCa Hypernews"
-        emailext(body: "This is a TEST! Please ignore", subject: "[HLT/EXPRESS/PROMPT] Full track validation for ${env.Title}", to: 'hn-cms-hnTest@cern.ch, physics.pritam@cern.ch')
+        emailext(body: "This is a TEST! Please ignore", subject: "[HLT/EXPRESS/PROMPT] Full track validation for ${env.Title} (${env.Week}, ${env.Year})", to: 'hn-cms-hnTest@cern.ch, physics.pritam@cern.ch')
       }
     }
     stage('Submission') {

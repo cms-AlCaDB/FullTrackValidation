@@ -134,6 +134,7 @@ if __name__ == '__main__':
 	ticket = api.check_duplicate()
 	if not ticket: 
 		args["Jira"]= int(api.get_key().split('-')[1].strip())+1
+		print(">> Labels not matching with any older ticket. CMSALCA-{} will be created at later stage.".format(args["Jira"]))
 	else:
 		args["Jira"] = int(ticket.split('-')[1].strip())
 
@@ -159,4 +160,9 @@ if __name__ == '__main__':
 	properties = open("envs.properties", "w")
 	properties.write("Validate = {}".format(args['Validate']))
 	properties.write("\nTitle = {}".format(args['Title']))
-	# properties.write("Week = {}".format(v if 'Week' in v for v in args['Lables']))
+	week = [v for v in args['Labels'] if 'Week' in v]
+	year = [v for v in args['Labels'] if '202' in v]
+	Labels = "_".join(args['Labels'])
+	properties.write("\nWeek = {}".format(week[0]))
+	properties.write("\nYear = {}".format(year[0]))
+	properties.write("\nLabels = {}".format(Labels))

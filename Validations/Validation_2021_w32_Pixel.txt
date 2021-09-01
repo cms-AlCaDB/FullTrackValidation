@@ -2,7 +2,7 @@ Title                   : Pixel gain calibrations for CRUZET 2021
 
 # Labels: List of labels separated by comma. Keep it unique for given validation
 #-------------------------------------------------------------------------------
-Labels                  : PIXEL, Week32
+Labels                  : Week32, 2021, PIXEL
 
 # Target GTs here
 #-------------------------------------------------------------------------------

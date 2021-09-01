@@ -106,8 +106,14 @@ def main():
     parser.add_argument("--dry",
                   action="store_true", dest="dry", default=False,
                   help="Print list of commands for doing dry run")
+    parser.add_argument("--wf",
+                  dest="workflow", choices=['new', 'refer'],
+                  help="Choose workflow to perform a dry run")
+    workflowGroup = parser.add_mutually_exclusive_group()
+    workflowGroup.add_argument('--new', help='Perform a local test on new conditions (Default: False)', action='store_true')
+    workflowGroup.add_argument('--refer', help='Perform a local test on reference conditions (Default: False)', action='store_true')
     arguments = parser.parse_args()
-
+    
     try:
         if arguments.filename==None: raise TypeError("Please provide input json file using -f option")
         metadataFilename = arguments.filename
@@ -395,24 +401,28 @@ I will ask you some questions to fill the metadata file. For some of the questio
             commands.append('./cmsDrivers.sh')
             if metadata['options']['Type']=='EXPR+RECO' or metadata['options']['Type']=='HLT+RECO':
                 commands.append('cp cmsDrivers.sh cmsDrivers_{}.sh'.format(metadata['options']['Type'].split('+')[0]))
-                commands.append('cmsRun NEWCONDITIONS0.py')
-                commands.append('cmsRun recodqm.py')
-                commands.append('cmsRun step4_newco_HARVESTING.py')
-                commands.append('mv DQM*.root {}_newco_DQMoutput.root'.format(metadata['options']['Type'].split('+')[0]))
-                commands.append('rm step*.root')
-                commands.append('cmsRun REFERENCE.py')
-                commands.append('cmsRun recodqm.py')
-                commands.append('cmsRun step4_refer_HARVESTING.py')
-                commands.append('mv DQM*.root {}_refer_DQMoutput.root'.format(metadata['options']['Type'].split('+')[0]))
+                if arguments.new:
+                    commands.append('cmsRun NEWCONDITIONS0.py')
+                    commands.append('cmsRun recodqm.py')
+                    commands.append('cmsRun step4_newco_HARVESTING.py')
+                    commands.append('mv DQM*.root {}_newco_DQMoutput.root'.format(metadata['options']['Type'].split('+')[0]))
+                elif arguments.refer:
+                    commands.append('rm step*.root')
+                    commands.append('cmsRun REFERENCE.py')
+                    commands.append('cmsRun recodqm.py')
+                    commands.append('cmsRun step4_refer_HARVESTING.py')
+                    commands.append('mv DQM*.root {}_refer_DQMoutput.root'.format(metadata['options']['Type'].split('+')[0]))
             elif metadata['options']['Type']=='PR':
                 commands.append('cp cmsDrivers.sh cmsDrivers_PR.sh')
-                commands.append('cmsRun NEWCONDITIONS0.py')
-                commands.append('cmsRun step4_newco_HARVESTING.py')
-                commands.append('mv DQM*.root PR_newco_DQMoutput.root')
-                commands.append('rm step*.root')
-                commands.append('cmsRun REFERENCE.py')
-                commands.append('cmsRun step4_refer_HARVESTING.py')
-                commands.append('mv DQM*.root PR_refer_DQMoutput.root')
+                if arguments.new:
+                    commands.append('cmsRun NEWCONDITIONS0.py')
+                    commands.append('cmsRun step4_newco_HARVESTING.py')
+                    commands.append('mv DQM*.root PR_newco_DQMoutput.root')
+                elif arguments.refer:
+                    commands.append('rm step*.root')
+                    commands.append('cmsRun REFERENCE.py')
+                    commands.append('cmsRun step4_refer_HARVESTING.py')
+                    commands.append('mv DQM*.root PR_refer_DQMoutput.root')
 
         dryrun = True
         # now execute commands
