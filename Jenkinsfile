@@ -34,7 +34,7 @@ pipeline {
         expression { doTest == '1' }
       }
       parallel {
-        stage('HLT New Test') {
+        stage('HLT New') {
           agent {
             label "lxplus"
           }
@@ -42,10 +42,10 @@ pipeline {
             cleanWs()
             checkout scm
             unstash 'json'
-            sh('echo ${VOMS_CREDENTIALS_PSW} | voms-proxy-init --rfc --voms cms --pwstdin')
-            sh('./relval_submit.py -f metadata_HLT.json --dry --new')
-            sh('./commands_in_one_go.sh')
-            sh('mkdir -p ${TEST_RESULT}/${Labels} && cp HLT_new*.root ${TEST_RESULT}/${Labels}/')
+            sh script: 'echo ${VOMS_CREDENTIALS_PSW} | voms-proxy-init --rfc --voms cms --pwstdin', label: "Generate VOMS proxy certificate"
+            sh script: './relval_submit.py -f metadata_HLT.json --dry --new', label: "Collect commands to create cmsDriver steps"
+            sh script: './commands_in_one_go.sh', label: "Create and run cmsDriver steps"
+            sh script: 'mkdir -p ${TEST_RESULT}/${Labels} && cp HLT_new*.root ${TEST_RESULT}/${Labels}/', label: "Moving output files to eos area"
           }
           post {
             success {
@@ -54,7 +54,7 @@ pipeline {
           }
         }
 
-        stage('HLT Reference Test') {
+        stage('HLT Reference') {
           agent {
             label "lxplus"
           }
@@ -62,14 +62,14 @@ pipeline {
             cleanWs()
             checkout scm
             unstash 'json'
-            sh('echo ${VOMS_CREDENTIALS_PSW} | voms-proxy-init --rfc --voms cms --pwstdin')
-            sh('./relval_submit.py -f metadata_HLT.json --dry --refer')
-            sh('./commands_in_one_go.sh')
-            sh('mkdir -p ${TEST_RESULT}/${Labels} && cp HLT_refer*.root ${TEST_RESULT}/${Labels}/')
+            sh script: 'echo ${VOMS_CREDENTIALS_PSW} | voms-proxy-init --rfc --voms cms --pwstdin', label: "Generate VOMS proxy certificate"
+            sh script: './relval_submit.py -f metadata_HLT.json --dry --refer', label: "Collect commands to create cmsDriver steps"
+            sh script: './commands_in_one_go.sh', label: "Create and run cmsDriver steps"
+            sh script: 'mkdir -p ${TEST_RESULT}/${Labels} && cp HLT_refer*.root ${TEST_RESULT}/${Labels}/', label: "Moving output files to eos area"
           }
         }
 
-        stage('Express New Test') {
+        stage('Express New') {
           agent {
             label "lxplus"
           }
@@ -77,10 +77,10 @@ pipeline {
             cleanWs()
             checkout scm
             unstash 'json'
-            sh('echo ${VOMS_CREDENTIALS_PSW} | voms-proxy-init --rfc --voms cms --pwstdin')
-            sh('./relval_submit.py -f metadata_Express.json --dry --new')
-            sh('./commands_in_one_go.sh')
-            sh('mkdir -p ${TEST_RESULT}/${Labels} && cp EXPR_new*.root ${TEST_RESULT}/${Labels}/')
+            sh script: 'echo ${VOMS_CREDENTIALS_PSW} | voms-proxy-init --rfc --voms cms --pwstdin', label: "Generate VOMS proxy certificate"
+            sh script: './relval_submit.py -f metadata_Express.json --dry --new', label: "Collect commands to create cmsDriver steps"
+            sh script: './commands_in_one_go.sh', label: "Create and run cmsDriver steps"
+            sh script: 'mkdir -p ${TEST_RESULT}/${Labels} && cp EXPR_new*.root ${TEST_RESULT}/${Labels}/', label: "Moving output files to eos area"
           }
           post {
             success {
@@ -89,7 +89,7 @@ pipeline {
           }
         }
 
-        stage('Express Reference Test') {
+        stage('Express Reference') {
           agent {
             label "lxplus"
           }
@@ -97,14 +97,14 @@ pipeline {
             cleanWs()
             checkout scm
             unstash 'json'
-            sh('echo ${VOMS_CREDENTIALS_PSW} | voms-proxy-init --rfc --voms cms --pwstdin')
-            sh('./relval_submit.py -f metadata_Express.json --dry --refer')
-            sh('./commands_in_one_go.sh')
-            sh('mkdir -p ${TEST_RESULT}/${Labels} && cp EXPR_refer*.root ${TEST_RESULT}/${Labels}/')
+            sh script: 'echo ${VOMS_CREDENTIALS_PSW} | voms-proxy-init --rfc --voms cms --pwstdin', label: "Generate VOMS proxy certificate"
+            sh script: './relval_submit.py -f metadata_Express.json --dry --refer', label: "Collect commands to create cmsDriver steps"
+            sh script: './commands_in_one_go.sh', label: "Create and run cmsDriver steps"
+            sh script: 'mkdir -p ${TEST_RESULT}/${Labels} && cp EXPR_refer*.root ${TEST_RESULT}/${Labels}/', label: "Moving output files to eos area"
           }
         }
 
-        stage('Prompt New Test') {
+        stage('Prompt New') {
           agent {
             label "lxplus"
           }
@@ -112,10 +112,10 @@ pipeline {
             cleanWs()
             checkout scm  
             unstash 'json'
-            sh('echo ${VOMS_CREDENTIALS_PSW} | voms-proxy-init --rfc --voms cms --pwstdin')
-            sh('./relval_submit.py -f metadata_Prompt.json --dry --new')
-            sh('./commands_in_one_go.sh')
-            sh('mkdir -p ${TEST_RESULT}/${Labels} && cp PR_new*.root ${TEST_RESULT}/${Labels}/')
+            sh script: 'echo ${VOMS_CREDENTIALS_PSW} | voms-proxy-init --rfc --voms cms --pwstdin', label: "Generate VOMS proxy certificate"
+            sh script: './relval_submit.py -f metadata_Prompt.json --dry --new', label: "Collect commands to create cmsDriver steps"
+            sh script: './commands_in_one_go.sh', label: "Create and run cmsDriver steps"
+            sh script: 'mkdir -p ${TEST_RESULT}/${Labels} && cp PR_new*.root ${TEST_RESULT}/${Labels}/', label: "Moving output files to eos area"
           }
           post {
             success {
@@ -124,7 +124,7 @@ pipeline {
           }
         }
 
-        stage('Prompt Reference Test') {
+        stage('Prompt Reference') {
           agent {
             label "lxplus"
           }
@@ -132,10 +132,10 @@ pipeline {
             cleanWs()
             checkout scm  
             unstash 'json'
-            sh('echo ${VOMS_CREDENTIALS_PSW} | voms-proxy-init --rfc --voms cms --pwstdin')
-            sh('./relval_submit.py -f metadata_Prompt.json --dry --refer')
-            sh('./commands_in_one_go.sh')
-            sh('mkdir -p ${TEST_RESULT}/${Labels} && cp PR_refer*.root ${TEST_RESULT}/${Labels}/')
+            sh script: 'echo ${VOMS_CREDENTIALS_PSW} | voms-proxy-init --rfc --voms cms --pwstdin', label: "Generate VOMS proxy certificate"
+            sh script: './relval_submit.py -f metadata_Prompt.json --dry --refer', label: "Collect commands to create cmsDriver steps"
+            sh script: './commands_in_one_go.sh', label: "Create and run cmsDriver steps"
+            sh script: 'mkdir -p ${TEST_RESULT}/${Labels} && cp PR_refer*.root ${TEST_RESULT}/${Labels}/', label: "Moving output files to eos area"
           }
         }
 
