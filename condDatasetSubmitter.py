@@ -855,7 +855,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
     print('Now execute:\n./wmcontrol.py --req_file %s  |& tee wmcontrol.1.log' % (wmconf_name))
 
 def printInfo(options):
-    if "HLT" in options.Type:
+    if "HLT" in options.Type or "EXPR" in options.Type:
         if options.HLT is not None:
             hltFilename = '%s/src/HLTrigger/Configuration/python/HLT_%s_cff.py' % (options.hltCmsswDir,
                     options.HLT)
@@ -895,13 +895,13 @@ def printInfo(options):
     elif (options.runLs):
         print("run: %s" % (options.runLs))
 
-    if "HLT" in options.Type:
+    if "HLT" in options.Type or "EXPR" in options.Type:
         print("HLT menu: %s" % (menu))
         print("Target HLT GT: %s" % (newgtshort))
         print("Reference HLT GT: %s" % (gtshort))
     if "HLT" in options.Type and "RECO" in options.Type:
         print("Common Prompt GT: %s" % (options.basegt))
-    if "PR" in options.Type:
+    if options.Type == "PR":
         print("Target Prompt GT: %s" % (newgtshort))
         print("Reference Prompt GT: %s" % (gtshort))
 

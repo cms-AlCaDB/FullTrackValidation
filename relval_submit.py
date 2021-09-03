@@ -407,7 +407,7 @@ I will ask you some questions to fill the metadata file. For some of the questio
                     commands.append('cmsRun step4_newco_HARVESTING.py')
                     commands.append('mv DQM*.root {}_newco_DQMoutput.root'.format(metadata['options']['Type'].split('+')[0]))
                 elif arguments.refer:
-                    commands.append('rm step*.root')
+                    commands.append('rm -f step*.root')
                     commands.append('cmsRun REFERENCE.py')
                     commands.append('cmsRun recodqm.py')
                     commands.append('cmsRun step4_refer_HARVESTING.py')
@@ -419,7 +419,7 @@ I will ask you some questions to fill the metadata file. For some of the questio
                     commands.append('cmsRun step4_newco_HARVESTING.py')
                     commands.append('mv DQM*.root PR_newco_DQMoutput.root')
                 elif arguments.refer:
-                    commands.append('rm step*.root')
+                    commands.append('rm -f step*.root')
                     commands.append('cmsRun REFERENCE.py')
                     commands.append('cmsRun step4_refer_HARVESTING.py')
                     commands.append('mv DQM*.root PR_refer_DQMoutput.root')
