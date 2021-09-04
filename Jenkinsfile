@@ -26,7 +26,7 @@ pipeline {
             env.Year = props.Year
             env.Labels = props.Labels
             def dict = readJSON file: 'envs.json'
-            env.Hlt_key = dict.Hlt_key
+            env.Hlt_key = dict.hlt_key
         }
         echo "HLT_Key is $Hlt_key"
       }
