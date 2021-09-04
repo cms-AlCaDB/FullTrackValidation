@@ -1,7 +1,7 @@
 pipeline {
   environment {
     //This variable need be tested as string
-    doTest = '1'
+    doTest = '0'
     VOMS_CREDENTIALS = credentials('gridpass')
     JIRA_CREDENTIALS = credentials('jirapass')
     TEST_RESULT = "/eos/user/p/pkalbhor/AlCaValidations"
@@ -16,8 +16,8 @@ pipeline {
       steps{
         cleanWs()
         checkout scm
-        sh('./process_input.py ${JIRA_CREDENTIALS_USR} ${JIRA_CREDENTIALS_PSW}')
-        stash includes: '*.json', name: 'json'
+        sh script: './process_input.py ${JIRA_CREDENTIALS_USR} ${JIRA_CREDENTIALS_PSW}', label: "Processing input template"
+        stash includes: '*.json', name: 'json', label: "Stash some files to be used later in the build"
         script {
             def props = readProperties file: 'envs.properties' 
             env.Validate = props.Validate
@@ -146,7 +146,7 @@ pipeline {
         expression { env.Validate == 'Yes' }
       }
       steps {
-        sh('./createTicket.py ${JIRA_CREDENTIALS_USR} ${JIRA_CREDENTIALS_PSW}')
+        sh script: './createTicket.py ${JIRA_CREDENTIALS_USR} ${JIRA_CREDENTIALS_PSW}', label: "Creating a JIRA ticket for validation discussions"
       }
     }
     stage('Email') {
