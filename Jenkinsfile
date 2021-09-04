@@ -17,7 +17,7 @@ pipeline {
         cleanWs()
         checkout scm
         sh script: './process_input.py ${JIRA_CREDENTIALS_USR} ${JIRA_CREDENTIALS_PSW}', label: "Processing input template"
-        stash includes: '*.json', name: 'json', label: "Stash some files to be used later in the build"
+        stash includes: '*.json', name: 'json'
         script {
             def props = readProperties file: 'envs.properties' 
             env.Validate = props.Validate
