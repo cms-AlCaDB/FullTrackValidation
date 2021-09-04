@@ -166,3 +166,6 @@ if __name__ == '__main__':
 	properties.write("\nWeek = {}".format(week[0]))
 	properties.write("\nYear = {}".format(year[0]))
 	properties.write("\nLabels = {}".format(Labels))
+
+	jsonfile = open('envs.json', 'w')
+	json.dump(args, jsonfile, indent=2)
