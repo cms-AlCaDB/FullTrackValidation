@@ -112,6 +112,18 @@ def build_Prompt_workflow(args, run):
 	options['two_WFs']		 = ""
 	return prompt_dict
 
+def compose_email(args):
+	emailSubject = "[HLT/EXPRESS/PROMPT] Full track validation of {Title} ({Week}, {Year})".format(Title = args['Title'], Week = args['Week'], Year = args['Year'])
+	emailBody = """Dear colleaques,
+We are going to perform full track validation of
+* Details of the workflow
+- Reference HLT GT: {TargetGT_HLT}
+Regards,
+Pritam for AlCaDB""".format(TargetGT_HLT=args['TargetGT_HLT'])
+	args['emailSubject'] = emailSubject
+	args['emailBody'] = emailBody
+	return args
+
 def check_requirements():
 	import pkg_resources
 	required = list()
@@ -164,6 +176,8 @@ if __name__ == '__main__':
 	args['Week']  = "{}".format(week[0])
 	args['Year']  = "{}".format(year[0])
 	args['Label'] = "{}".format(Label)
+
+	args = compose_email(args)
 
 	jsonfile = open('envs.json', 'w')
 	json.dump(args, jsonfile, indent=2)

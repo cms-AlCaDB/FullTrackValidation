@@ -151,7 +151,7 @@ pipeline {
       }
       steps {
         echo "Sending email request to AlCa Hypernews"
-        emailext(body: "Test, please ignore.", subject: "[HLT/EXPRESS/PROMPT] Full track validation of ${env.Title} (${env.Week}, ${env.Year})", to: 'physics.pritam@gmail.com')
+        emailext(body: "${env.emailBody}", subject: "${env.emailSubject}", to: 'physics.pritam@gmail.com')
       }
     }
     stage('Submission') {
