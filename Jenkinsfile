@@ -161,7 +161,7 @@ Regards,
 Pritam for AlCaDB
 """
         }
-        emailext(body: emailBody, subject: env.emailSubject, to: 'physics.pritam@gmail.com')
+        emailext(body: emailBody, subject: "${env.emailSubject}", to: 'physics.pritam@gmail.com')
       }
     }
     stage('Submission') {
