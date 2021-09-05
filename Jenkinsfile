@@ -21,9 +21,7 @@ pipeline {
         script {
             def dict = readJSON file: 'envs.json'
             dict.each { key, value -> env."${key}"= value }
-            dict.each { key, value -> println env."${key}" }
         }
-        echo "HLT_Key is $hlt_key"
       }
     }
 
@@ -153,7 +151,17 @@ pipeline {
       }
       steps {
         echo "Sending email request to AlCa Hypernews"
-        emailext(body: "This is a TEST! Please ignore", subject: "[HLT/EXPRESS/PROMPT] Full track validation of ${env.Title} (${env.Week}, ${env.Year})", to: 'physics.pritam@gmail.com')
+        script {
+          env.emailSubject = "[HLT/EXPRESS/PROMPT] Full track validation of ${env.Title} (${env.Week}, ${env.Year})"
+          String emailBody = """Dear colleaques,
+We are going to perform full track validation of ${emailSubject}
+* Details of the workflow
+- Reference HLT GT: $TargetGT_HLT
+Regards,
+Pritam for AlCaDB
+"""
+        }
+        emailext(body: emailBody, subject: env.emailSubject, to: 'physics.pritam@gmail.com')
       }
     }
     stage('Submission') {
