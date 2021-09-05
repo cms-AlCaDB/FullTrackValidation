@@ -139,6 +139,7 @@ if __name__ == '__main__':
 		args["Jira"] = int(ticket.split('-')[1].strip())
 
 	run_number = args['Run'].split(":")[0].strip("{").strip("'")
+	args['run_number'] = run_number
 	try:
 		run = get_run(run_number)
 	except:
@@ -157,15 +158,12 @@ if __name__ == '__main__':
 		json.dump(data, rfile, indent=2)
 		rfile.close()
 	
-	properties = open("envs.properties", "w")
-	properties.write("Validate = {}".format(args['Validate']))
-	properties.write("\nTitle = {}".format(args['Title']))
 	week = [v for v in args['Labels'] if 'Week' in v]
 	year = [v for v in args['Labels'] if '202' in v]
-	Labels = "_".join(args['Labels'])
-	properties.write("\nWeek = {}".format(week[0]))
-	properties.write("\nYear = {}".format(year[0]))
-	properties.write("\nLabels = {}".format(Labels))
+	Label = "_".join(args['Labels'])
+	args['Week']  = "{}".format(week[0])
+	args['Year']  = "{}".format(year[0])
+	args['Label'] = "{}".format(Label)
 
 	jsonfile = open('envs.json', 'w')
 	json.dump(args, jsonfile, indent=2)
