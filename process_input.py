@@ -117,9 +117,30 @@ def compose_email(args):
 	emailBody = """Dear colleaques,
 We are going to perform full track validation of
 * Details of the workflow
-- Reference HLT GT: {TargetGT_HLT}
-Regards,
-Pritam for AlCaDB""".format(TargetGT_HLT=args['TargetGT_HLT'])
+- Target HLT GT: {TargetGT_HLT}
+- Reference HLT GT: {ReferenceGT_HLT}
+
+- Target EXPRESS GT: {TargetGT_EXPRESS}
+- Reference EXPRESS GT: {ReferenceGT_EXPRESS}
+
+- Target PROMPT GT: {TargetGT_PROMPT}
+- Reference PROMPT GT: {ReferenceGT_PROMPT}
+
+- The data chosen for validation is from {class}, run {run_number}
+- HLT Menu: {hlt_key}
+- CMSSW version to be used: {HLT_release} for HLT/EXPRESS/PROMPT
+- The chosen datasets are: {Dataset}
+
+{Subsystem} experts are invited to scrutinize the results as well at [2].
+Once the workflows are ready, we will ask the {Subsystem} validators to report the outcome of the checks at JIRA [3]
+
+Best regards,
+Pritam, Amandeep, Francesco, Tamas, Helena (for AlCa/DB)
+
+[1] https://cmsoms.cern.ch/cms/runs/report?cms_run={run_number}&cms_run_sequence=GLOBAL-RUN
+[2] https://twiki.cern.ch/twiki/bin/view/CMS/PdmVTriggerConditionValidation2021
+[3] https://its.cern.ch/jira/browse/CMSALCA-{Jira}
+""".format(**args)
 	args['emailSubject'] = emailSubject
 	args['emailBody'] = emailBody
 	return args
