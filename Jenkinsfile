@@ -152,16 +152,16 @@ pipeline {
       steps {
         echo "Sending email request to AlCa Hypernews"
         script {
-          env.emailSubject = "[HLT/EXPRESS/PROMPT] Full track validation of ${env.Title} (${env.Week}, ${env.Year})"
+          String emailSubject = "[HLT/EXPRESS/PROMPT] Full track validation of ${env.Title} (${env.Week}, ${env.Year})"
           String emailBody = """Dear colleaques,
-We are going to perform full track validation of ${emailSubject}
+We are going to perform full track validation of
 * Details of the workflow
 - Reference HLT GT: $TargetGT_HLT
 Regards,
 Pritam for AlCaDB
 """
         }
-        emailext(body: emailBody, subject: "${env.emailSubject}", to: 'physics.pritam@gmail.com')
+        emailext(body: emailBody, subject: emailSubject, to: 'physics.pritam@gmail.com')
       }
     }
     stage('Submission') {
