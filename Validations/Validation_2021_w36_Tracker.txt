@@ -1,4 +1,4 @@
-Title                   : Tracker conditions for CRUZET 2021 reprocessing
+Title                   : Tracker conditions for CRUZET reprocessing
 
 Subsystem               : Tracker
 # Labels: List of labels separated by comma. Keep it unique for given validation
@@ -31,7 +31,7 @@ Run                     : {'344518': [[1, 1892]]}
 
 # Yes, if you want to submit job for computation if local test is successful
 #-------------------------------------------------------------------------------
-Validate                : No
+Validate                : Yes
 
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
