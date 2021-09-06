@@ -1,5 +1,9 @@
+#
+# Author : Pritam Kalbhor (physics.pritam@gmail.com)
+#
+
 from jira import JIRA
-import base64
+import base64, sys
 
 class JiraAPI:
    CERN_CA_BUNDLE = '/etc/pki/tls/certs/ca-bundle.crt'
@@ -14,19 +18,12 @@ class JiraAPI:
                   basic_auth=(username, password),
                   options={'check_update': False, 'verify': self.CERN_CA_BUNDLE, 'client_cert': (self.cert, self.key)})
 
-   def create_issue(self):
+   def create_issue(self, args):
       """Create new JIRA ticket"""
-      pass
-
-      # jira = get_jira_client()
-      # new_issue = jira.create_issue(project='CMSALCA', issuetype={'name': 'Task'})
-
-      # Summary = "[HLT/EXPRESS/PROMPT] Full track validation of "
-      # Summary += Title
-      # Summary += " (Week 32, 2021)"
-      # new_issue.update(summary=Summary)
-      # new_issue.update(description='Desciption comming soon!')
-      # new_issue.update(assignee={'name': 'pkalbhor'})
+      jira = self.connection
+      new_issue = jira.create_issue(project='CMSALCA', issuetype={'name': 'Task'})
+      new_issue.update(summary = args['emailSubject'], description = args['emailBody'])
+      new_issue.update(assignee={'name': 'tvami'})
 
    def check_duplicate(self):
       # Summaries of my last 3 reported issues
@@ -45,6 +42,5 @@ if __name__ == '__main__':
    args = dict()
    sysArgs = sys.argv
    api = JiraAPI(args, sysArgs[1], sysArgs[2])
-   ticket = api.check_duplicate()
-   # jira = api.get_jira_client()
-   # issue = jira.issue("CMSALCA-135")
+   jira = api.connection
+   issue = jira.issue("CMSALCA-135")

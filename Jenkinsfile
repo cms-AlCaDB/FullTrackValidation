@@ -139,9 +139,10 @@ pipeline {
     }
     stage('Create Jira Ticket') {
       when {
-        expression { env.Validate == 'Yes' }
+        expression { env.Validate == 'No' }
       }
       steps {
+        unstash 'json'
         sh script: './createTicket.py ${JIRA_CREDENTIALS_USR} ${JIRA_CREDENTIALS_PSW}', label: "Creating a JIRA ticket for validation discussions"
       }
     }
@@ -151,15 +152,24 @@ pipeline {
       }
       steps {
         echo "Sending email request to AlCa Hypernews"
-        emailext(body: "${env.emailBody}", subject: "${env.emailSubject}", to: 'physics.pritam@gmail.com')
+        emailext(body: "${env.emailBody}", subject: "${env.emailSubject}", to: 'physics.pritam@gmail.com') //hn-cms-alca@cern.ch
       }
     }
     stage('Submission') {
       when {
-        expression { env.Validate == 'Yes' }
+        expression { env.Validate == 'No' }
       }
       steps {
-        echo "Submitting request to Request Manager/WMAgent production tool."
+        cleanWs()
+        checkout scm  
+        unstash 'json'
+        sh script: 'echo ${VOMS_CREDENTIALS_PSW} | voms-proxy-init --rfc --voms cms --pwstdin', label: "Generate VOMS proxy certificate"
+        sh script: './relval_submit.py -f metadata_HLT.json', label: "HLT Workflow: Collect commands to create cmsDriver steps"
+        sh script: './commands_in_one_go.sh', label: "Submit HLT conditions workflow to Request Manager"
+        sh script: './relval_submit.py -f metadata_Express.json', label: "Express Workflow: Collect commands to create cmsDriver steps"
+        sh script: './commands_in_one_go.sh', label: "Submit Express conditions workflow to Request Manager"
+        sh script: './relval_submit.py -f metadata_Prompt.json', label: "Prompt Workflow: Collect commands to create cmsDriver steps"
+        sh script: './commands_in_one_go.sh', label: "Submit Prompt conditions workflow to Request Manager"
       }
     }
     stage('Twiki update') {

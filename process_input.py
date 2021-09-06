@@ -26,6 +26,13 @@ def get_arguments():
 	for line in iFile:
 		args[line.split(':')[0].strip()] = ":".join(line.split(':')[1:]).strip()
 	args['Labels'] = [v.strip() for v in args['Labels'].split(',')]
+	args['run_number'] = args['Run'].split(":")[0].strip("{").strip("'")
+	week = [v for v in args['Labels'] if 'Week' in v]
+	year = [v for v in args['Labels'] if '202' in v]
+	Label = "_".join(args['Labels'])
+	args['Week']  = "{}".format(week[0])
+	args['Year']  = "{}".format(year[0])
+	args['Label'] = "{}".format(Label)
 	return args
 
 def get_mappings():
@@ -115,8 +122,8 @@ def build_Prompt_workflow(args, run):
 def compose_email(args):
 	emailSubject = "[HLT/EXPRESS/PROMPT] Full track validation of {Title} ({Week}, {Year})".format(Title = args['Title'], Week = args['Week'], Year = args['Year'])
 	emailBody = """Dear colleaques,
-We are going to perform full track validation of
-* Details of the workflow
+We are going to perform {emailSubject}
+Details of the workflow:
 - Target HLT GT: {TargetGT_HLT}
 - Reference HLT GT: {ReferenceGT_HLT}
 
@@ -140,7 +147,7 @@ Pritam, Amandeep, Francesco, Tamas, Helena (for AlCa/DB)
 [1] https://cmsoms.cern.ch/cms/runs/report?cms_run={run_number}&cms_run_sequence=GLOBAL-RUN
 [2] https://twiki.cern.ch/twiki/bin/view/CMS/PdmVTriggerConditionValidation2021
 [3] https://its.cern.ch/jira/browse/CMSALCA-{Jira}
-""".format(**args)
+""".format(emailSubject=emailSubject, **args)
 	args['emailSubject'] = emailSubject
 	args['emailBody'] = emailBody
 	return args
@@ -171,10 +178,8 @@ if __name__ == '__main__':
 	else:
 		args["Jira"] = int(ticket.split('-')[1].strip())
 
-	run_number = args['Run'].split(":")[0].strip("{").strip("'")
-	args['run_number'] = run_number
 	try:
-		run = get_run(run_number)
+		run = get_run(args['run_number'])
 	except:
 		run = {'class': args['class']}
 		run['oms_attributes'] = {'cmssw_version': args['HLT_release'],
@@ -190,13 +195,6 @@ if __name__ == '__main__':
 		rfile = open("metadata_{}.json".format(wid), 'w')
 		json.dump(data, rfile, indent=2)
 		rfile.close()
-	
-	week = [v for v in args['Labels'] if 'Week' in v]
-	year = [v for v in args['Labels'] if '202' in v]
-	Label = "_".join(args['Labels'])
-	args['Week']  = "{}".format(week[0])
-	args['Year']  = "{}".format(year[0])
-	args['Label'] = "{}".format(Label)
 
 	args = compose_email(args)
 
