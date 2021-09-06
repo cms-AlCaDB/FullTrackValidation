@@ -21,8 +21,7 @@ class JiraAPI:
    def create_issue(self, args):
       """Create new JIRA ticket"""
       jira = self.connection
-      new_issue = jira.create_issue(project='CMSALCA', issuetype={'name': 'Task'})
-      new_issue.update(summary = args['emailSubject'], description = args['emailBody'])
+      new_issue = jira.create_issue(project='CMSALCA', issuetype={'name': 'Task'}, summary = args['emailSubject'], description = args['emailBody'])
       new_issue.update(assignee={'name': 'tvami'})
 
    def check_duplicate(self):
