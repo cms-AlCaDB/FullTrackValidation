@@ -395,10 +395,18 @@ def step1(options):
 
     run = str(options.runLs).split(":")[0].strip("{u").strip("'")
     value2 = list(options.runLs.items())[0][1]
-    dfile.write("echo "" > step1_files.txt\n")
-    dfile.write("dasgoclient --limit 0 --format json --query 'lumi,file dataset={} run={}' | das-selected-lumis.py {} | sort -u >> step1_files.txt\n".format(options.ds[0], run, "%s,%s"%(value2[0][0],value2[0][1]) ))
-    dfile.write('echo \'{}\' > step1_lumi_ranges.txt\n'.format("{\""+run+"\": %s}"%(value2)))
+    command1 = "echo '' > step1_files.txt\n"
+    command2 = "dasgoclient --limit 0 --format json --query 'lumi,file dataset={} run={}' | das-selected-lumis.py {} | sort -u >> step1_files.txt\n".format(options.ds[0], run, "%s,%s"%(value2[0][0],value2[0][1]) )
+    command3 = 'echo \'{}\' > step1_lumi_ranges.txt\n'.format("{\""+run+"\": %s}"%(value2))
+    dfile.write(command1)
+    dfile.write(command2)
+    dfile.write(command3)
     dfile.write("\n\n")
+
+    if not options.dry:
+        execme(command1)
+        execme(command2)
+        execme(command3)
 
 def execme(command):
     if DRYRUN:
