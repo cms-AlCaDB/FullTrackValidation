@@ -1,7 +1,7 @@
 pipeline {
   environment {
     //This variable need be tested as string
-    doTest = '0'
+    doTest = '1'
     VOMS_CREDENTIALS = credentials('gridpass')
     JIRA_CREDENTIALS = credentials('jirapass')
     TEST_RESULT = "/eos/user/p/pkalbhor/AlCaValidations"
@@ -139,7 +139,7 @@ pipeline {
     }
     stage('Create Jira Ticket') {
       when {
-        expression { env.Validate == 'No' }
+        expression { env.Validate == 'Yes' }
       }
       steps {
         unstash 'json'
@@ -152,12 +152,12 @@ pipeline {
       }
       steps {
         echo "Sending email request to AlCa Hypernews"
-        emailext(body: "${env.emailBody}", subject: "${env.emailSubject}", to: 'physics.pritam@gmail.com') //hn-cms-alca@cern.ch
+        emailext(body: "${env.emailBody}", subject: "${env.emailSubject}", to: 'hn-cms-alca@cern.ch, physics.pritam@gmail.com')
       }
     }
     stage('Submission') {
       when {
-        expression { env.Validate == 'No' }
+        expression { env.Validate == 'Yes' }
       }
       steps {
         cleanWs()

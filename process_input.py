@@ -9,7 +9,7 @@ from modules.jira_api import JiraAPI
 def get_input():
 	files = glob.glob("Validations/*.txt")
 	files.sort(key=os.path.getmtime)
-	return files[0] 
+	return files[-1] 
 
 def get_run(run_number):
 	run = runregistry.get_run(run_number=int(run_number))
@@ -17,6 +17,7 @@ def get_run(run_number):
 	return run
 
 def get_arguments():
+	print(">> We will be processing lastly edited template: ", get_input())
 	file="_NewValidation.txt"
 	os.system("""sed '/^#.*$/d' "%s" > %s""" %(get_input(), file))
 	os.system("""sed -i '/^[[:space:]]*$/d' %s""" %(file))
@@ -45,71 +46,48 @@ def get_mappings():
 	mappings['ReferenceGT_PROMPT']  = 'gt'
 	mappings['Dataset']			= 'ds'
 
-def build_HLT_workflow(args, run):
+def build_HLT_workflow(args):
 	hlt_dict = dict()
-	oms = run['oms_attributes']
-
-	if args['HLT_release'] == 'None':
-		hlt_dict['HLT_release'] = oms['cmssw_version']
-		hlt_dict['PR_release'] = oms['cmssw_version']
-	else:
-		hlt_dict['HLT_release'] = args['HLT_release']
-		hlt_dict['PR_release'] = args['PR_release']
+	hlt_dict['HLT_release'] = args['HLT_release']
+	hlt_dict['PR_release'] = args['PR_release']
 	options = hlt_dict['options'] = dict()
-	if round(oms['b_field'])==0:
-		options['B0T'] = ""
-	if run['class']=="Cosmics21CRUZET":
-		options['cosmics'] = ""
+	if round(args['b_field'])==0: options['B0T'] = ""
+	if args['class']=="Cosmics21CRUZET": options['cosmics'] = ""
 	options['HLT'] 			 = "Custom"
 	options['Type'] 		 = "HLT+RECO"
-	options['HLTCustomMenu'] = "orcoff:"+oms['hlt_key']
+	options['HLTCustomMenu'] = "orcoff:"+args['hlt_key']
 	options['ds']			 = args['Dataset']
-	options['basegt']		 = args['ReferenceGT_PROMPT']
+	options['basegt']		 = args['TargetGT_PROMPT']
 	options['gt']			 = args['ReferenceGT_HLT']
 	options['newgt']		 = args['TargetGT_HLT']
 	options['runLs']		 = ast.literal_eval(args['Run'])
 	options['jira']		 	 = args['Jira']
 	return hlt_dict
 
-def build_Express_workflow(args, run):
+def build_Express_workflow(args):
 	express_dict = dict()
-	oms = run['oms_attributes']
-
-	if args['HLT_release'] == 'None':
-		express_dict['HLT_release'] = oms['cmssw_version']
-		express_dict['PR_release'] = oms['cmssw_version']
-	else:
-		express_dict['HLT_release'] = args['HLT_release']
-		express_dict['PR_release'] = args['PR_release']
+	express_dict['HLT_release'] = args['HLT_release']
+	express_dict['PR_release'] = args['PR_release']
 	options = express_dict['options'] = dict()
-	if round(oms['b_field'])==0:
-		options['B0T'] = ""
-	if run['class']=="Cosmics21CRUZET":
-		options['cosmics'] = ""
+	if round(args['b_field'])==0: options['B0T'] = ""
+	if args['class']=="Cosmics21CRUZET": options['cosmics'] = ""
 	options['HLT'] 			 = "Custom"
 	options['Type'] 		 = "EXPR+RECO"
-	options['HLTCustomMenu'] = "orcoff:"+oms['hlt_key']
+	options['HLTCustomMenu'] = "orcoff:"+args['hlt_key']
 	options['ds']			 = args['Dataset']
-	options['basegt']		 = args['ReferenceGT_PROMPT']
+	options['basegt']		 = args['TargetGT_PROMPT']
 	options['gt']			 = args['ReferenceGT_EXPRESS']
 	options['newgt']		 = args['TargetGT_EXPRESS']
 	options['runLs']		 = ast.literal_eval(args['Run'])
 	options['jira']		 	 = args['Jira']
 	return express_dict
 
-def build_Prompt_workflow(args, run):
+def build_Prompt_workflow(args):
 	prompt_dict = dict()
-	oms = run['oms_attributes']
-
-	if args['PR_release'] == 'None':
-		prompt_dict['PR_release'] = oms['cmssw_version']
-	else:
-		prompt_dict['PR_release'] = args['PR_release']
+	prompt_dict['PR_release'] = args['PR_release']
 	options = prompt_dict['options'] = dict()
-	if round(oms['b_field'])==0:
-		options['B0T'] = ""
-	if run['class']=="Cosmics21CRUZET":
-		options['cosmics'] = ""
+	if round(args['b_field'])==0: options['B0T'] = ""
+	if args['class']=="Cosmics21CRUZET": options['cosmics'] = ""
 	options['Type'] 		 = "PR"
 	options['ds']			 = args['Dataset']
 	options['gt']			 = args['ReferenceGT_PROMPT']
@@ -120,7 +98,7 @@ def build_Prompt_workflow(args, run):
 	return prompt_dict
 
 def compose_email(args):
-	emailSubject = "[HLT/EXPRESS/PROMPT] Full track validation of {Title} ({Week}, {Year})".format(Title = args['Title'], Week = args['Week'], Year = args['Year'])
+	emailSubject = "[HLT/Express/Prompt] Full track validation of {Title} ({Week}, {Year})".format(Title = args['Title'], Week = args['Week'], Year = args['Year'])
 	emailBody = """Dear colleaques,
 We are going to perform {emailSubject}
 Details of the workflow:
@@ -135,14 +113,14 @@ Details of the workflow:
 
 - The data chosen for validation is from {class}, run {run_number}
 - HLT Menu: {hlt_key}
-- CMSSW version to be used: {HLT_release} for HLT/EXPRESS/PROMPT
+- CMSSW version to be used: {HLT_release} for HLT/Express/Prompt
 - The chosen datasets are: {Dataset}
 
 {Subsystem} experts are invited to scrutinize the results as well at [2].
 Once the workflows are ready, we will ask the {Subsystem} validators to report the outcome of the checks at JIRA [3]
 
 Best regards,
-Pritam, Amandeep, Francesco, Tamas, Helena (for AlCa/DB)
+Pritam, Amandeep, Tamas, Francesco, Helena (for AlCa/DB)
 
 [1] https://cmsoms.cern.ch/cms/runs/report?cms_run={run_number}&cms_run_sequence=GLOBAL-RUN
 [2] https://twiki.cern.ch/twiki/bin/view/CMS/PdmVTriggerConditionValidation2021
@@ -166,8 +144,20 @@ def check_requirements():
 		if not pkg in packages:
 			os.system("pip3 install {} --user".format(pkg))
 
+def extract_keys(args):
+	run = get_run(args['run_number'])
+	oms = run['oms_attributes']
+	args['cmssw_version'] = oms['cmssw_version']
+	args['HLT_release'] = oms['cmssw_version']
+	args['PR_release']  = oms['cmssw_version']
+	args['b_field']     = int(oms['b_field'])
+	args['hlt_key']     = oms['hlt_key']
+	args['class']		= run['class']
+	return args
+
 if __name__ == '__main__':
-	args  = get_arguments()
+	args = get_arguments()
+	args = extract_keys(args)
 
 	sysArgs = sys.argv
 	api = JiraAPI(args, sysArgs[1], sysArgs[2])
@@ -178,18 +168,18 @@ if __name__ == '__main__':
 	else:
 		args["Jira"] = int(ticket.split('-')[1].strip())
 
-	try:
-		run = get_run(args['run_number'])
-	except:
-		run = {'class': args['class']}
-		run['oms_attributes'] = {'cmssw_version': args['HLT_release'],
-								 'b_field': int(args['b_field']),
-								 'hlt_key': args['hlt_key']
-								}
+	# try:
+	# 	run = get_run(args['run_number'])
+	# except:
+	# 	run = {'class': args['class']}
+	# 	run['oms_attributes'] = {'cmssw_version': args['HLT_release'],
+	# 							 'b_field': int(args['b_field']),
+	# 							 'hlt_key': args['hlt_key']
+	# 							}
 
-	hlt_dict 	 = build_HLT_workflow(args, run)
-	express_dict = build_Express_workflow(args, run)
-	prompt_dict  = build_Prompt_workflow(args, run)
+	hlt_dict 	 = build_HLT_workflow(args)
+	express_dict = build_Express_workflow(args)
+	prompt_dict  = build_Prompt_workflow(args)
 
 	for data, wid in zip([hlt_dict, express_dict, prompt_dict], ['HLT', 'Express', 'Prompt']):
 		rfile = open("metadata_{}.json".format(wid), 'w')
