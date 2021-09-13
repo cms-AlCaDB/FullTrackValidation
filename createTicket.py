@@ -12,6 +12,6 @@ ticket = api.check_duplicate()
 if ticket: 
 	print(">> Not creating duplicate ticket!")
 else:
-	api.create_issue(args)
+	api.create_issue()
 	key = api.get_key()
 	print(">> New ticket created with number ", key)

@@ -18,11 +18,17 @@ class JiraAPI:
                   basic_auth=(username, password),
                   options={'check_update': False, 'verify': self.CERN_CA_BUNDLE, 'client_cert': (self.cert, self.key)})
 
-   def create_issue(self, args):
+   def create_issue(self):
       """Create new JIRA ticket"""
       jira = self.connection
       new_issue = jira.create_issue(project='CMSALCA', issuetype={'name': 'Task'}, summary = args['emailSubject'], description = args['emailBody'])
       new_issue.update(assignee={'name': 'tvami'})
+      new_issue.update(fields={"labels": self.args['Labels']})
+      new_issue.update(fields={"priority": {'name': 'Major'}})
+
+   def add_comment(self, text):
+      issue = self.connection.issue('CMSALCA-{}'.format(self.args['Jira']))
+      comment = self.connection.add_comment(issue.key, text)
 
    def check_duplicate(self):
       # Summaries of my last 3 reported issues

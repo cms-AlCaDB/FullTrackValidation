@@ -4,7 +4,7 @@ pipeline {
     doTest = '0'
     VOMS_CREDENTIALS = credentials('gridpass')
     JIRA_CREDENTIALS = credentials('jirapass')
-    TEST_RESULT = "/eos/user/p/pkalbhor/AlCaValidations"
+    TEST_RESULT = "/eos/home-p/pkalbhor/AlCaValidations"
   }
   agent any
   options {
@@ -137,6 +137,33 @@ pipeline {
 
       }
     }
+
+    stage('Unit Tests') {
+      parallel {
+        stage('JIRA Test') {
+          agent {
+            label "lxplus"
+          }
+          steps {
+            cleanWs()
+            checkout scm  
+            unstash 'json'
+          }
+        }
+
+        stage('Email Test') {
+          agent {
+            label "lxplus"
+          }
+          steps {
+            cleanWs()
+            checkout scm
+            unstash 'json'
+          }
+        }
+      }
+    }
+
     stage('Create Jira Ticket') {
       when {
         expression { env.Validate == 'Yes' }
