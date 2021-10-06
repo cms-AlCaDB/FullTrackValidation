@@ -7,8 +7,6 @@ import base64, sys
 
 class JiraAPI:
    CERN_CA_BUNDLE = '/etc/pki/tls/certs/ca-bundle.crt'
-   cert = '/afs/cern.ch/user/p/pkalbhor/private/usercert.pem'
-   key = '/afs/cern.ch/user/p/pkalbhor/private/userkey.pem'
    def __init__(self, args, username, password):
       self.args = args
       self.connection = self.get_jira_client(username, password)
@@ -16,7 +14,7 @@ class JiraAPI:
    def get_jira_client(self, username, password):
       return JIRA('http://its.cern.ch/jira',
                   basic_auth=(username, password),
-                  options={'check_update': False, 'verify': self.CERN_CA_BUNDLE, 'client_cert': (self.cert, self.key)})
+                  options={'check_update': False, 'verify': self.CERN_CA_BUNDLE})
 
    def create_issue(self):
       """Create new JIRA ticket"""
