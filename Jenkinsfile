@@ -1,7 +1,7 @@
 pipeline {
   environment {
     //This variable need be tested as string
-    doTest = '0'
+    doTest = '1'
     VOMS_CREDENTIALS = credentials('gridpass')
     JIRA_CREDENTIALS = credentials('jirapass')
     TEST_RESULT = "/eos/home-p/pkalbhor/AlCaValidations"
@@ -175,7 +175,7 @@ pipeline {
     }
     stage('Email') {
       when {
-        expression { env.Validate == 'No' }
+        expression { env.Validate == 'Yes' }
       }
       steps {
         echo "Sending email request to AlCa Hypernews"
