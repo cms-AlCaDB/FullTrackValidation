@@ -234,6 +234,10 @@ def getDriverDetails(Type, release, ds, B0T, HIon, pA, cosmics, recoRelease):
         for ds_name in ds:
             if ds_name.find("2021")!=-1:
                 str_era_hlt="Run3"
+    if release.find("12_")!= -1:
+        for ds_name in ds:
+            if ds_name.find("2021")!=-1:
+                str_era_hlt="Run3"
 
     str_era_pr="Run2_2018"
     if recoRelease.find("10_")!= -1:
@@ -241,6 +245,10 @@ def getDriverDetails(Type, release, ds, B0T, HIon, pA, cosmics, recoRelease):
             if ds_name.find("2018")!=-1:
                 str_era_pr="Run2_2018"
     if recoRelease.find("11_")!= -1:
+        for ds_name in ds:
+            if ds_name.find("2021")!=-1:
+                str_era_pr="Run3"
+    if recoRelease.find("12_")!= -1:
         for ds_name in ds:
             if ds_name.find("2021")!=-1:
                 str_era_pr="Run3"
