@@ -8,6 +8,7 @@ from modules.jira_api import JiraAPI
 
 def get_input():
 	files = glob.glob("Validations/*.txt")
+	print(files)
 	files.sort(key=os.path.getmtime)
 	return files[-1] 
 
