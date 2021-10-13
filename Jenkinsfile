@@ -179,6 +179,8 @@ pipeline {
       }
       steps {
         echo "Sending email request to AlCa Hypernews"
+        echo "${env.emailBody}"
+        echo "${env.emailSubject}"
         emailext(body: "${env.emailBody}", subject: "${env.emailSubject}", to: 'hn-cms-alca@cern.ch, physics.pritam@gmail.com')
       }
     }

@@ -148,11 +148,11 @@ def extract_keys(args):
 	run = get_run(args['run_number'])
 	oms = run['oms_attributes']
 	args['cmssw_version'] = oms['cmssw_version']
-	args['HLT_release'] = oms['cmssw_version']
-	args['PR_release']  = oms['cmssw_version']
 	args['b_field']     = int(oms['b_field'])
 	args['hlt_key']     = oms['hlt_key']
 	args['class']		= run['class']
+	if args['HLT_release'] == None: args['HLT_release'] = oms['cmssw_version']
+	if args['PR_release'] == None: args['PR_release']  = oms['cmssw_version']
 	return args
 
 if __name__ == '__main__':
