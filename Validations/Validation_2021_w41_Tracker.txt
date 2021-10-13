@@ -38,8 +38,8 @@ Validate                : Yes
 #------- OPTIONAL -------- OPTIONAL -------- OPTIONAL --------- OPTIONAL -------
 
 #-------------------------------------------------------------------------------
-HLT_release             : CMSSW_12_0_2_patch2
-PR_release              : CMSSW_12_0_2_patch2
+HLT_release             : CMSSW_12_0_2_patch1
+PR_release              : CMSSW_12_0_2_patch1
 b_field                 : None
 class                   : None
 hlt_key                 : None
