@@ -8,7 +8,6 @@ from modules.jira_api import JiraAPI
 
 def get_input():
 	files = glob.glob("Validations/*.txt")
-	print(files)
 	files.sort(key=os.path.getmtime)
 	return files[-1] 
 
@@ -100,7 +99,7 @@ def build_Prompt_workflow(args):
 
 def compose_email(args):
 	emailSubject = "[HLT/Express/Prompt] Full track validation of {Title} ({Week}, {Year})".format(Title = args['Title'], Week = args['Week'], Year = args['Year'])
-	emailBody = """Dear colleaques,
+	emailBody = """Dear colleagues,
 We are going to perform {emailSubject}
 Details of the workflow:
 - Target HLT GT: {TargetGT_HLT}

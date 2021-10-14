@@ -19,7 +19,7 @@ class JiraAPI:
    def create_issue(self):
       """Create new JIRA ticket"""
       jira = self.connection
-      new_issue = jira.create_issue(project='CMSALCA', issuetype={'name': 'Task'}, summary = args['emailSubject'], description = args['emailBody'])
+      new_issue = jira.create_issue(project='CMSALCA', issuetype={'name': 'Task'}, summary = self.args['emailSubject'], description = self.args['emailBody'])
       new_issue.update(assignee={'name': 'tvami'})
       new_issue.update(fields={"labels": self.args['Labels']})
       new_issue.update(fields={"priority": {'name': 'Major'}})

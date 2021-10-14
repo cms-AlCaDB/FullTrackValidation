@@ -521,7 +521,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
             driver_command += "--customise_commands='%s' " % (details['custcommands'])
 
         cmssw_command = "cd %s; eval `scramv1 runtime -sh`; cd -" % (options.hltCmsswDir)
-        upload_command = "; wmupload.py -u %s -g PPD -l %s %s"% (os.getenv('USER'), cfgname, cfgname)
+        upload_command = "; ./wmupload.py -u %s -g PPD -l %s %s"% (os.getenv('USER'), cfgname, cfgname)
         if DRYRUN: upload_command = ""
         execme(cmssw_command + '; ' + driver_command + upload_command)
         base = None
@@ -573,7 +573,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                 driver_command += "--customise_commands='%s' " % (recodqm['custcommands'])
             if options.recoCmsswDir:
                 cmssw_command = "cd %s; eval `scramv1 runtime -sh`; cd -" % (options.recoCmsswDir)
-                upload_command = "wmupload.py -u %s -g PPD -l %s %s" % (os.getenv('USER'),
+                upload_command = "./wmupload.py -u %s -g PPD -l %s %s" % (os.getenv('USER'),
                         'recodqm.py', 'recodqm.py')
 
                 execme(cmssw_command + '; ' + driver_command + '; ' + upload_command)
@@ -601,7 +601,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
 
             if options.recoCmsswDir:
                 cmssw_command = "cd %s; eval `scramv1 runtime -sh`; cd -" % (options.recoCmsswDir)
-                upload_command = "wmupload.py -u %s -g PPD -l %s %s" % (os.getenv('USER'),
+                upload_command = "./wmupload.py -u %s -g PPD -l %s %s" % (os.getenv('USER'),
                         'step4_%s_HARVESTING.py' % label,'step4_%s_HARVESTING.py' % label)
 
                 execme(cmssw_command + '; ' + driver_command + '; ' + upload_command)
