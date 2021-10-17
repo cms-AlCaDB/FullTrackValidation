@@ -155,7 +155,7 @@ def main():
                 print('''\nWizard for metadata
 I will ask you some questions to fill the metadata file. For some of the questions there are defaults between square brackets (i.e. []), leave empty (i.e. hit Enter) to use them.''')
 
-                typeList = ['HLT+RECO', 'EXPR+RECO', 'PR', 'HLT+RECO+ALCA', 'PR+ALCA']
+                typeList = ['HLT+RECO', 'EXPR+RECO', 'PR', 'EXPR', 'HLT+RECO+ALCA', 'PR+ALCA']
 
                 print('\nTypes of workflow submissions')
                 for (index, type) in enumerate(typeList):
@@ -165,23 +165,17 @@ I will ask you some questions to fill the metadata file. For some of the questio
 
                 if 'HLT+RECO' in type or 'EXPR+RECO' in type:
                     hlt_release = getInput('CMSSW_11_3_2', '\nWhich CMSSW release for HLT?\ne.g. CMSSW_7_4_9_patch1\nhlt_release [CMSSW_11_3_2]: ')
+                    hlt_menu = getInput('orcoff:/cdaq/cosmic/commissioning2021/CRUZET/Cosmics/V3', '\nWhich HLT menu?\ne.g. orcoff:/cdaq/physics/Run2015/25ns14e33/v3.5/HLT/V7\nhlt_menu [orcoff:/cdaq/cosmic/commissioning2021/CRUZET/Cosmics/V3]: ')
+                    basegt = getInput('113X_dataRun3_Prompt_Candidate_2021_08_02_15_14_18', '\nWhat is the common GT for Reco?\ne.g. 74X_dataRun2_Prompt_v1\nbasegt [113X_dataRun3_Prompt_Candidate_2021_08_02_15_14_18]: ')
 
                 if 'PR' == type:
                     is_PR_after_HLTRECO = getInput('True','\nHave you already submitted workflows for type : HLT+RECO?\ntype [y/n] : ')
 
                 pr_release = getInput('CMSSW_11_3_2', '\nWhich CMSSW release for Prompt Reco?\ne.g. CMSSW_7_4_11_patch1\npr_release [CMSSW_11_3_2]: ')
 
-                if 'HLT+RECO' in type or 'EXPR+RECO' in type:
-                    hlt_menu = getInput('orcoff:/cdaq/cosmic/commissioning2021/CRUZET/Cosmics/V3', '\nWhich HLT menu?\ne.g. orcoff:/cdaq/physics/Run2015/25ns14e33/v3.5/HLT/V7\nhlt_menu [orcoff:/cdaq/cosmic/commissioning2021/CRUZET/Cosmics/V3]: ')
-
                 newgt = getInput('113X_dataRun3_HLT_Candidate_2021_08_02_15_14_25', '\nWhat is the new GT to be validated?\ne.g. 74X_dataRun2_HLTValidation_2015-09-07-08-26-15\nnewgt [113X_dataRun3_HLT_Candidate_2021_08_02_15_14_25]: ')
                 jira = getInput('10', '\nWhat is the JIRA ticket number?\ne.g. 10\njira [10]:')
-
                 gt = getInput('113X_dataRun3_HLT_v3', '\nWhat is the reference GT?\ne.g. 74X_dataRun2_HLT_v1\ngt [113X_dataRun3_HLT_v3]: ')
-
-                if 'HLT+RECO' in type or 'EXPR+RECO' in type:
-                    basegt = getInput('113X_dataRun3_Prompt_Candidate_2021_08_02_15_14_18', '\nWhat is the common GT for Reco?\ne.g. 74X_dataRun2_Prompt_v1\nbasegt [113X_dataRun3_Prompt_Candidate_2021_08_02_15_14_18]: ')
-
                 ds = getInput('/ExpressCosmics/Commissioning2021-Express-v1/FEVT', '\nWhat is the dataset to be used (comma-separated if more than one)?\ne.g. /HLTPhysics/Run2015C-v1/RAW\nds [/ExpressCosmics/Commissioning2021-Express-v1/FEVT]: ')
 
                 run_err_mess = 'The run value has to be an integer, a dictionary or empty (null).'
@@ -191,11 +185,7 @@ I will ask you some questions to fill the metadata file. For some of the questio
                 Runs_forcheck = ''
                 Lumisec_forcheck = ''
 
-                #subSetup_slc6.sh is required for the query
                 os.system("export SCRAM_ARCH=slc7_amd64_gcc900") 
-                #os.system("scramv1 project {0}".format(hlt_release))
-                #os.chdir("{0}/src".format(hlt_release))
-                #os.system("eval `scramv1 runtime -sh`")
                 os.environ["X509_USER_PROXY"] = os.popen('voms-proxy-info -path').read().strip()
                 execme("source /cvmfs/cms.cern.ch/common/crab-setup.sh")
                 # do some type recognition and set run or runLs accordingly
@@ -258,12 +248,11 @@ I will ask you some questions to fill the metadata file. For some of the questio
                     sys.exit('POOR_STATISTIC')
                   elif checkStat_out == 'LOW_STAT':
                     print('WARNING! The statistic is low. Please check carefully if you do not want to consider a better RUN/lumisection.')
-                b0T = getInput('n', '\nIs this for B=0T?\nAnswer [n]: ')
-                hion = getInput('n', '\nIs this for Heavy Ions? Note B=0T is not compatible with Heavy Ions at the moment, also pA runs and Heavy Ions runs are mutually exclusive\nAnswer [n]: ')
-                pa_run   = getInput('n', '\nIs this for pA run?\nAnswer [n]:')
-                cosmics_run   = getInput('n', '\nIs this for cosmics run?\nAnswer [n]:')
+                b0T         = getInput('n', '\nIs this for B=0T?\nAnswer [n]: ')
+                hion        = getInput('n', '\nIs this for Heavy Ions? Note B=0T is not compatible with Heavy Ions at the moment, also pA runs and Heavy Ions runs are mutually exclusive\nAnswer [n]: ')
+                pa_run      = getInput('n', '\nIs this for pA run?\nAnswer [n]:')
+                cosmics_run = getInput('n', '\nIs this for cosmics run?\nAnswer [n]:')
                 metadata = {
-                    'PR_release': pr_release,
                     'options': {
                         'Type': type,
                         'jira': jira,
@@ -272,15 +261,9 @@ I will ask you some questions to fill the metadata file. For some of the questio
                         'ds': ds,
                         'run': run}}
 
-                if 'PR' == type:
-                    if(is_PR_after_HLTRECO.lower() == 'n'):
-                        metadata['options'].update({'two_WFs': ''})
-
                 if runLs:
                     metadata['options']['runLs'] = runLs
                     metadata['options'].pop('run')
-
-
                 if b0T.lower() == 'y':
                     metadata['options'].update({'B0T':''})
                 if hion.lower() == 'y':
@@ -289,8 +272,10 @@ I will ask you some questions to fill the metadata file. For some of the questio
                     metadata['options'].update({'pA':''})
                 if cosmics_run.lower() == 'y':
                     metadata['options'].update({'cosmics':''})
+
                 if 'HLT+RECO' in type or 'EXPR+RECO' in type:
                     metadata['HLT_release'] = hlt_release
+                    metadata['PR_release'] = pr_release
                     metadata['options'].update({
                         'HLT': 'Custom',
                         'HLTCustomMenu': hlt_menu,
@@ -298,6 +283,12 @@ I will ask you some questions to fill the metadata file. For some of the questio
                     if metadata['PR_release'] != metadata['HLT_release']:
                         pr_release = metadata['PR_release']
                         metadata['options']['recoCmsswDir'] = '../%s/' % (pr_release)
+
+                if type == 'EXPR':
+                    metadata.update({'Expr_release': pr_release})
+                if type == 'PR':
+                    if(is_PR_after_HLTRECO.lower() == 'n'):
+                        metadata['options'].update({'two_WFs': ''})
 
                 metadata = json.dumps(metadata, sort_keys=True, indent=4)
                 print('\nThis is the generated metadata:\n%s' % (metadata))
@@ -314,35 +305,31 @@ I will ask you some questions to fill the metadata file. For some of the questio
         metadata = json.loads(metadataFile.read())
         print('\nexecute the following commands:\n')
         commands = []
-        try:
-            if metadata['HLT_release']:
-                #commands.append('eval \'scramv1 project %s\'' % metadata['HLT_release'] )
-                commands.append('source bash/wmsetup.sh')
-                #commands.append('cd ..')
-                #commands.append('cd %s/..' % os.getcwd())
-                commands.append('export SCRAM_ARCH=slc7_amd64_gcc900')
-                commands.append('scramv1 project %s' % (metadata['HLT_release']))
-                commands.append('cd %s/src' % (metadata['HLT_release']))
-                #commands.append('eval \'scramv1 runtime -sh\'')
-                commands.append('eval `scramv1 runtime -sh`')
-                commands.append('git cms-addpkg HLTrigger/Configuration')
-                #commands.append('eval \'scramv1 b\'')
-                commands.append('scramv1 b')
-                #commands.append('voms-proxy-init --voms cms') # it is already in subSetup_slc6.sh
-                commands.append('cd -')
-                if metadata['PR_release'] != metadata['HLT_release']:
-                    #commands.append('eval \'scramv1 project %s\'' % metadata['PR_release'])
-                    commands.append('scramv1 project %s' % (metadata['PR_release']))
-        except KeyError:
-            #commands.append('eval \'scramv1 project %s\'' % metadata['PR_release'] )
+        if 'HLT_release' in [x.encode('UTF8') for x in metadata.keys()]:
+            commands.append('source bash/wmsetup.sh')
+            commands.append('export SCRAM_ARCH=slc7_amd64_gcc900')
+            commands.append('scramv1 project %s' % (metadata['HLT_release']))
+            commands.append('cd %s/src' % (metadata['HLT_release']))
+            commands.append('eval `scramv1 runtime -sh`')
+            commands.append('git cms-addpkg HLTrigger/Configuration')
+            commands.append('scramv1 b')
+            #commands.append('voms-proxy-init --voms cms') # it is already in subSetup_slc6.sh
+            commands.append('cd -')
+            if metadata['PR_release'] != metadata['HLT_release']:
+                commands.append('scramv1 project %s' % (metadata['PR_release']))
+        elif 'Expr_release' in [x.encode('UTF8') for x in metadata.keys()]:
+            commands.append('export SCRAM_ARCH=slc7_amd64_gcc900')
+            commands.append('scramv1 project %s' % (metadata['Expr_release']))
+            commands.append('cd %s/src' % (metadata['Expr_release']))
+            commands.append('eval `scramv1 runtime -sh`')
+            commands.append('scramv1 b')
+            commands.append('cd -')
+        else:
             commands.append('source bash/wmsetup.sh') #subSetupAuto.sh') #subSetup_slc6.sh')
-            #commands.append('cd ..')
-            commands.append('export SCRAM_ARCH=slc7_amd64_gcc900')    
+            commands.append('export SCRAM_ARCH=slc7_amd64_gcc900')
             commands.append('scramv1 project %s' % (metadata['PR_release']))
             commands.append('cd %s/src' % (metadata['PR_release']))
-            #commands.append('eval \'scramv1 runtime -sh\'')
             commands.append('eval `scramv1 runtime -sh`')
-            #commands.append('voms-proxy-init --voms cms') # it is already in subSetup_slc6.sh
             commands.append('cd -')
 
         cond_submit_command = './condDatasetSubmitter.py '
@@ -404,16 +391,41 @@ I will ask you some questions to fill the metadata file. For some of the questio
             if metadata['options']['Type']=='EXPR+RECO' or metadata['options']['Type']=='HLT+RECO':
                 commands.append('cp cmsDrivers.sh cmsDrivers_{}.sh'.format(metadata['options']['Type'].split('+')[0]))
                 if arguments.new:
-                    commands.append('cmsRun NEWCONDITIONS0.py')
-                    commands.append('cmsRun recodqm.py')
-                    commands.append('cmsRun step4_newco_HARVESTING.py')
+                    if metadata['PR_release'] != metadata['HLT_release']:
+                        commands.append("cd %s; eval `scramv1 runtime -sh`; cd -" % metadata['HLT_release'])
+                        commands.append('cmsRun NEWCONDITIONS0.py')
+                        commands.append("cd %s; eval `scramv1 runtime -sh`; cd -" % metadata['PR_release'])
+                        commands.append('cmsRun recodqm.py')
+                        commands.append('cmsRun step4_newco_HARVESTING.py')
+                    else:
+                        commands.append('cmsRun NEWCONDITIONS0.py')
+                        commands.append('cmsRun recodqm.py')
+                        commands.append('cmsRun step4_newco_HARVESTING.py')
                     commands.append('mv DQM*.root {}_newco_DQMoutput.root'.format(metadata['options']['Type'].split('+')[0]))
                 elif arguments.refer:
                     commands.append('rm -f step*.root')
-                    commands.append('cmsRun REFERENCE.py')
-                    commands.append('cmsRun recodqm.py')
-                    commands.append('cmsRun step4_refer_HARVESTING.py')
+                    if metadata['PR_release'] != metadata['HLT_release']:
+                        commands.append("cd %s; eval `scramv1 runtime -sh`; cd -" % metadata['HLT_release'])
+                        commands.append('cmsRun REFERENCE.py')
+                        commands.append("cd %s; eval `scramv1 runtime -sh`; cd -" % metadata['PR_release'])
+                        commands.append('cmsRun recodqm.py')
+                        commands.append('cmsRun step4_refer_HARVESTING.py')
+                    else:
+                        commands.append('cmsRun NEWCONDITIONS0.py')
+                        commands.append('cmsRun recodqm.py')
+                        commands.append('cmsRun step4_newco_HARVESTING.py')
                     commands.append('mv DQM*.root {}_refer_DQMoutput.root'.format(metadata['options']['Type'].split('+')[0]))
+            elif metadata['options']['Type'] == 'EXPR':
+                commands.append('cp cmsDrivers.sh cmsDrivers_EXPR.sh')
+                if arguments.new:
+                    commands.append('cmsRun NEWCONDITIONS0.py')
+                    commands.append('cmsRun step4_newco_HARVESTING.py')
+                    commands.append('mv DQM*.root EXPR_newco_DQMoutput.root')
+                elif arguments.refer:
+                    commands.append('rm -f step*.root')
+                    commands.append('cmsRun REFERENCE.py')
+                    commands.append('cmsRun step4_refer_HARVESTING.py')
+                    commands.append('mv DQM*.root EXPR_refer_DQMoutput.root')
             elif metadata['options']['Type']=='PR':
                 commands.append('cp cmsDrivers.sh cmsDrivers_PR.sh')
                 if arguments.new:

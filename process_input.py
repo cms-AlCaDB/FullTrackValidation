@@ -53,9 +53,11 @@ def build_HLT_workflow(args):
 	options = hlt_dict['options'] = dict()
 	if round(args['b_field'])==0: options['B0T'] = ""
 	if args['class']=="Cosmics21CRUZET": options['cosmics'] = ""
+	if args['HLT_release'] != args['PR_release']: 
+		options['recoCmsswDir'] = args['PR_release']
+	options['HLTCustomMenu'] = None if args['HLT_Type'] == 'GRun' else "orcoff:"+args['hlt_key']
 	options['HLT'] 			 = args['HLT_Type']
 	options['Type'] 		 = "HLT+RECO"
-	options['HLTCustomMenu'] = "orcoff:"+args['hlt_key']
 	options['ds']			 = args['Dataset']
 	options['basegt']		 = args['TargetGT_PROMPT']
 	options['gt']			 = args['ReferenceGT_HLT']
@@ -64,18 +66,32 @@ def build_HLT_workflow(args):
 	options['jira']		 	 = args['Jira']
 	return hlt_dict
 
+# def build_Express_workflow(args):
+# 	express_dict = dict()
+# 	express_dict['HLT_release'] = args['HLT_release']
+# 	express_dict['PR_release'] = args['PR_release']
+# 	options = express_dict['options'] = dict()
+# 	if round(args['b_field'])==0: options['B0T'] = ""
+# 	if args['class']=="Cosmics21CRUZET": options['cosmics'] = ""
+# 	options['HLT'] 			 = args['HLT_Type']
+# 	options['Type'] 		 = "EXPR+RECO"
+# 	options['HLTCustomMenu'] = "orcoff:"+args['hlt_key']
+# 	options['ds']			 = args['Dataset']
+# 	options['basegt']		 = args['TargetGT_PROMPT']
+# 	options['gt']			 = args['ReferenceGT_EXPRESS']
+# 	options['newgt']		 = args['TargetGT_EXPRESS']
+# 	options['runLs']		 = ast.literal_eval(args['Run'])
+# 	options['jira']		 	 = args['Jira']
+# 	return express_dict
+
 def build_Express_workflow(args):
 	express_dict = dict()
-	express_dict['HLT_release'] = args['HLT_release']
-	express_dict['PR_release'] = args['PR_release']
+	express_dict['Expr_release'] = args['Expr_release']
 	options = express_dict['options'] = dict()
 	if round(args['b_field'])==0: options['B0T'] = ""
 	if args['class']=="Cosmics21CRUZET": options['cosmics'] = ""
-	options['HLT'] 			 = args['HLT_Type']
-	options['Type'] 		 = "EXPR+RECO"
-	options['HLTCustomMenu'] = "orcoff:"+args['hlt_key']
+	options['Type'] 		 = "EXPR"
 	options['ds']			 = args['Dataset']
-	options['basegt']		 = args['TargetGT_PROMPT']
 	options['gt']			 = args['ReferenceGT_EXPRESS']
 	options['newgt']		 = args['TargetGT_EXPRESS']
 	options['runLs']		 = ast.literal_eval(args['Run'])
@@ -150,8 +166,9 @@ def extract_keys(args):
 	args['cmssw_version'] = oms['cmssw_version']
 	args['b_field']     = int(oms['b_field'])
 	args['class']		= run['class']
-	if not 'CMSSW' in args['HLT_release']: args['HLT_release'] = oms['cmssw_version']
-	if not 'CMSSW' in args['PR_release']: args['PR_release']  = oms['cmssw_version']
+	if not 'CMSSW' in args['HLT_release'] : args['HLT_release'] = oms['cmssw_version']
+	if not 'CMSSW' in args['PR_release']  : args['PR_release']  = oms['cmssw_version']
+	if not 'CMSSW' in args['Expr_release']: args['PR_release']  = oms['cmssw_version']
 	if args['HLT_release'] != oms['cmssw_version']: 
 		args['HLT_Type'] = "GRun"
 		args['hlt_key']  = "the GRun menu for %s" %args['HLT_release']

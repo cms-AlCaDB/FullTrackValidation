@@ -55,7 +55,7 @@ def createOptionParser():
                         action='store_true')
     parser.add_option("--Type",
                         help="Defines the type of the workflow",
-                        choices=['HLT','PR','PR+ALCA','RECO+HLT','HLT+RECO', 'EXPR+RECO', 'HLT+RECO+ALCA'],
+                        choices=['HLT','PR','PR+ALCA', 'EXPR', 'RECO+HLT','HLT+RECO', 'EXPR+RECO', 'HLT+RECO+ALCA'],
                         default='HLT')
     parser.add_option("--two_WFs",
                         default=False,
@@ -354,7 +354,7 @@ def getDriverDetails(Type, release, ds, B0T, HIon, pA, cosmics, recoRelease):
         HLTBase.update({'recodqm':HLTRECObase})
         return HLTBase
 
-    elif Type in ['PR', 'PR+ALCA']:
+    elif Type in ['PR', 'PR+ALCA', 'EXPR']:
         theDetails = {"reqtype":"PR",
                         "steps":"RAW2DIGI,L1Reco,RECO,EI,PAT,DQM",
                         "procname":"reRECO",
@@ -379,12 +379,12 @@ def getDriverDetails(Type, release, ds, B0T, HIon, pA, cosmics, recoRelease):
         if B0T:
             theDetails.update({"magfield":"0T",
                                 "customise":"Configuration/DataProcessing/RecoTLR.customisePrompt,Configuration/DataProcessing/RecoTLR.customiseCosmicData"})
-                                #"customise":"Configuration/DataProcessing/RecoTLR.customisePromptRun2DeprecatedB0T"})
+            if Type == 'EXPR':
+                theDetails.update({"customise":"Configuration/DataProcessing/RecoTLR.customiseExpress,Configuration/DataProcessing/RecoTLR.customiseCosmicData"})
 
         if cosmics:
             theDetails.update({"steps": "RAW2DIGI,L1Reco,RECO,DQM",
-                                "magfield": "0T"
-                                })
+                                "magfield": "0T"})
 
         if pA:
             theDetails.update({"era":"Run2_2016_pA"})
@@ -395,6 +395,9 @@ def getDriverDetails(Type, release, ds, B0T, HIon, pA, cosmics, recoRelease):
 
         if Type == 'PR+ALCA':
             theDetails.update({"steps":"RAW2DIGI,L1Reco,RECO,ALCA:SiStripCalMinBias,DQM"})
+
+        if Type == 'EXPR':
+            theDetails.update({"reqtype":"EXPR"})
 
         return theDetails
 
@@ -407,9 +410,9 @@ def step1(options):
     command1 = "echo '' > step1_files.txt\n"
     command2 = "dasgoclient --limit 0 --format json --query 'lumi,file dataset={} run={}' | das-selected-lumis.py {} | sort -u >> step1_files.txt\n".format(options.ds[0], run, "%s,%s"%(value2[0][0],value2[0][1]) )
     command3 = 'echo \'{}\' > step1_lumi_ranges.txt\n'.format("{\""+run+"\": %s}"%(value2))
-    execme(command1)
-    execme(command2)
-    execme(command3)
+    execme(command1, echo=False)
+    execme(command2, echo=False)
+    execme(command3, echo=False)
 
 def splitOptions(command, echo = True):
     if echo: dfile.write("\n")
@@ -503,8 +506,8 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
         scenario = '--scenario cosmics'
 
     # Create the drivers
-    for c in confCondList:
-        (cfgname,custgt) = c
+    for cfgname, custgt in confCondList:
+        dfile.write("\n##### Steps for %s conditions!!" %('NEW' if 'NEW' in cfgname.strip('.py').strip('0') else cfgname.strip('.py').strip('0')))
         print("\n\n\tCreating for", cfgname, "\n\n")
         driver_command = "cmsDriver.py %s " % (details['reqtype'])+\
                 "-s %s " % (details['steps']) +\
@@ -544,8 +547,10 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
 
         cmssw_command = "cd %s; eval `scramv1 runtime -sh`; cd -" % (options.hltCmsswDir)
         upload_command = "./wmupload.py -u %s -g PPD -l %s %s"% (os.getenv('USER'), cfgname, cfgname)
-        # execme(cmssw_command + '; ' + driver_command)
-        execme(driver_command)
+        if ('NEW' in cfgname and options.recoCmsswDir):
+            execme(cmssw_command + '; ' + driver_command)  
+        else: 
+            execme(driver_command)
         upload_command = "" if DRYRUN else execme(upload_command)
         base = None
 
@@ -598,8 +603,8 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                 cmssw_command = "cd %s; eval `scramv1 runtime -sh`; cd -" % (options.recoCmsswDir)
                 upload_command = "./wmupload.py -u %s -g PPD -l %s %s" % (os.getenv('USER'),
                         'recodqm.py', 'recodqm.py')
-
-                execme(driver_command + '; ' + upload_command)
+                execme(cmssw_command + '; ' + driver_command)
+                upload_command = "" if DRYRUN else execme(upload_command)
             else:
                 execme(driver_command)
 
@@ -626,8 +631,8 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                 cmssw_command = "cd %s; eval `scramv1 runtime -sh`; cd -" % (options.recoCmsswDir)
                 upload_command = "./wmupload.py -u %s -g PPD -l %s %s" % (os.getenv('USER'),
                         'step4_%s_HARVESTING.py' % label,'step4_%s_HARVESTING.py' % label)
-
-                execme(cmssw_command + '; ' + driver_command + '; ' + upload_command)
+                execme(cmssw_command + '; ' + driver_command)
+                upload_command = "" if DRYRUN else execme(upload_command)
             else:
                 execme(driver_command)
         else:
@@ -648,7 +653,6 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                             "-n 100 "
             if details['era'] != "":
                 driver_command += "--era %s " % (details['era'])
-
             execme(driver_command)
     ##END of for loop
 
@@ -894,11 +898,10 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
     print('Now execute:\n./wmcontrol.py --req_file %s  |& tee wmcontrol.1.log' % (wmconf_name))
 
 def printInfo(options):
-    if "HLT" in options.Type or "EXPR" in options.Type:
+    if "HLT" in options.Type or "EXPR+RECO" in options.Type:
         if options.HLT is not None:
             hltFilename = '%s/src/HLTrigger/Configuration/python/HLT_%s_cff.py' % (options.hltCmsswDir,
                     options.HLT)
-
         else:
             hltFilename = '%s/src/HLTrigger/Configuration/python/HLT_GRun_cff.py' % (options.hltCmsswDir)
 
@@ -907,11 +910,6 @@ def printInfo(options):
             f = open(hltFilename)
             menu = f.readline()
             menu = menu.strip().split(":")[-1].strip()
-            # menu = menu.replace('\n', '').replace('# ', '')
-            # menulist = menu.split()
-            # hltCmsswVersion = (options.hltCmsswDir).split('/')
-            # menulist[-1] = '(%s)' % (hltCmsswVersion[-1])
-            # menu = menulist[0] + " " + menulist[-1]
 
     matched = re.match("(.*),(.*),(.*)", options.newgt)
     if matched:
@@ -934,15 +932,15 @@ def printInfo(options):
     elif (options.runLs):
         print("run: %s" % (options.runLs))
 
-    if "HLT" in options.Type or "EXPR" in options.Type:
+    if "HLT" in options.Type or "EXPR+RECO" in options.Type:
         print("HLT menu: %s" % (menu))
         print("Target HLT GT: %s" % (newgtshort))
         print("Reference HLT GT: %s" % (gtshort))
     if "HLT" in options.Type and "RECO" in options.Type:
         print("Common Prompt GT: %s" % (options.basegt))
-    if options.Type == "PR":
-        print("Target Prompt GT: %s" % (newgtshort))
-        print("Reference Prompt GT: %s" % (gtshort))
+    if options.Type in ["PR", "EXPR"]:
+        print("Target %s GT: %s" % (options.Type, newgtshort))
+        print("Reference %s GT: %s" % (options.Type, gtshort))
 
 #-------------------------------------------------------------------------------
 
@@ -960,8 +958,6 @@ if __name__ == "__main__":
 
     # Get the options
     options = createOptionParser()
-    print(options.run)
-    print(type(options.run))
     # this type is LIST in the normal CASE,
     # and it's also list with a single element == dictionary in the LS-filtering case. This is a problem
 

@@ -31,7 +31,7 @@ Run                     : {'344518': [[1, 1892]]}
 
 # Yes, if you want to submit job for computation if local test is successful
 #-------------------------------------------------------------------------------
-Validate                : Yes
+Validate                : No
 
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
@@ -41,6 +41,7 @@ Validate                : Yes
 Jira                    : 140
 HLT_release             : CMSSW_12_0_2_patch1
 PR_release              : CMSSW_12_0_2_patch1
+Expr_release            : CMSSW_12_0_2_patch1
 b_field                 : None
 class                   : None
 hlt_key                 : None
