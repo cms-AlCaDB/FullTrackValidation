@@ -6,7 +6,9 @@ pipeline {
     JIRA_CREDENTIALS = credentials('jirapass')
     TEST_RESULT = "/eos/home-p/pkalbhor/AlCaValidations"
   }
-  agent any
+  agent {
+    label "lxplus"
+  }
   options {
     // This is required if you want to clean before build
     skipDefaultCheckout(true)

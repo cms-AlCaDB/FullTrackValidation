@@ -9,6 +9,7 @@ from modules.jira_api import JiraAPI
 def get_input():
 	files = glob.glob("Validations/*.txt")
 	files.sort()
+	print(files)
 	return files[-1] 
 
 def get_run(run_number):
@@ -168,7 +169,7 @@ def extract_keys(args):
 	args['class']		= run['class']
 	if not 'CMSSW' in args['HLT_release'] : args['HLT_release'] = oms['cmssw_version']
 	if not 'CMSSW' in args['PR_release']  : args['PR_release']  = oms['cmssw_version']
-	if not 'CMSSW' in args['Expr_release']: args['PR_release']  = oms['cmssw_version']
+	if not 'CMSSW' in args['Expr_release']: args['Expr_release']  = oms['cmssw_version']
 	if args['HLT_release'] != oms['cmssw_version']: 
 		args['HLT_Type'] = "GRun"
 		args['hlt_key']  = "the GRun menu for %s" %args['HLT_release']
