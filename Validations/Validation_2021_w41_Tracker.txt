@@ -20,7 +20,7 @@ ReferenceGT_PROMPT      : 120X_dataRun3_Prompt_v2
 
 # Dataset
 #-------------------------------------------------------------------------------
-Dataset                 : /ExpressCosmics/Commissioning2021-Express-v1/FEVT
+Dataset                 : /Cosmics/Commissioning2021-v1/RAW
 
 # Run Number
 # Choose of the following example format
@@ -38,6 +38,7 @@ Validate                : Yes
 #------- OPTIONAL -------- OPTIONAL -------- OPTIONAL --------- OPTIONAL -------
 
 #-------------------------------------------------------------------------------
+Jira                    : 140
 HLT_release             : CMSSW_12_0_2_patch1
 PR_release              : CMSSW_12_0_2_patch1
 b_field                 : None

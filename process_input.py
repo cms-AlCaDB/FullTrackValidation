@@ -53,7 +53,7 @@ def build_HLT_workflow(args):
 	options = hlt_dict['options'] = dict()
 	if round(args['b_field'])==0: options['B0T'] = ""
 	if args['class']=="Cosmics21CRUZET": options['cosmics'] = ""
-	options['HLT'] 			 = "Custom"
+	options['HLT'] 			 = args['HLT_Type']
 	options['Type'] 		 = "HLT+RECO"
 	options['HLTCustomMenu'] = "orcoff:"+args['hlt_key']
 	options['ds']			 = args['Dataset']
@@ -71,7 +71,7 @@ def build_Express_workflow(args):
 	options = express_dict['options'] = dict()
 	if round(args['b_field'])==0: options['B0T'] = ""
 	if args['class']=="Cosmics21CRUZET": options['cosmics'] = ""
-	options['HLT'] 			 = "Custom"
+	options['HLT'] 			 = args['HLT_Type']
 	options['Type'] 		 = "EXPR+RECO"
 	options['HLTCustomMenu'] = "orcoff:"+args['hlt_key']
 	options['ds']			 = args['Dataset']
@@ -149,10 +149,15 @@ def extract_keys(args):
 	oms = run['oms_attributes']
 	args['cmssw_version'] = oms['cmssw_version']
 	args['b_field']     = int(oms['b_field'])
-	args['hlt_key']     = oms['hlt_key']
 	args['class']		= run['class']
-	if args['HLT_release'] == None: args['HLT_release'] = oms['cmssw_version']
-	if args['PR_release'] == None: args['PR_release']  = oms['cmssw_version']
+	if not 'CMSSW' in args['HLT_release']: args['HLT_release'] = oms['cmssw_version']
+	if not 'CMSSW' in args['PR_release']: args['PR_release']  = oms['cmssw_version']
+	if args['HLT_release'] != oms['cmssw_version']: 
+		args['HLT_Type'] = "GRun"
+		args['hlt_key']  = "the GRun menu for %s" %args['HLT_release']
+	else:
+		args['HLT_Type'] = "Custom"
+		args['hlt_key']  = oms['hlt_key']
 	return args
 
 if __name__ == '__main__':
@@ -160,22 +165,19 @@ if __name__ == '__main__':
 	args = extract_keys(args)
 
 	sysArgs = sys.argv
-	api = JiraAPI(args, sysArgs[1], sysArgs[2])
-	ticket = api.check_duplicate()
-	if not ticket: 
-		args["Jira"]= int(api.get_key().split('-')[1].strip())+1
-		print(">> Labels not matching with any older ticket. CMSALCA-{} will be created at later stage.".format(args["Jira"]))
-	else:
-		args["Jira"] = int(ticket.split('-')[1].strip())
-
-	# try:
-	# 	run = get_run(args['run_number'])
-	# except:
-	# 	run = {'class': args['class']}
-	# 	run['oms_attributes'] = {'cmssw_version': args['HLT_release'],
-	# 							 'b_field': int(args['b_field']),
-	# 							 'hlt_key': args['hlt_key']
-	# 							}
+	try:
+		api = JiraAPI(args, sysArgs[1], sysArgs[2])
+		ticket = api.check_duplicate()
+		if not ticket:
+			args["Jira"]= int(api.get_key().split('-')[1].strip())+1
+			print(">> Labels not matching with any older ticket. CMSALCA-{} will be created at later stage.".format(args["Jira"]))
+		else:
+			args["Jira"] = int(ticket.split('-')[1].strip())
+	except:
+		if not "Jira" in args.keys(): 
+			print("Provide ticket number in input template if you are facing error accessing Jira site")
+			exit()
+		print(">> Jira site is not accessible. Ticket number is taken from input template. CMSALCA-%s" %args["Jira"])
 
 	hlt_dict 	 = build_HLT_workflow(args)
 	express_dict = build_Express_workflow(args)

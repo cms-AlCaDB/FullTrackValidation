@@ -16,7 +16,7 @@ from modules import wma
 DRYRUN = False # pass option --dry to set to true
 
 dfile = open("cmsDrivers.sh", "w")
-dfile.write("#!/bin/bash\n")
+dfile.write("#!/bin/bash \nset -x\n")
 
 #-------------------------------------------------------------------------------
 
@@ -276,7 +276,7 @@ def getDriverDetails(Type, release, ds, B0T, HIon, pA, cosmics, recoRelease):
         HLTBase.update({"datatier":"FEVTDEBUG,DQM", "eventcontent":"FEVTDEBUG,DQM"})
         
     if pA:
-        HLTBase.update({"era":"Run2_2016_pA"})
+        HLTBase.update({"era":"Run3_2022_pA"})
 
     HLTRECObase = {"steps":"RAW2DIGI,L1Reco,RECO",
                     "procname":"reRECO",
@@ -335,13 +335,15 @@ def getDriverDetails(Type, release, ds, B0T, HIon, pA, cosmics, recoRelease):
             raise ValueError('theRelease is set to %s, which is not supported by condDatasetSubmitter' % (recoRelease))
 
         if B0T:
-            pass
+            HLTRECObase.update({"magfield":"0T"})
+            if Type == "EXPR+RECO":
+                HLTRECObase.update({"customise":"Configuration/DataProcessing/RecoTLR.customiseExpress,Configuration/DataProcessing/RecoTLR.customiseCosmicData"})
 
         if cosmics: 
             HLTRECObase.update({"steps":"RAW2DIGI,L1Reco,RECO,DQM"})
 
         if pA:
-            HLTRECObase.update({"era":"Run2_2016_pA"})
+            HLTRECObase.update({"era":"Run3_2022_pA"})
 
         if HIon:
             raise ValueError('condDatasetSubmitter is not yet set up to run HI validations - e-tutto-lavoraccio')
@@ -375,7 +377,6 @@ def getDriverDetails(Type, release, ds, B0T, HIon, pA, cosmics, recoRelease):
             raise ValueError('theRelease is set to %s, which is not supported by condDatasetSubmitter' % (recoRelease))
 
         if B0T:
-            pass
             theDetails.update({"magfield":"0T",
                                 "customise":"Configuration/DataProcessing/RecoTLR.customisePrompt,Configuration/DataProcessing/RecoTLR.customiseCosmicData"})
                                 #"customise":"Configuration/DataProcessing/RecoTLR.customisePromptRun2DeprecatedB0T"})
@@ -406,34 +407,54 @@ def step1(options):
     command1 = "echo '' > step1_files.txt\n"
     command2 = "dasgoclient --limit 0 --format json --query 'lumi,file dataset={} run={}' | das-selected-lumis.py {} | sort -u >> step1_files.txt\n".format(options.ds[0], run, "%s,%s"%(value2[0][0],value2[0][1]) )
     command3 = 'echo \'{}\' > step1_lumi_ranges.txt\n'.format("{\""+run+"\": %s}"%(value2))
-    dfile.write(command1)
-    dfile.write(command2)
-    dfile.write(command3)
-    dfile.write("\n\n")
+    execme(command1)
+    execme(command2)
+    execme(command3)
 
-    if not options.dry:
-        execme(command1)
-        execme(command2)
-        execme(command3)
+def splitOptions(command, echo = True):
+    if echo: dfile.write("\n")
+    if "hltGetConfiguration" in command:
+        dfile.write("# Step 0: Extract custom HLT configuration from given HLT menu\n")
+    if "--processName HLT2" in command:
+        dfile.write("# Step 2: HLT\n")
+    if "--processName reRECO" in command:
+        dfile.write("# Step 3: Reconstruction\n")
+    if "step4" in command:
+        dfile.write("# Step 4: DQM Harvesting\n")
+    for cmd in command.split(";"):
+        if 'cmsDriver' in cmd:
+            for idx, ccc in zip(range(len(cmd.split('--'))), cmd.split('--')):
+                dfile.write("# "+ccc+"\n") if idx==0 else dfile.write("# --"+ccc+"\n")
+        elif echo:
+            dfile.write("# "+cmd+"\n")
+    if echo:
+        dfile.write("\n"+command+"\n")
+    else:
+        dfile.write(command+"\n")
 
-def execme(command):
+def execme(command, echo = True):
     if DRYRUN:
         print(command)
-        if not 'wmcontrol' in command:
-            for cmd in command.split(";"):
-                if 'cmsDriver' in cmd:
-                    for idx, ccc in zip(range(len(cmd.split('--'))), cmd.split('--')):
-                        dfile.write("# "+ccc+"\n") if idx==0 else dfile.write("# --"+ccc+"\n")
-                else:
-                    dfile.write("# "+cmd+"\n")
-            dfile.write("\n"+command+"\n")
+        if not 'wmcontrol' in command: splitOptions(command, echo=echo)
     else:
         print(" * Executing: %s..." % command)
-        ##TO-DO: rewrite to subprocess!
+        splitOptions(command, echo=echo)
         os.system(command)
         print(" * Executed!")
 
 #-------------------------------------------------------------------------------
+def collect_commands(options):
+    command = []
+    command.append("export SCRAM_ARCH=slc7_amd64_gcc900")
+    command.append("scramv1 project %s" %(options.release))
+    command.append("cd %s/src" %(options.release))
+    command.append("eval `scramv1 runtime -sh`")
+    command.append("git cms-addpkg HLTrigger/Configuration")
+    command.append("scramv1 b")
+    command.append("cd -")
+    if DRYRUN: 
+        for cmd in command: execme(cmd, echo = False)
+
 def createHLTConfig(options):
     assert os.path.exists("%s/src/HLTrigger/Configuration/" % (options.hltCmsswDir)), "error: HLTrigger/Configuration/ is missing in the CMSSW release for HLT (set to: echo $CMSSW_VERSION ) - can't create the HLT configuration "
     onerun = 0
@@ -460,7 +481,8 @@ def createHLTConfig(options):
     patch_command2 = "sed -i 's/, fragment.DQMHistograms//g' %s/src/HLTrigger/Configuration/python/HLT_%s_cff.py" % (options.hltCmsswDir, options.HLT)
 
     if (is_hltGetConfigurationOK(getCMSSWReleaseFromPath(options.hltCmsswDir))):
-        execme(cmssw_command + '; ' + hlt_command + '; ' + build_command)
+        # execme(cmssw_command + '; ' + hlt_command + '; ' + build_command)
+        execme(hlt_command)
     else:
         execme(cmssw_command + '; ' + hlt_command + '; ' + patch_command + '; ' + patch_command2 + '; ' + build_command)
         print("\n CMSSW release for HLT doesn't allow usage of hltGetConfiguration out-of-the-box, patching configuration ")
@@ -521,9 +543,10 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
             driver_command += "--customise_commands='%s' " % (details['custcommands'])
 
         cmssw_command = "cd %s; eval `scramv1 runtime -sh`; cd -" % (options.hltCmsswDir)
-        upload_command = "; ./wmupload.py -u %s -g PPD -l %s %s"% (os.getenv('USER'), cfgname, cfgname)
-        if DRYRUN: upload_command = ""
-        execme(cmssw_command + '; ' + driver_command + upload_command)
+        upload_command = "./wmupload.py -u %s -g PPD -l %s %s"% (os.getenv('USER'), cfgname, cfgname)
+        # execme(cmssw_command + '; ' + driver_command)
+        execme(driver_command)
+        upload_command = "" if DRYRUN else execme(upload_command)
         base = None
 
         if 'base' in details:
@@ -576,7 +599,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                 upload_command = "./wmupload.py -u %s -g PPD -l %s %s" % (os.getenv('USER'),
                         'recodqm.py', 'recodqm.py')
 
-                execme(cmssw_command + '; ' + driver_command + '; ' + upload_command)
+                execme(driver_command + '; ' + upload_command)
             else:
                 execme(driver_command)
 
@@ -969,6 +992,8 @@ if __name__ == "__main__":
     # Read the group of conditions from the list in the file
     confCondList = getConfCondDictionary(options)
 
+    # Start
+    collect_commands(options)
     # Create the cff
     if options.HLT in ["SameAsRun", "Custom"]:
         createHLTConfig(options)
