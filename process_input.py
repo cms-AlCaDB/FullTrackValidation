@@ -8,7 +8,7 @@ from modules.jira_api import JiraAPI
 
 def get_input():
 	files = glob.glob("Validations/*.txt")
-	files.sort(key=os.path.getmtime)
+	files.sort()
 	return files[-1] 
 
 def get_run(run_number):
