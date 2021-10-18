@@ -80,7 +80,7 @@ class Configuration:
     def __init__ (self, parser):
         # assume you have a .conf input file, first...
         # see : https://docs.python.org/2/library/configparser.html
-        self.configparser = ConfigParser.SafeConfigParser()
+        self.configparser = ConfigParser.ConfigParser()
 
         try:
             options,args = parser.parse_args()

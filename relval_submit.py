@@ -318,6 +318,7 @@ I will ask you some questions to fill the metadata file. For some of the questio
             if metadata['PR_release'] != metadata['HLT_release']:
                 commands.append('scramv1 project %s' % (metadata['PR_release']))
         elif 'Expr_release' in [x.encode('UTF8') for x in metadata.keys()]:
+            commands.append('source bash/wmsetup.sh')
             commands.append('export SCRAM_ARCH=slc7_amd64_gcc900')
             commands.append('scramv1 project %s' % (metadata['Expr_release']))
             commands.append('cd %s/src' % (metadata['Expr_release']))
@@ -376,12 +377,15 @@ I will ask you some questions to fill the metadata file. For some of the questio
                 run_label_for_fn += str(oneRun)
 
         if not arguments.dry:
-            try:
-                if metadata['HLT_release']:
-                    wtype = 'EXPRESS' if metadata['options']['Type']=='EXPR+RECO' else 'HLT'
-                    commands.append('./wmcontrol.py --req_file %sConditionValidation_%s_%s_%s.conf |& tee wmc_%s.log' % (
-                            wtype, metadata['HLT_release'], metadata['options']['basegt'], run_label_for_fn, wtype))
-            except KeyError:
+            if 'HLT_release' in [x.encode('UTF8') for x in metadata.keys()]:
+                wtype = 'EXPRESS' if metadata['options']['Type']=='EXPR+RECO' else 'HLT'
+                commands.append('./wmcontrol.py --req_file %sConditionValidation_%s_%s_%s.conf |& tee wmc_%s.log' % (
+                        wtype, metadata['HLT_release'], metadata['options']['basegt'], run_label_for_fn, wtype))
+            elif 'Expr_release' in [x.encode('UTF8') for x in metadata.keys()]:
+                wtype = 'Express'
+                commands.append('./wmcontrol.py --req_file EXPRConditionValidation_%s_%s_%s.conf |& tee wmc_EXPR.log' % (
+                    metadata['Expr_release'], metadata['options']['newgt'], run_label_for_fn))
+            else:
                 commands.append('./wmcontrol.py --req_file PRConditionValidation_%s_%s_%s.conf |& tee wmc_PR.log' % (
                             metadata['PR_release'], metadata['options']['newgt'], run_label_for_fn))
             commands.append('rm *.couchID')

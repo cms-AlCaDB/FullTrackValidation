@@ -1,0 +1,45 @@
+Title                   : Tracker conditions for CRUZET reprocessing
+
+Subsystem               : Tracker
+# Labels: List of labels separated by comma. Keep it unique for given validation
+#-------------------------------------------------------------------------------
+Labels                  : Week36, 2021, Tracker
+
+# Target GTs here
+#-------------------------------------------------------------------------------
+TargetGT_HLT            : 113X_dataRun3_HLT_Candidate_2021_09_06_15_51_59
+TargetGT_EXPRESS        : 113X_dataRun3_Express_Candidate_2021_09_06_16_21_51
+TargetGT_PROMPT         : 113X_dataRun3_Prompt_Candidate_2021_09_06_16_21_26
+
+
+# Reference GTs here
+#-------------------------------------------------------------------------------
+ReferenceGT_HLT         : 113X_dataRun3_HLT_v3
+ReferenceGT_EXPRESS     : 113X_dataRun3_Express_v4
+ReferenceGT_PROMPT      : 113X_dataRun3_Prompt_v3
+
+# Dataset
+#-------------------------------------------------------------------------------
+Dataset                 : /ExpressCosmics/Commissioning2021-Express-v1/FEVT
+
+# Run Number
+# Choose of the following example format
+# 344518
+# {"344518": [[1, 1892]]}
+#-------------------------------------------------------------------------------
+Run                     : {'344518': [[1, 1892]]}
+
+# Yes, if you want to submit job for computation if local test is successful
+#-------------------------------------------------------------------------------
+Validate                : No
+
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+#------- OPTIONAL -------- OPTIONAL -------- OPTIONAL --------- OPTIONAL -------
+
+#-------------------------------------------------------------------------------
+HLT_release             : None
+PR_release              : None
+b_field                 : None
+class                   : None
+hlt_key                 : None

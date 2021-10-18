@@ -9,7 +9,6 @@ from modules.jira_api import JiraAPI
 def get_input():
 	files = glob.glob("Validations/*.txt")
 	files.sort()
-	print(files)
 	return files[-1] 
 
 def get_run(run_number):
@@ -97,6 +96,7 @@ def build_Express_workflow(args):
 	options['newgt']		 = args['TargetGT_EXPRESS']
 	options['runLs']		 = ast.literal_eval(args['Run'])
 	options['jira']		 	 = args['Jira']
+	options['two_WFs']		 = ""
 	return express_dict
 
 def build_Prompt_workflow(args):

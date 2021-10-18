@@ -1,0 +1,45 @@
+Title                   : Pixel gain calibrations for CRUZET 2021
+
+Subsystem               : Pixel
+# Labels: List of labels separated by comma. Keep it unique for given validation
+#-------------------------------------------------------------------------------
+Labels                  : Week32, 2021, PIXEL
+
+# Target GTs here
+#-------------------------------------------------------------------------------
+TargetGT_HLT            : 113X_dataRun3_HLT_Candidate_2021_08_13_17_05_34
+TargetGT_EXPRESS        : 113X_dataRun3_Express_Candidate_2021_08_13_17_09_06
+TargetGT_PROMPT         : 113X_dataRun3_Prompt_Candidate_2021_08_13_17_08_32
+
+
+# Reference GTs here
+#-------------------------------------------------------------------------------
+ReferenceGT_HLT         : 113X_dataRun3_HLT_v3
+ReferenceGT_EXPRESS     : 113X_dataRun3_HLT_v3
+ReferenceGT_PROMPT      : 113X_dataRun3_Prompt_v3
+
+# Dataset
+#-------------------------------------------------------------------------------
+Dataset                 : /ExpressCosmics/Commissioning2021-Express-v1/FEVT
+
+# Run Number
+# Choose of the following example format
+# 344518
+# {"344518": [[1, 1892]]}
+#-------------------------------------------------------------------------------
+Run                     : {'344518': [[1, 1892]]}
+
+# Yes, if you want to submit job for computation if local test is successful
+#-------------------------------------------------------------------------------
+Validate                : Yes
+
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+#------- OPTIONAL -------- OPTIONAL -------- OPTIONAL --------- OPTIONAL -------
+
+#-------------------------------------------------------------------------------
+HLT_release             : CMSSW_11_3_4
+PR_release              : CMSSW_11_3_4
+b_field                 : 0
+class                   : Cosmics21CRUZET
+hlt_key                 : /cdaq/cosmic/commissioning2021/CRUZET/Cosmics/V4
