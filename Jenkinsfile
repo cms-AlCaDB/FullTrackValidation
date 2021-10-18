@@ -17,6 +17,7 @@ pipeline {
       steps{
         cleanWs()
         checkout scm
+        sh script: 'pip3 install --upgrade --user pip; pip3 install --user -r requirements.txt', label: "Check for dependencies"
         sh script: 'set +x; ${AUTH} | ./process_input.py alcauser `xargs`', label: "Processing input template"
         stash includes: '*.json', name: 'json'
         script {
