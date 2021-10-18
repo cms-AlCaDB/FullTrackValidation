@@ -1,8 +1,8 @@
 #!/bin/env python3
 import glob, os, sys, json, ast
-import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+from requests.packages.urllib3 import disable_warnings
+disable_warnings(InsecureRequestWarning)
 import runregistry
 from modules.jira_api import JiraAPI
 
