@@ -6,7 +6,7 @@ pipeline {
     TEST_RESULT = "/eos/home-a/alcauser/AlCaValidations"
   }
   agent {
-    label "alcaplus"
+    label "user-alcauser"
   }
   options {
     // This is required if you want to clean before build
@@ -33,7 +33,7 @@ pipeline {
       parallel {
         stage('HLT New') {
           agent {
-            label "alcaplus"
+            label "user-alcauser"
           }
           steps {
             cleanWs()
@@ -53,7 +53,7 @@ pipeline {
 
         stage('HLT Reference') {
           agent {
-            label "alcaplus"
+            label "user-alcauser"
           }
           steps {
             cleanWs()
@@ -68,7 +68,7 @@ pipeline {
 
         stage('Express New') {
           agent {
-            label "alcaplus"
+            label "user-alcauser"
           }
           steps {
             cleanWs()
@@ -88,7 +88,7 @@ pipeline {
 
         stage('Express Reference') {
           agent {
-            label "alcaplus"
+            label "user-alcauser"
           }
           steps {
             cleanWs()
@@ -103,7 +103,7 @@ pipeline {
 
         stage('Prompt New') {
           agent {
-            label "alcaplus"
+            label "user-alcauser"
           }
           steps {
             cleanWs()
@@ -123,7 +123,7 @@ pipeline {
 
         stage('Prompt Reference') {
           agent {
-            label "alcaplus"
+            label "user-alcauser"
           }
           steps {
             cleanWs()
@@ -143,7 +143,7 @@ pipeline {
       parallel {
         stage('JIRA Test') {
           agent {
-            label "alcaplus"
+            label "user-alcauser"
           }
           steps {
             cleanWs()
@@ -154,7 +154,7 @@ pipeline {
 
         stage('Email Test') {
           agent {
-            label "alcaplus"
+            label "user-alcauser"
           }
           steps {
             cleanWs()
