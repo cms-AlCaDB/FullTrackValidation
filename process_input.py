@@ -1,6 +1,7 @@
 #!/bin/env python3
 import glob, os, sys, json, ast
 import requests
+print("Module path: ", requests.__file__)
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from requests.packages.urllib3 import disable_warnings
 disable_warnings(InsecureRequestWarning)
