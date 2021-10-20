@@ -1,7 +1,7 @@
 pipeline {
   environment {
     //This variable need be tested as string
-    doTest = '1'
+    doTest = '0'
     AUTH = "$HOME/private/.auth/.dec"
     TEST_RESULT = "/eos/home-a/alcauser/AlCaValidations"
   }
@@ -160,6 +160,7 @@ pipeline {
             cleanWs()
             checkout scm
             unstash 'json'
+            emailext(body: "${env.emailBody}", subject: "${env.emailSubject}", to: 'physics.pritam@gmail.com')
           }
         }
       }
