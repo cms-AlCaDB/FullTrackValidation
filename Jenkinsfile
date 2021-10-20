@@ -157,7 +157,7 @@ pipeline {
             label "user-alcauser"
           }
           steps {
-            sh script: 'mail -s "${emailSubject}" -r "AlcaDB Team <alcadb.user@cern.ch>" physics.pritam@gmail.com <<< "${emailBody}"', label: "Sending test email"
+            sh script: 'mail -s "${emailSubject}" -r "AlcaDB Team <alcadb.user@cern.ch>" -c "101pritam@gmail.com" physics.pritam@gmail.com <<< "${emailBody}"', label: "Sending test email"
           }
         }
       }
@@ -180,7 +180,7 @@ pipeline {
         echo "Sending email request to AlCa Hypernews"
         echo "${env.emailBody}"
         echo "${env.emailSubject}"
-        emailext(body: "${env.emailBody}", subject: "${env.emailSubject}", to: 'hn-cms-alca@cern.ch, physics.pritam@gmail.com')
+        sh script: 'mail -s "${emailSubject}" -r "AlcaDB Team <alcadb.user@cern.ch>" -c "physics.pritam@gmail.com" hn-cms-alca@cern.ch <<< "${emailBody}"', label: "Sending announcement email"
       }
     }
     stage('Submission') {
