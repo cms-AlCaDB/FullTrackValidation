@@ -157,7 +157,7 @@ pipeline {
             label "user-alcauser"
           }
           steps {
-            sh script 'mail -s "${env.emailSubject}" -r "AlcaDB Team <alcadb.user@cern.ch>" physics.pritam@gmail.com <<< "${env.emailBody}"', label: "Sending test email."
+            sh script: 'mail -s "${env.emailSubject}" -r "AlcaDB Team <alcadb.user@cern.ch>" physics.pritam@gmail.com <<< "${env.emailBody}"', label: "Sending test email"
           }
         }
       }
