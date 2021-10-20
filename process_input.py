@@ -148,6 +148,13 @@ Pritam, Amandeep, Tamas, Francesco, Helena (for AlCa/DB)
 	args['emailBody'] = emailBody
 	return args
 
+def create_emailConfig(args):
+	configfile = open("email.txt", "w")
+	configfile.write("Subject: %s"%args['emailSubject'])
+	configfile.write("\nFrom: AlCaDB Team <alcadb.user@cern.ch>\n")
+	configfile.write(args['emailBody'])
+	configfile.close()
+
 def check_requirements():
 	import pkg_resources
 	required = list()
@@ -208,6 +215,5 @@ if __name__ == '__main__':
 		rfile.close()
 
 	args = compose_email(args)
-
 	jsonfile = open('envs.json', 'w')
 	json.dump(args, jsonfile, indent=2)

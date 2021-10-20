@@ -157,10 +157,7 @@ pipeline {
             label "user-alcauser"
           }
           steps {
-            cleanWs()
-            checkout scm
-            unstash 'json'
-            emailext(body: "${env.emailBody}", subject: "${env.emailSubject}", to: 'physics.pritam@gmail.com')
+            sh script 'mail -s "${env.emailSubject}" -r "AlcaDB Team <alcadb.user@cern.ch>" physics.pritam@gmail.com <<< "${env.emailBody}"', label: "Sending test email."
           }
         }
       }
