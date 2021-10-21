@@ -211,9 +211,7 @@ pipeline {
   }
   post {
     always {
-      steps {
-        sh script: 'mail -s "Jenkins Build ${currentResult}: Job ${JOB_NAME}" -r "AlcaDB Team <alcadb.user@cern.ch>" -c "101pritam@gmail.com" physics.pritam@gmail.com <<< "${currentBuild.currentResult}"', label: "Sending post-build email"
-      }
+      sh script: 'mail -s "Jenkins Build ${currentResult}: Job ${JOB_NAME}" -r "AlcaDB Team <alcadb.user@cern.ch>" -c "101pritam@gmail.com" physics.pritam@gmail.com <<< "${currentBuild.currentResult}"', label: "Sending post-build email"
       // emailext(body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}\n Access cosole output at: ${env.BUILD_URL}console. \n ${env.RUN_DISPLAY_URL}", recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}", to: 'physics.pritam@gmail.com', attachLog: true)
     }
 
