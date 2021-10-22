@@ -26,6 +26,36 @@ pipeline {
       }
     }
 
+    stage('Unit Tests') {
+      parallel {
+        stage('JIRA Test') {
+          agent {
+            label "user-alcauser"
+          }
+          steps {
+            cleanWs()
+            checkout scm  
+            unstash 'json'
+            sh script: 'python3 -m pytest tests/jira_tests.py -s  --junit-xml=results.xml -o junit_family="xunit1"', label: "Unit test rusult"
+          }
+          post {
+            always {
+              junit 'test_result.xml'
+            }
+          }
+        }
+
+        stage('Email Test') {
+          agent {
+            label "user-alcauser"
+          }
+          steps {
+            sh script: 'mail -s "${emailSubject}" -r "AlcaDB Team <alcadb.user@cern.ch>" physics.pritam@gmail.com <<< "${emailBody}"', label: "Sending test email"
+          }
+        }
+      }
+    }
+
     stage('Local Tests') {
       when {
         expression { doTest == '1' }
@@ -136,36 +166,6 @@ pipeline {
           }
         }
 
-      }
-    }
-
-    stage('Unit Tests') {
-      parallel {
-        stage('JIRA Test') {
-          agent {
-            label "user-alcauser"
-          }
-          steps {
-            cleanWs()
-            checkout scm  
-            unstash 'json'
-            sh script: 'python3 -m pytest tests/jira_tests.py --junit-xml=test_result.xml', label: "Unit test rusult"
-          }
-          post {
-            always {
-              junit 'test_result.xml'
-            }
-          }
-        }
-
-        stage('Email Test') {
-          agent {
-            label "user-alcauser"
-          }
-          steps {
-            sh script: 'mail -s "${emailSubject}" -r "AlcaDB Team <alcadb.user@cern.ch>" physics.pritam@gmail.com <<< "${emailBody}"', label: "Sending test email"
-          }
-        }
       }
     }
 
