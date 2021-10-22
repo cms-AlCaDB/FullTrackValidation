@@ -5,7 +5,7 @@ Subsystem               : Tracker
 #-------------------------------------------------------------------------------
 Labels                  : Week41, 2021, Tracker
 
-# Target GTs here
+# Target GTs here 
 #-------------------------------------------------------------------------------
 TargetGT_HLT            : 120X_dataRun3_HLT_Candidate_2021_10_13_16_55_53
 TargetGT_EXPRESS        : 120X_dataRun3_Express_Candidate_2021_10_13_16_56_05
