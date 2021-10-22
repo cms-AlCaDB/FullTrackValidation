@@ -38,8 +38,10 @@ Validate                : No
 #------- OPTIONAL -------- OPTIONAL -------- OPTIONAL --------- OPTIONAL -------
 
 #-------------------------------------------------------------------------------
+Jira                    : None
 HLT_release             : None
 PR_release              : None
+Expr_release            : None
 b_field                 : None
 class                   : None
 hlt_key                 : None

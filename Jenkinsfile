@@ -1,7 +1,7 @@
 pipeline {
   environment {
     //This variable need be tested as string
-    doTest = '0'
+    doTest = '1'
     AUTH = "$HOME/private/.auth/.dec"
     TEST_RESULT = "/eos/home-a/alcauser/AlCaValidations"
   }
@@ -40,7 +40,7 @@ pipeline {
           }
           post {
             always {
-              junit '*.xml'
+              junit 'results.xml'
             }
           }
         }
