@@ -149,6 +149,12 @@ pipeline {
             cleanWs()
             checkout scm  
             unstash 'json'
+            sh script: 'python3 -m pytest tests/jira_tests.py --junit-xml=test_result.xml', label: "Unit test rusult"
+          }
+          post {
+            always {
+              junit 'test_result.xml'
+            }
           }
         }
 
@@ -157,7 +163,7 @@ pipeline {
             label "user-alcauser"
           }
           steps {
-            sh script: 'mail -s "${emailSubject}" -r "AlcaDB Team <alcadb.user@cern.ch>" -c "101pritam@gmail.com" physics.pritam@gmail.com <<< "${emailBody}"', label: "Sending test email"
+            sh script: 'mail -s "${emailSubject}" -r "AlcaDB Team <alcadb.user@cern.ch>" physics.pritam@gmail.com <<< "${emailBody}"', label: "Sending test email"
           }
         }
       }
@@ -180,7 +186,7 @@ pipeline {
         echo "Sending email request to AlCa Hypernews"
         echo "${env.emailBody}"
         echo "${env.emailSubject}"
-        sh script: 'mail -s "${emailSubject}" -r "AlcaDB Team <alcadb.user@cern.ch>" -c "physics.pritam@gmail.com" hn-cms-alca@cern.ch <<< "${emailBody}"', label: "Sending announcement email"
+        sh script: 'mail -s "${emailSubject}" -r "AlcaDB Team <alcadb.user@cern.ch>" -c "alcadb.user@cern.ch" hn-cms-alca@cern.ch <<< "${emailBody}"', label: "Sending announcement email"
       }
     }
     stage('Submission') {
@@ -212,7 +218,6 @@ pipeline {
   post {
     always {
       sh script: "mail -s 'Jenkins Build ${currentBuild.currentResult}: Job ${JOB_NAME}' -r 'AlcaDB Team <alcadb.user@cern.ch>' -c '101pritam@gmail.com' physics.pritam@gmail.com <<< 'More info at: ${env.RUN_DISPLAY_URL}'", label: "Sending post-build email"
-      // emailext(body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}\n Access cosole output at: ${env.BUILD_URL}console. \n ${env.RUN_DISPLAY_URL}", recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}", to: 'physics.pritam@gmail.com', attachLog: true)
     }
 
   }

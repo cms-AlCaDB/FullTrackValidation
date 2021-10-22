@@ -9,6 +9,7 @@ class JiraAPI:
    CERN_CA_BUNDLE = '/etc/pki/tls/certs/ca-bundle.crt'
    def __init__(self, args, username, password):
       self.args = args
+      self.username = username
       self.connection = self.get_jira_client(username, password)
 
    def get_jira_client(self, username, password):
@@ -38,6 +39,7 @@ class JiraAPI:
       return False
 
    def get_key(self):
+      """Get Jira issue key of the most recent ticket from CMSALCA project"""
       issue = self.connection.search_issues('project=CMSALCA order by created desc', maxResults=1)[0]
       return issue.key
 

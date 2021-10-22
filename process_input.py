@@ -1,9 +1,9 @@
 #!/bin/env python3
+#
+# Author : Pritam Kalbhor (physics.pritam@gmail.com)
+#
+
 import glob, os, sys, json, ast
-import requests
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from requests.packages.urllib3 import disable_warnings
-disable_warnings(InsecureRequestWarning)
 import runregistry
 from modules.jira_api import JiraAPI
 
@@ -13,13 +13,15 @@ def get_input():
 	return files[-1] 
 
 def get_run(run_number):
+	# import urllib3; urllib3.disable_warnings()
 	run = runregistry.get_run(run_number=int(run_number))
-	# print(run['oms_attributes'].keys())
 	return run
 
 def get_arguments():
 	print(">> We will be processing lastly edited template: ", get_input())
 	file="_NewValidation.txt"
+
+	# Ignore lines starting with hash #. Delete empty lines
 	os.system("""sed '/^#.*$/d' "%s" > %s""" %(get_input(), file))
 	os.system("""sed -i '/^[[:space:]]*$/d' %s""" %(file))
 	
@@ -35,6 +37,7 @@ def get_arguments():
 	args['Week']  = "{}".format(week[0])
 	args['Year']  = "{}".format(year[0])
 	args['Label'] = "{}".format(Label)
+	iFile.close()
 	return args
 
 def get_mappings():
@@ -66,24 +69,6 @@ def build_HLT_workflow(args):
 	options['runLs']		 = ast.literal_eval(args['Run'])
 	options['jira']		 	 = args['Jira']
 	return hlt_dict
-
-# def build_Express_workflow(args):
-# 	express_dict = dict()
-# 	express_dict['HLT_release'] = args['HLT_release']
-# 	express_dict['PR_release'] = args['PR_release']
-# 	options = express_dict['options'] = dict()
-# 	if round(args['b_field'])==0: options['B0T'] = ""
-# 	if args['class']=="Cosmics21CRUZET": options['cosmics'] = ""
-# 	options['HLT'] 			 = args['HLT_Type']
-# 	options['Type'] 		 = "EXPR+RECO"
-# 	options['HLTCustomMenu'] = "orcoff:"+args['hlt_key']
-# 	options['ds']			 = args['Dataset']
-# 	options['basegt']		 = args['TargetGT_PROMPT']
-# 	options['gt']			 = args['ReferenceGT_EXPRESS']
-# 	options['newgt']		 = args['TargetGT_EXPRESS']
-# 	options['runLs']		 = ast.literal_eval(args['Run'])
-# 	options['jira']		 	 = args['Jira']
-# 	return express_dict
 
 def build_Express_workflow(args):
 	express_dict = dict()
@@ -217,3 +202,4 @@ if __name__ == '__main__':
 	args = compose_email(args)
 	jsonfile = open('envs.json', 'w')
 	json.dump(args, jsonfile, indent=2)
+	jsonfile.close()
