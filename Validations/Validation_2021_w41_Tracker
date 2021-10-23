@@ -22,7 +22,7 @@ ReferenceGT_PROMPT      : 120X_dataRun3_Prompt_v2
 #-------------------------------------------------------------------------------
 Dataset                 : /Cosmics/Commissioning2021-v1/RAW
 
-# Run Number 
+# Run Number
 # Choose of the following example format
 # 344518
 # {"344518": [[1, 1892]]}
