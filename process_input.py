@@ -33,10 +33,9 @@ def get_arguments():
 	args['run_number'] = args['Run'].split(":")[0].strip("{").strip("'")
 	week = [v for v in args['Labels'] if 'Week' in v]
 	year = [v for v in args['Labels'] if '202' in v]
-	Label = "_".join(args['Labels'])
 	args['Week']  = "{}".format(week[0])
 	args['Year']  = "{}".format(year[0])
-	args['Label'] = "{}".format(Label)
+	args['Label'] = "{}".format("_".join(args['Labels']))
 	iFile.close()
 	return args
 

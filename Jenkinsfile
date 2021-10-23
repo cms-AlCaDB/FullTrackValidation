@@ -22,6 +22,8 @@ pipeline {
         script {
             def dict = readJSON file: 'envs.json'
             dict.each { key, value -> env."${key}"= value }
+            buildName "${env.Label}"
+            buildDescription "${env.emailSubject} Executed @ ${NODE_NAME}"
         }
       }
     }
