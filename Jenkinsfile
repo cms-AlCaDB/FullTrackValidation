@@ -39,6 +39,7 @@ pipeline {
             checkout scm  
             unstash 'json'
             sh script: 'python3 -m pytest tests/jira_tests.py -s  --junit-xml=results.xml -o junit_family="xunit1"', label: "Unit test rusult"
+            sh script: 'python3 tests/test_urls.py dumm dumm "${RUN_ARTIFACTS_DISPLAY_URL}"', label: "Test artifact url"
           }
           post {
             always {
@@ -181,7 +182,7 @@ pipeline {
       }
       steps {
         unstash 'json'
-        sh script: 'set +x; ${AUTH} | ./createTicket.py alcauser `xargs` ${env.RUN_ARTIFACTS_DISPLAY_URL}', label: "Creating a JIRA ticket for validation discussions"
+        sh script: 'set +x; ${AUTH} | ./createTicket.py alcauser `xargs` "${RUN_ARTIFACTS_DISPLAY_URL}"', label: "Creating a JIRA ticket for validation discussions"
       }
     }
     stage('Email') {
