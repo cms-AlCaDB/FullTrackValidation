@@ -56,7 +56,7 @@ pipeline {
             script {
               env.emailBody = String.format("${env.emailBody}", "${env.RUN_ARTIFACTS_DISPLAY_URL}")
             }
-            sh script: 'python3 -c "import json; f = open("envs.json", "r+"); d = json.load(f); mail=d["emailBody"]; d.update({"emailBody": mail%("${env.emailBody}")}); json.dump(d, f, indent=2); f.close()"' 
+            sh script: 'python3 -c """import json; f = open("envs.json", "r+"); d = json.load(f); mail=d["emailBody"]; d.update({"emailBody": mail%("${env.emailBody}")}); json.dump(d, f, indent=2); f.close()"""' 
             sh script: 'cat envs.json'
             sh script: 'mail -s "${emailSubject}" -r "AlcaDB Team <alcadb.user@cern.ch>" physics.pritam@gmail.com <<< "${emailBody}"', label: "Sending test email"
           }
@@ -183,7 +183,7 @@ pipeline {
       }
       steps {
         unstash 'json'
-        sh script: 'python3 -c "import json; f = open("envs.json", "r+"); d = json.load(f); mail=d["emailBody"]; d.update({"emailBody": mail%("${env.emailBody}")}); json.dump(d, f, indent=2); f.close()"'
+        sh script: 'python3 -c """import json; f = open("envs.json", "r+"); d = json.load(f); mail=d["emailBody"]; d.update({"emailBody": mail%("${env.emailBody}")}); json.dump(d, f, indent=2); f.close()"""'
         sh script: 'set +x; ${AUTH} | ./process_input.py alcauser `xargs`', label: "Creating a JIRA ticket for validation discussions"
       }
     }
