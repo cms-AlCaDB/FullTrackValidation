@@ -336,11 +336,11 @@ def getDriverDetails(Type, release, ds, B0T, HIon, pA, cosmics, recoRelease):
 
         if B0T:
             HLTRECObase.update({"magfield":"0T"})
-            if Type == "EXPR+RECO":
-                HLTRECObase.update({"customise":"Configuration/DataProcessing/RecoTLR.customiseExpress,Configuration/DataProcessing/RecoTLR.customiseCosmicData"})
 
         if cosmics: 
             HLTRECObase.update({"steps":"RAW2DIGI,L1Reco,RECO,DQM"})
+            if Type == "EXPR+RECO":
+                HLTRECObase.update({"customise":"Configuration/DataProcessing/RecoTLR.customiseExpress,Configuration/DataProcessing/RecoTLR.customiseCosmicData"})
 
         if pA:
             HLTRECObase.update({"era":"Run3_2022_pA"})
@@ -377,14 +377,14 @@ def getDriverDetails(Type, release, ds, B0T, HIon, pA, cosmics, recoRelease):
             raise ValueError('theRelease is set to %s, which is not supported by condDatasetSubmitter' % (recoRelease))
 
         if B0T:
-            theDetails.update({"magfield":"0T",
-                                "customise":"Configuration/DataProcessing/RecoTLR.customisePrompt,Configuration/DataProcessing/RecoTLR.customiseCosmicData"})
-            if Type == 'EXPR':
-                theDetails.update({"customise":"Configuration/DataProcessing/RecoTLR.customiseExpress,Configuration/DataProcessing/RecoTLR.customiseCosmicData"})
+            theDetails.update({"magfield":"0T"})
 
         if cosmics:
-            theDetails.update({"steps": "RAW2DIGI,L1Reco,RECO,DQM",
-                                "magfield": "0T"})
+            theDetails.update({"steps": "RAW2DIGI,L1Reco,RECO,DQM"})
+            if Type == 'PR':
+                theDetails.update({"customise":"Configuration/DataProcessing/RecoTLR.customisePrompt,Configuration/DataProcessing/RecoTLR.customiseCosmicData"})
+            if Type == 'EXPR':
+                theDetails.update({"customise":"Configuration/DataProcessing/RecoTLR.customiseExpress,Configuration/DataProcessing/RecoTLR.customiseCosmicData"})
 
         if pA:
             theDetails.update({"era":"Run2_2016_pA"})

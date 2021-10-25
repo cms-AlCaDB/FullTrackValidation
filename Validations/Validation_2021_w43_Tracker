@@ -1,0 +1,47 @@
+Title                   : Tracker alignment conditions for post-CRAFT
+
+Subsystem               : Tracker
+# Labels: List of labels separated by comma. Keep it unique for given validation
+#-------------------------------------------------------------------------------
+Labels                  : Week43, 2021, Tracker
+
+# Target GTs here 
+#-------------------------------------------------------------------------------
+TargetGT_HLT            : 120X_dataRun3_HLT_Candidate_2021_10_25_13_36_41
+TargetGT_EXPRESS        : 120X_dataRun3_Express_Candidate_2021_10_25_13_36_51
+TargetGT_PROMPT         : 120X_dataRun3_Prompt_Candidate_2021_10_25_13_37_04
+
+
+# Reference GTs here
+#-------------------------------------------------------------------------------
+ReferenceGT_HLT         : 120X_dataRun3_HLT_v3
+ReferenceGT_EXPRESS     : 120X_dataRun3_Express_v2
+ReferenceGT_PROMPT      : 120X_dataRun3_Prompt_v2
+
+# Dataset
+#-------------------------------------------------------------------------------
+Dataset                 : /ExpressCosmics/Commissioning2021-Express-v1/FEVT
+
+# Run Number
+# Choose of the following example format
+# 344518
+# {"344518": [[1, 1892]]}
+#-------------------------------------------------------------------------------
+Run                     : {'345755': [[1, 990]]}
+
+# Yes, if you want to submit job for computation if local test is successful
+#-------------------------------------------------------------------------------
+Validate                : No
+
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+#------- OPTIONAL -------- OPTIONAL -------- OPTIONAL --------- OPTIONAL -------
+
+#-------------------------------------------------------------------------------
+Jira                    : None
+HLT_release             : None
+PR_release              : None
+Expr_release            : None
+b_field                 : None
+class                   : None
+hlt_key                 : None

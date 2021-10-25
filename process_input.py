@@ -73,7 +73,7 @@ def build_HLT_workflow(args):
 	hlt_dict['PR_release'] = args['PR_release']
 	options = hlt_dict['options'] = dict()
 	if round(args['b_field'])==0: options['B0T'] = ""
-	if args['class']=="Cosmics21CRUZET": options['cosmics'] = ""
+	if "Cosmics" in args['class']: options['cosmics'] = ""
 	if args['HLT_release'] != args['PR_release']: 
 		options['recoCmsswDir'] = args['PR_release']
 	options['HLTCustomMenu'] = None if args['HLT_Type'] == 'GRun' else "orcoff:"+args['hlt_key']
@@ -92,7 +92,7 @@ def build_Express_workflow(args):
 	express_dict['Expr_release'] = args['Expr_release']
 	options = express_dict['options'] = dict()
 	if round(args['b_field'])==0: options['B0T'] = ""
-	if args['class']=="Cosmics21CRUZET": options['cosmics'] = ""
+	if "Cosmics" in args['class']: options['cosmics'] = ""
 	options['Type'] 		 = "EXPR"
 	options['ds']			 = args['Dataset']
 	options['gt']			 = args['ReferenceGT_EXPRESS']
@@ -107,7 +107,7 @@ def build_Prompt_workflow(args):
 	prompt_dict['PR_release'] = args['PR_release']
 	options = prompt_dict['options'] = dict()
 	if round(args['b_field'])==0: options['B0T'] = ""
-	if args['class']=="Cosmics21CRUZET": options['cosmics'] = ""
+	if "Cosmics" in args['class']: options['cosmics'] = ""
 	options['Type'] 		 = "PR"
 	options['ds']			 = args['Dataset']
 	options['gt']			 = args['ReferenceGT_PROMPT']
@@ -136,15 +136,17 @@ Details of the workflow:
 - CMSSW version to be used: {HLT_release} for HLT/Express/Prompt
 - The chosen datasets are: {Dataset}
 
-{Subsystem} experts are invited to scrutinize the results as well at [2].
-Once the workflows are ready, we will ask the {Subsystem} validators to report the outcome of the checks at JIRA [3]
+You can have a look at cmsDriver configuration at [2].
+{Subsystem} experts are invited to scrutinize the results as well at [3].
+Once the workflows are ready, we will ask the {Subsystem} validators to report the outcome of the checks at JIRA [4]
 
 Best regards,
 Pritam, Amandeep, Tamas, Francesco, Helena (for AlCa/DB)
 
 [1] https://cmsoms.cern.ch/cms/runs/report?cms_run={run_number}&cms_run_sequence=GLOBAL-RUN
-[2] https://twiki.cern.ch/twiki/bin/view/CMS/PdmVTriggerConditionValidation2021
-[3] https://its.cern.ch/jira/browse/CMSALCA-{Jira}
+[2] %s
+[3] https://twiki.cern.ch/twiki/bin/view/CMS/PdmVTriggerConditionValidation2021
+[4] https://its.cern.ch/jira/browse/CMSALCA-{Jira}
 """.format(emailSubject=emailSubject, **args)
 	args['emailSubject'] = emailSubject
 	args['emailBody'] = emailBody

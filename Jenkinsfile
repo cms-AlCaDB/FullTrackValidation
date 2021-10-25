@@ -52,6 +52,9 @@ pipeline {
             label "user-alcauser"
           }
           steps {
+            script {
+              env.emailBody = String.format("${env.emailBody}", "${env.RUN_DISPLAY_URL}")
+            }
             sh script: 'mail -s "${emailSubject}" -r "AlcaDB Team <alcadb.user@cern.ch>" physics.pritam@gmail.com <<< "${emailBody}"', label: "Sending test email"
           }
         }
