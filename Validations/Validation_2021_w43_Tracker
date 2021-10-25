@@ -20,7 +20,7 @@ ReferenceGT_PROMPT      : 120X_dataRun3_Prompt_v2
 
 # Dataset
 #-------------------------------------------------------------------------------
-Dataset                 : /ExpressCosmics/Commissioning2021-Express-v1/FEVT
+Dataset                 : /Cosmics/Commissioning2021-v1/RAW
 
 # Run Number
 # Choose of the following example format
@@ -31,7 +31,7 @@ Run                     : {'345755': [[1, 990]]}
 
 # Yes, if you want to submit job for computation if local test is successful
 #-------------------------------------------------------------------------------
-Validate                : No
+Validate                : Yes
 
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
