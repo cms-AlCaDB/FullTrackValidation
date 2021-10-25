@@ -20,7 +20,7 @@ ReferenceGT_PROMPT      : 120X_dataRun3_Prompt_v2
 
 # Dataset
 #-------------------------------------------------------------------------------
-Dataset                 : /Cosmics/Commissioning2021-v1/RAW
+Dataset                 : /ExpressCosmics/Commissioning2021-Express-v1/FEVT
 
 # Run Number
 # Choose of the following example format
