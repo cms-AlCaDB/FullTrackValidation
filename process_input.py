@@ -9,6 +9,15 @@ from datetime import datetime
 from collections import namedtuple
 from modules.jira_api import JiraAPI
 
+from argparse import ArgumentParser
+from getpass import getpass, getuser
+parser = ArgumentParser(description="Options for batch run")
+parser.add_argument('-u', '--user', type=str, dest='user', help='user name')
+group = parser.add_mutually_exclusive_group()
+group.add_argument('-p', '--pwstdin', type=str, dest='password')
+group.add_argument('--pat', action="store_true", help='use PAT')
+parsedArgs = parser.parse_args()
+
 def get_input():
 	"""Retrieve most recently edited input template. 
 	   Commit time will be recorded.
@@ -31,11 +40,13 @@ def get_input():
 		return commit_dates[-1].path
 
 def get_run(run_number):
+	"""Returns run configuration in json format. Input param: run number"""
 	# import urllib3; urllib3.disable_warnings()
 	run = runregistry.get_run(run_number=int(run_number))
 	return run
 
 def get_arguments():
+	"""Returns input arguments after processing input template in dictionary format"""
 	print(">> We will be processing lastly edited template: ", get_input())
 	file="_NewValidation.txt"
 
@@ -174,6 +185,7 @@ def check_requirements():
 			os.system("pip3 install {} --user".format(pkg))
 
 def extract_keys(args):
+	"""Extract keys from run-registry"""
 	run = get_run(args['run_number'])
 	oms = run['oms_attributes']
 	args['cmssw_version'] = oms['cmssw_version']
@@ -190,13 +202,19 @@ def extract_keys(args):
 		args['hlt_key']  = oms['hlt_key']
 	return args
 
+def get_user():
+	"""Set username and password for """
+	if not parsedArgs.user: 
+		parsedArgs.user = getuser()
+	if not (parsedArgs.password or parsedArgs.pat):
+		parsedArgs.password = getpass(prompt="Password of user '%s' for Jira: "% parsedArgs.user)
+
 if __name__ == '__main__':
+	get_user()					# set user and password for Jira
 	args = get_arguments()
 	args = extract_keys(args)
-
-	sysArgs = sys.argv
 	try:
-		api = JiraAPI(args, sysArgs[1], sysArgs[2])
+		api = JiraAPI(args, parsedArgs.user, parsedArgs.password)
 		ticket = api.check_duplicate()
 		if not ticket:
 			args["Jira"]= int(api.get_key().split('-')[1].strip())+1

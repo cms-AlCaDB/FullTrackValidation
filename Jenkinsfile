@@ -17,7 +17,7 @@ pipeline {
       steps{
         cleanWs()
         checkout scm
-        sh script: 'set +x; ${AUTH} | ./process_input.py alcauser `xargs`', label: "Processing input template"
+        sh script: './process_input.py --pat', label: "Processing input template"
         stash includes: '*.json', name: 'json'
         script {
             def dict = readJSON file: 'envs.json'

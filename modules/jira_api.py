@@ -3,19 +3,25 @@
 #
 
 from jira import JIRA
-import base64, sys
+import base64, sys, subprocess
 
 class JiraAPI:
    CERN_CA_BUNDLE = '/etc/pki/tls/certs/ca-bundle.crt'
    def __init__(self, args, username, password):
       self.args = args
       self.username = username
-      self.connection = self.get_jira_client(username, password)
+      self.connection = self.get_jira_client(password)
 
-   def get_jira_client(self, username, password):
-      return JIRA('http://its.cern.ch/jira',
-                  basic_auth=(username, password),
-                  options={'check_update': False, 'verify': self.CERN_CA_BUNDLE})
+   def get_jira_client(self, password):
+      host = 'http://its.cern.ch/jira'
+      if password is not None: 
+         return JIRA(host, basic_auth=(self.username, password),
+               options={'check_update': False, 'verify': self.CERN_CA_BUNDLE})
+      else:
+         headers = JIRA.DEFAULT_OPTIONS["headers"].copy()
+         pat = subprocess.getoutput("$HOME/private/.auth/.dec")
+         headers["Authorization"] = f"Bearer {pat}"
+         return JIRA(server=host, options={"headers": headers})
 
    def create_issue(self):
       """Create new JIRA ticket"""
