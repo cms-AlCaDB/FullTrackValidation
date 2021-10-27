@@ -1,20 +1,26 @@
 #!/bin/env python3
-import unittest, os, sys, json, subprocess, pytest
+import unittest, os, sys, json, subprocess, xmlrunner
+from argparse import Namespace
 from pathlib import Path
 directory = os.path.abspath(__file__)
 sys.path.append(str(Path(directory).parent.parent))
 
-import process_input as process_input
+from process_input import *
 
-def test_roles(record_property):
-    """Testing JIRA api access"""
-    args = process_input.get_arguments()
-    args = process_input.extract_keys(args)
-    cred = (subprocess.getoutput("whoami"), subprocess.getoutput("$HOME/private/.auth/.dec"))
-    api = process_input.JiraAPI(args, *cred)
-    record_property('Jira', args['Jira'])
+def get_project_permissions():
+    """Logs into Jira and returns permissions of the user for CMSALCA project"""
+    get_user()
+    args = get_arguments()
+    args = extract_keys(args)
+    api = JiraAPI(args, parsedArgs.user, parsedArgs.password)
+    ticket = api.check_duplicate()
+    jira = api.connection
+    mp = jira.my_permissions(projectKey='CMSALCA')['permissions']
+    permissions = Namespace(**mp)
+    return permissions
 
 class TestJira(unittest.TestCase):
+    access = get_project_permissions()
     def test_input(self):
         input_files = ['metadata_HLT.json', 'metadata_Prompt.json', 'metadata_Express.json']
         for f in input_files:
@@ -27,7 +33,26 @@ class TestJira(unittest.TestCase):
             self.assertTrue(type(args) == dict)
             self.assertTrue(len(list(args.keys())) >= 2)
 
+    def test_roles_BROWSE_PROJECTS(self):
+        self.assertTrue(self.access.BROWSE_PROJECTS['havePermission'])
+
+    def test_roles_CREATE_ISSUES(self):
+        self.assertTrue(self.access.CREATE_ISSUES['havePermission'])
+
+    def test_roles_ASSIGN_ISSUE(self):
+        self.assertTrue(self.access.ASSIGN_ISSUE['havePermission'])
+
+    def test_roles_EDIT_ISSUE(self):
+        self.assertTrue(self.access.EDIT_ISSUE['havePermission'])
+
+    def test_roles_RESOLVE_ISSUES(self):
+        self.assertTrue(self.access.RESOLVE_ISSUES['havePermission'])
+
+    def test_roles_CLOSE_ISSUES(self):
+        self.assertTrue(self.access.CLOSE_ISSUES['havePermission'])
+
 if __name__ == '__main__':
-#     sysArgs = sys.argv
-#     # pytest.main()
-    unittest.main(argv=['first-arg-is-ignored'], exit=False)
+    with open('results.xml', 'wb') as output:
+        unittest.main(argv=['first-arg-is-ignored'], exit=False,
+            testRunner=xmlrunner.XMLTestRunner(output=output),
+            failfast=False, buffer=False, catchbreak=False)

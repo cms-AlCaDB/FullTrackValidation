@@ -37,8 +37,7 @@ pipeline {
             cleanWs()
             checkout scm  
             unstash 'json'
-            sh script: 'python3 -m pytest tests/jira_tests.py -s  --junit-xml=results.xml -o junit_family="xunit1"', label: "Unit test rusult"
-            sh script: 'python3 tests/test_urls.py dumm dumm "${RUN_ARTIFACTS_DISPLAY_URL}"', label: "Test artifact url"
+            sh script: 'python3 tests/jira_tests.py --pat', label: "Unit test rusult"
           }
           post {
             always {

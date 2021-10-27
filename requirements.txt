@@ -2,3 +2,5 @@ jira
 requests
 cernrequests
 runregistry
+unittest
+unittest-xml-reporting

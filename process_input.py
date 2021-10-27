@@ -223,9 +223,8 @@ if __name__ == '__main__':
 		else:
 			args["Jira"] = int(ticket.split('-')[1].strip())
 	except:
-		if not "Jira" in args.keys(): 
-			print("Provide ticket number in input template if you are facing error accessing Jira site")
-			exit()
+		if args["Jira"] == 'None':
+			raise ValueError("Check Error message. Provide ticket number in input template if you are facing error accessing Jira site")
 		print(">> Jira site is not accessible. Ticket number is taken from input template. CMSALCA-%s" %args["Jira"])
 
 	hlt_dict 	 = build_HLT_workflow(args)
