@@ -26,7 +26,7 @@ def get_input():
 	files = glob.glob("Validations/*")
 	dlist = list()
 	for f in files: dlist.append(os.path.getmtime(f))
-	if len(set(dlist)) > 1: 
+	if len(set(dlist)) > 2: 
 		files.sort(key=os.path.getmtime)
 		return files[-1]
 	else:
