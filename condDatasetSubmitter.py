@@ -780,9 +780,10 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                     ds_name = ds[:1].replace("/","") + ds[1:].replace("/","_")
                     ds_name = ds_name.replace("-","_")
                     label = cfgname.lower().replace('.py', '')[0:5]
+                    ReqLabel = details['reqtype']+label
                     wmcconf_text += '\n[%s_%s_%s]\n' % (details['reqtype'], label, ds_name) +\
                                     'input_name = %s\n' % (ds) +\
-                                    'request_id=%s__ALCA_%s-%s_%s_%s\n' % (options.release,options.jira,datetime.datetime.now().strftime("%Y_%m_%d_%H_%M"),ds_name,label) +\
+                                    'request_id=%s__ALCA_%s-%s_%s_%s\n' % (options.release,options.jira,datetime.datetime.now().strftime("%Y_%m_%d_%H_%M"),ds_name,ReqLabel) +\
                                     'keep_step%d = True\n' % (task) +\
                                     'time_event = 1\n' +\
                                     'size_memory = 8000\n' +\
@@ -819,9 +820,10 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                 ds_name = ds[:1].replace("/","") + ds[1:].replace("/","_")
                 ds_name = ds_name.replace("-","_")
                 label = cfgname.lower().replace('.py', '')[0:5]
+                ReqLabel = details['reqtype']+label
                 wmcconf_text += '\n\n[%s_%s_%s]\n' %(details['reqtype'], label, ds_name) +\
                                 'input_name = %s\n' % (ds) +\
-                                'request_id=%s__ALCA_%s-%s_%s_%s\n' % (options.release,options.jira,datetime.datetime.now().strftime("%Y_%m_%d_%H_%M"),ds_name,label) +\
+                                'request_id=%s__ALCA_%s-%s_%s_%s\n' % (options.release,options.jira,datetime.datetime.now().strftime("%Y_%m_%d_%H_%M"),ds_name,ReqLabel) +\
                                 'keep_step%d = True\n' % (task) +\
                                 'time_event = 1\n' +\
                                 'size_memory = 8000\n' +\
@@ -846,9 +848,10 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                     ds_name = ds[:1].replace("/","") + ds[1:].replace("/","_")
                     ds_name = ds_name.replace("-","_")
                     label = cfgname.lower().replace('.py', '')[0:5]
+                    ReqLabel = details['reqtype']+label
                     wmcconf_text += '\n\n[%s_%s_%s]\n' % (details['reqtype'], label,ds_name) +\
                                     'input_name = %s\n' % (ds) +\
-                                    'request_id=%s__ALCA_%s-%s_%s_%s\n' % (options.release,options.jira,datetime.datetime.now().strftime("%Y_%m_%d_%H_%M"),ds_name,label) +\
+                                    'request_id=%s__ALCA_%s-%s_%s_%s\n' % (options.release,options.jira,datetime.datetime.now().strftime("%Y_%m_%d_%H_%M"),ds_name,ReqLabel) +\
                                     'keep_step1 = True\n' +\
                                     'time_event = 10\n' +\
                                     'size_memory = 8000\n' +\
