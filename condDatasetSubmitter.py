@@ -751,7 +751,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
             label   = cfgname.lower().replace('.py', '')[0:5]
             wmcconf_text += '[%s_reference_%s]\n' % (details['reqtype'],ds_name) +\
                             'input_name = %s\n' % (ds) +\
-                            'request_id = %s__ALCA_%s-%s_%s_refer\n' % (options.release,options.jira,datetime.datetime.now().strftime("%Y_%m_%d_%H_%M"),ds_name) +\
+                            'request_id = %s__ALCA_%s-%s_%s_%srefer\n' % (options.release,options.jira,datetime.datetime.now().strftime("%Y_%m_%d_%H_%M"),ds_name, details['reqtype']) +\
                             'keep_step1 = True\n' +\
                             'time_event = 10\n' +\
                             'size_memory = 8000\n' +\
