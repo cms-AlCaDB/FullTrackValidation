@@ -130,27 +130,28 @@ def build_Prompt_workflow(args):
 	return prompt_dict
 
 def compose_email(args):
-	emailSubject = "[HLT/Express/Prompt] Full track validation of {Title} ({Week}, {Year})".format(Title = args['Title'], Week = args['Week'], Year = args['Year'])
+	title_text = "{Title} ({Week}, {Year})".format(Title = args['Title'], Week = args['Week'], Year = args['Year'])
+	emailSubject = "[HLT/Express/Prompt] Full track validation of {}".format(title_text)
 	emailBody = """Dear colleagues,
-We are going to perform {emailSubject}
+We are going to perform full track validation of {title_text}
 Details of the workflow:
 - Target HLT GT: {TargetGT_HLT}
 - Reference HLT GT: {ReferenceGT_HLT}
 
-- Target EXPRESS GT: {TargetGT_EXPRESS}
-- Reference EXPRESS GT: {ReferenceGT_EXPRESS}
+- Target Express GT: {TargetGT_EXPRESS}
+- Reference Express GT: {ReferenceGT_EXPRESS}
 
-- Target PROMPT GT: {TargetGT_PROMPT}
-- Reference PROMPT GT: {ReferenceGT_PROMPT}
+- Target Prompt GT: {TargetGT_PROMPT}
+- Reference Prompt GT: {ReferenceGT_PROMPT}
 
-- The data chosen for validation is from {class}, run {run_number}
+- Run: {run_number} recorded on {start_date} with magnetic field {b_field}T
 - HLT Menu: {hlt_key}
-- CMSSW version to be used: {HLT_release} for HLT/Express/Prompt
-- The chosen datasets are: {Dataset}
+- CMSSW version: {HLT_release} for HLT/Express/Prompt
+- Dataset: {Dataset}
 
-You can have a look at cmsDriver configuration at [2].
-{Subsystem} experts are invited to scrutinize the results as well at [3].
-Once the workflows are ready, we will ask the {Subsystem} validators to report the outcome of the checks at JIRA [4]
+The cmsDriver configuration for the submission is accessible here [2].
+Validation details will be documented at [3].
+Once the workflows are ready, we will ask the {Subsystem} validators to report the outcome of the checks at JIRA [4].
 
 Best regards,
 Pritam, Amandeep, Tamas, Francesco, Helena (for AlCa/DB)
@@ -159,7 +160,7 @@ Pritam, Amandeep, Tamas, Francesco, Helena (for AlCa/DB)
 [2] %s
 [3] https://twiki.cern.ch/twiki/bin/view/CMS/PdmVTriggerConditionValidation2021
 [4] https://its.cern.ch/jira/browse/CMSALCA-{Jira}
-""".format(emailSubject=emailSubject, **args)
+""".format(title_text=title_text, **args)
 	args['emailSubject'] = emailSubject
 	args['emailBody'] = emailBody
 	return args
@@ -187,10 +188,14 @@ def check_requirements():
 
 def extract_keys(args):
 	"""Extract keys from run-registry"""
+	def get_date(raw_time):
+		return datetime.strptime(raw_time, '%Y-%m-%dT%H:%M:%SZ').strftime('%b-%d %Y')
 	run = get_run(args['run_number'])
 	oms = run['oms_attributes']
 	args['cmssw_version'] = oms['cmssw_version']
-	args['b_field']     = int(oms['b_field'])
+	args['b_field']     = float(oms['b_field'])
+	args['start_time']  = oms['start_time']
+	args['start_date']  = get_date(oms['start_time'])
 	args['class']		= run['class']
 	if not 'CMSSW' in args['HLT_release'] : args['HLT_release'] = oms['cmssw_version']
 	if not 'CMSSW' in args['PR_release']  : args['PR_release']  = oms['cmssw_version']

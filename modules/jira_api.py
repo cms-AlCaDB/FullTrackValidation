@@ -14,19 +14,18 @@ class JiraAPI:
 
    def get_jira_client(self, password):
       host = 'http://its.cern.ch/jira'
+      options={'check_update': False, 'verify': self.CERN_CA_BUNDLE}
       if password is not None: 
-         return JIRA(host, basic_auth=(self.username, password),
-               options={'check_update': False, 'verify': self.CERN_CA_BUNDLE})
+         return JIRA(host, basic_auth=(self.username, password), options=options)
       else:
-         headers = JIRA.DEFAULT_OPTIONS["headers"].copy()
-         pat = subprocess.getoutput("$HOME/private/.auth/.dec")
-         headers["Authorization"] = f"Bearer {pat}"
-         return JIRA(server=host, options={"headers": headers})
+         PAT = subprocess.getoutput("$HOME/private/.auth/.dec")
+         return JIRA(host, token_auth=PAT, options=options)
 
    def create_issue(self):
       """Create new JIRA ticket"""
       jira = self.connection
-      new_issue = jira.create_issue(project='CMSALCA', issuetype={'name': 'Task'}, summary = self.args['emailSubject'], description = self.args['emailBody'])
+      new_issue = jira.create_issue(project='CMSALCA', issuetype={'name': 'Task'}, 
+         summary = self.args['emailSubject'], description = self.args['emailBody'])
       new_issue.update(assignee={'name': 'tvami'})
       new_issue.update(fields={"labels": self.args['Labels']})
       new_issue.update(fields={"priority": {'name': 'Major'}})
