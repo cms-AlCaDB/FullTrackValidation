@@ -411,7 +411,8 @@ def step1(options):
     execme(command1, echo=False)
     for dataset in options.ds:
         execme("dasgoclient --limit 0 --format json --query 'lumi,file dataset={} run={}' | \
-            das-selected-lumis.py {} | sort -u >> step1_files.txt\n".format(dataset, run, "%s,%s"%(value2[0][0],value2[0][1]) ))
+            das-selected-lumis.py {} | sort -u >> step1_files.txt\n".format(dataset, run, \
+            "%s,%s"%(value2[0][0],value2[0][1]) ), echo=False)
     command3 = 'echo \'{}\' > step1_lumi_ranges.txt\n'.format("{\""+run+"\": %s}"%(value2))
     execme(command3, echo=False)
 
@@ -496,7 +497,6 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
     # get processing string
     if options.string is None:
         processing_string = str(datetime.date.today()).replace("-", "_") + "_" + str(datetime.datetime.now().time()).replace(":", "_")[0:5]
-        #processing_string = str(datetime.date.today()).replace("-","_") # GF: check differentiation between steps VS step{2}_processstring
     else:
         processing_string = options.string # GF: check differentiation between steps VS step{2}_processstring
 
@@ -552,7 +552,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
             execme(cmssw_command + '; ' + driver_command)  
         else: 
             execme(driver_command)
-        upload_command = "" if DRYRUN else execme(upload_command)
+        upload_command = "" #if DRYRUN else execme(upload_command)
         base = None
 
         if 'base' in details:
@@ -605,7 +605,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                 upload_command = "./wmupload.py -u %s -g PPD -l %s %s" % (os.getenv('USER'),
                         'recodqm.py', 'recodqm.py')
                 execme(cmssw_command + '; ' + driver_command)
-                upload_command = "" if DRYRUN else execme(upload_command)
+                upload_command = "" #if DRYRUN else execme(upload_command)
             else:
                 execme(driver_command)
 
@@ -633,7 +633,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                 upload_command = "./wmupload.py -u %s -g PPD -l %s %s" % (os.getenv('USER'),
                         'step4_%s_HARVESTING.py' % label,'step4_%s_HARVESTING.py' % label)
                 execme(cmssw_command + '; ' + driver_command)
-                upload_command = "" if DRYRUN else execme(upload_command)
+                upload_command = "" #if DRYRUN else execme(upload_command)
             else:
                 execme(driver_command)
         else:
@@ -657,10 +657,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
             execme(driver_command)
     ##END of for loop
 
-    #matched=re.match("(.*)::All",options.gt)
-    #gtshort=matched.group(1)
     matched = re.match("(.*),(.*),(.*)", options.newgt)
-
     if matched:
         gtshort = matched.group(1)
     else:
@@ -675,8 +672,6 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
     if base:
         subgtshort = gtshort
         refsubgtshort = refgtshort
-        #matched=re.match("(.*)::All",options.basegt)
-        #gtshort=matched.group(1)
         matched = re.match("(.*),(.*),(.*)", options.basegt)
         if matched:
             gtshort = matched.group(1)
@@ -686,8 +681,6 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
     if recodqm:
         subgtshort = gtshort
         refsubgtshort = refgtshort
-        #matched=re.match("(.*)::All",options.basegt)
-        #gtshort=matched.group(1)
         matched = re.match("(.*),(.*),(.*)",options.basegt)
         if matched:
             gtshort = matched.group(1)
@@ -992,10 +985,11 @@ if __name__ == "__main__":
     # Start
     collect_commands(options)
     # Create the cff
-    if options.HLT in ["SameAsRun", "Custom"]:
-        createHLTConfig(options)
+    if options.HLT in ["SameAsRun", "Custom"]: createHLTConfig(options)
 
+    # Get list of input files
     step1(options)
+
     # Create the cfgs, both for cmsRun and WMControl
     createCMSSWConfigs(options, confCondList, allRunsAndBlocks)
 
