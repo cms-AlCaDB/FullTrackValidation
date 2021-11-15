@@ -353,7 +353,8 @@ I will ask you some questions to fill the metadata file. For some of the questio
                 wtype = 'EXPRESS' if metadata['options']['Type']=='EXPR+RECO' else 'HLT'
                 cond_submit_command += '|& tee cond_%s.log'%(wtype)
         except KeyError:
-            cond_submit_command += '|& tee cond_PR.log'
+            wtype = 'EXPR' if metadata['options']['Type']=='EXPR' else 'PR'
+            cond_submit_command += '|& tee cond_%s.log' % wtype
 
         #commands.append(' git clone -b master git@github.com:cms-PdmV/wmcontrol.git  master-my-local-name    (**make sure that that PdmV master is the one you want to use**)')
         # commands.append('cd AlCaDB-WMControl')
