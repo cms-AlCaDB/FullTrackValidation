@@ -33,7 +33,7 @@ from modules import helper
 from modules import wma # here u have all the components to interact with the wma
 
 #-------------------------------------------------------------------------------
-
+workflow_file = "workflow_config.json"
 
 dbs_url_g = wma.DBS_URL
 
@@ -51,6 +51,14 @@ default_parameters = {
 
 if os.getenv('SCRAM_ARCH'):
     default_parameters['scramarch'] = os.getenv('SCRAM_ARCH')
+
+#-------------------------------------------------------------------------------
+def get_workflow_dict():
+    if os.path.exists(workflow_file) and os.stat(workflow_file).st_size != 0:
+        content = json.load(open(workflow_file))
+    else:
+        content = dict()
+    return content
 
 #-------------------------------------------------------------------------------
 class ExtendedOption (optparse.Option):
@@ -437,9 +445,11 @@ def loop_and_submit(cfg):
     Loop on all the sections of the configparser, build and submit the request.
     This is the orchestra director function.
     '''
+    wfIDs = get_workflow_dict()
     pp = pprint.PrettyPrinter(indent=4)
 
     for section in cfg.configparser.sections():
+        wfIDs.update({section: {}})
         # Warning muted
         #print '\n---> Processing request "%s"' %section
         # build the dictionary for the request
@@ -584,6 +594,7 @@ def loop_and_submit(cfg):
                         print("Finished in", int((time.time()-t)*1000), "\bms")
 
             # just print the parameters of the request you would have injected
+            wfIDs[section].update({"Config": params})
             if test_mode:
                 pp.pprint(params)
             else: # do it for real!
@@ -591,12 +602,13 @@ def loop_and_submit(cfg):
                 try:
                     workflow = wma.makeRequest(wma.WMAGENT_URL, params,
                             encodeDict=(service_params['request_type']=='TaskChain'))
-
+                    wfIDs[section].update({"workflow_name": workflow})
                 except:
                     random_sleep()
                     #just try a second time
                     workflow = wma.makeRequest(wma.WMAGENT_URL, params,
                             encodeDict=(service_params['request_type']=='TaskChain'))
+                    wfIDs[section].update({"workflow_name": workflow})
                 if not cfg.dont_approve:
                     try:
                         wma.approveRequest(wma.WMAGENT_URL, workflow)
@@ -605,6 +617,9 @@ def loop_and_submit(cfg):
                         #just try a second time
                         wma.approveRequest(wma.WMAGENT_URL, workflow)
                 random_sleep()
+    wfile = open(workflow_file, "w")
+    json.dump(wfIDs, wfile, indent=2)
+    wfile.close()
 
 #-------------------------------------------------------------------------------
 def make_cfg_docid_dict(filename):
@@ -806,11 +821,12 @@ def build_params_dict(section,cfg):
                 print("Using the one in the cfg-docid dictionary.")
                 docIDs[step] = cfg_docid_dict[step_cfg_name]
             else:
-                print("No DocId found for section %s. Uploading the cfg to the couch." % (section))
+                print("No DocId found for section %s. Uploading the cfg %s to the couch." % (section, step_cfg_name))
                 docIDs[step] = wma.upload_to_couch(step_cfg_name, section, user, group,test_mode)
 
     step1_docID, step2_docID, step3_docID = docIDs
     if harvest_docID == '' and harvest_cfg != '':
+        print("Uploading cfg %s to the couch"% harvest_cfg)
         harvest_docID = wma.upload_to_couch(harvest_cfg , section, user, group,test_mode)
 
     # check if the request is valid
