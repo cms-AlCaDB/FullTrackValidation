@@ -3,7 +3,7 @@
 #
 
 from jira import JIRA
-import base64, sys, subprocess
+import base64, os, sys, subprocess, time
 
 class JiraAPI:
    CERN_CA_BUNDLE = '/etc/pki/tls/certs/ca-bundle.crt'
@@ -18,6 +18,7 @@ class JiraAPI:
       if password is not None: 
          return JIRA(host, basic_auth=(self.username, password), options=options)
       else:
+         # Requires jira version >= 3.1.1
          PAT = subprocess.getoutput("$HOME/private/.auth/.dec")
          return JIRA(host, token_auth=PAT, options=options)
 
@@ -48,9 +49,61 @@ class JiraAPI:
       issue = self.connection.search_issues('project=CMSALCA order by created desc', maxResults=1)[0]
       return issue.key
 
+def get_workflow_id_names():
+   file = 'workflow_config.json'
+   if os.path.exists(file):
+      config = json.load(open(file))
+   else:
+      raise FileNotFoundError('Create %s by submitting relval for production' %file)
+   campIDs = {'HLT': set(), 'PR': set(), 'EXPR': set()}
+   workflow_names = {'HLT': set(), 'PR': set(), 'EXPR': set()}
+   for section in config.keys():
+      wtype = section.split('_')[0].strip()
+      campIDs[wtype].add(config[section]['Config']['Campaign'])
+      workflow_names[wtype].add(config[section]['workflow_name'])
+   return (campIDs, workflow_names)
+
+def submission_status(campIDs):
+   dmytro = 'https://dmytro.web.cern.ch/dmytro/cmsprodmon/requests.php?campaign='
+   comment = """Hi All,
+   You can monitor status of the submission using following campaign ids:
+   HLT: [{hlt}|{dmytro}{hlt}]
+   Prompt: [{prompt}|{dmytro}{prompt}]
+   Express: [{express}|{dmytro}{express}]
+
+   Best,
+   AlCaDB Team""".format(hlt=str(*campIDs['HLT']), 
+                              prompt=str(*campIDs['PR']), 
+                              express=str(*campIDs['EXPR']), dmytro=dmytro)
+   return comment
+
+def countdown(time_sec):
+   """Taken from https://www.programiz.com/python-programming/examples/countdown-timer"""
+   while time_sec:
+      mins, secs = divmod(time_sec, 60)
+      timeformat = '{:02d}:{:02d}'.format(mins, secs)
+      print(timeformat, end='\r')
+      time.sleep(1)
+      time_sec -= 1
+
 if __name__ == '__main__':
-   args = dict()
-   sysArgs = sys.argv
-   api = JiraAPI(args, sysArgs[1], sysArgs[2])
+   from pathlib import Path
+   directory = os.path.abspath(__file__)
+   sys.path.append(str(Path(directory).parent.parent))
+   from process_input import *
+   parser.add_argument('--comment', action='store_true', help='Comment status of sumission to the JIRA')
+   parsedArgs = parser.parse_known_args()[0]
+
+   get_user()
+   args = json.load(open('envs.json'))
+   api = JiraAPI(args, parsedArgs.user, parsedArgs.password)
    jira = api.connection
-   issue = jira.issue("CMSALCA-135")
+   if parsedArgs.comment:
+      campIDs, workflow_names = get_workflow_id_names()
+      comment = submission_status(campIDs)
+      print('>> Alert!!! You going to comment on CMSALCA-%s. \
+           \n>> Make sure you are doing it deliberately' %args['Jira'])
+      print('>> You have 15 seconds to quit')
+      countdown(15)
+      status = api.add_comment(comment)
+      print('>> Comment added:\n', comment)
