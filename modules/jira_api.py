@@ -37,7 +37,7 @@ class JiraAPI:
 
    def check_duplicate(self):
       # Summaries of my last 3 reported issues
-      for issue in self.connection.search_issues('project=CMSALCA order by created desc', maxResults=5):
+      for issue in self.connection.search_issues('project=CMSALCA order by created desc', maxResults=50):
          labels = set(issue.fields.labels)
          if labels == set(self.args['Labels']):
             print(">> Labels ", labels, " matching with ticket: ", issue.key, "!")
