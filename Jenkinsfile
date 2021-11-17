@@ -51,11 +51,13 @@ pipeline {
             label "user-alcauser"
           }
           steps {
+            checkout scm
             unstash 'json'
             script {
               env.emailBody = String.format("${env.emailBody}", "${env.RUN_ARTIFACTS_DISPLAY_URL}")
+              env.COMMITTER_EMAIL = sh(script: 'echo $(git show -s --format="%ae")', returnStdout: true).toString().trim()
             }
-            sh script: 'mail -s "${emailSubject}" -r "AlcaDB Team <alcadb.user@cern.ch>" physics.pritam@gmail.com <<< "${emailBody}"', label: "Sending test email"
+            sh script: "mail -s '${emailSubject}' -r 'AlcaDB Team <alcadb.user@cern.ch>' -c '${env.COMMITTER_EMAIL}' physics.pritam@gmail.com <<< '${emailBody}'", label: "Sending test email"
           }
         }
       }
@@ -189,8 +191,8 @@ pipeline {
       }
       steps {
         echo "Sending email request to AlCa Hypernews"
-        echo "${env.emailBody}"
         echo "${env.emailSubject}"
+        echo "${env.emailBody}"
         sh script: 'mail -s "${emailSubject}" -r "AlcaDB Team <alcadb.user@cern.ch>" -c "alcadb.user@cern.ch" hn-cms-alca@cern.ch <<< "${emailBody}"', label: "Sending announcement email"
       }
     }
@@ -209,6 +211,12 @@ pipeline {
         sh script: './commands_in_one_go.sh', label: "Submit Express conditions workflow to Request Manager"
         sh script: './relval_submit.py -f metadata_Prompt.json', label: "Prompt Workflow: Collect commands to create cmsDriver steps"
         sh script: './commands_in_one_go.sh', label: "Submit Prompt conditions workflow to Request Manager"
+        sh script: 'python3 modules/jira_api.py --comment --pat', label: "Comment status of the submission inside jira ticket"
+      }
+      post {
+        success {
+          archiveArtifacts(artifacts: 'workflow_config.json', fingerprint: true)
+        }
       }
     }
     stage('Twiki update') {
@@ -222,7 +230,7 @@ pipeline {
   }
   post {
     always {
-      sh script: "mail -s 'Jenkins Build ${currentBuild.currentResult}: Job ${JOB_NAME}' -r 'AlcaDB Team <alcadb.user@cern.ch>' -c '101pritam@gmail.com' physics.pritam@gmail.com <<< 'More info at: ${env.RUN_DISPLAY_URL}'", label: "Sending post-build email"
+      sh script: "mail -s 'Jenkins Build ${currentBuild.currentResult}: Job ${JOB_NAME}' -r 'AlcaDB Team <alcadb.user@cern.ch>' -c '${env.COMMITTER_EMAIL}' physics.pritam@gmail.com <<< 'More info at: ${env.RUN_DISPLAY_URL}'", label: "Sending post-build email"
     }
 
   }
