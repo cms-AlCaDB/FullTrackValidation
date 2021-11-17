@@ -17,7 +17,7 @@ group = parser.add_mutually_exclusive_group()
 group.add_argument('-p', '--pwstdin', type=str, dest='password')
 group.add_argument('--pat', action="store_true", help='use PAT')
 parser.add_argument('--url', type=str, help='Put url for Jenkins build')
-parsedArgs = parser.parse_args()
+parsedArgs = parser.parse_known_args()[0]
 
 def get_input():
 	"""Retrieve most recently edited input template. 
