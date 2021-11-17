@@ -20,7 +20,7 @@ ReferenceGT_PROMPT      : 120X_dataRun3_Prompt_v2
 
 # List of Dataset. Comma(,) separated. NO space allowed in between
 #-------------------------------------------------------------------------------
-Dataset                 : /MinBias/Commissioning2021-v1/RAW
+Dataset                 : /MinimumBias/Commissioning2021-v1/RAW
 
 # Run Number
 # Choose of the following example format
