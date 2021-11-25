@@ -3,7 +3,7 @@
 #
 
 from jira import JIRA
-import base64, os, sys, subprocess, time
+import base64, os, sys, subprocess, time, json
 
 class JiraAPI:
    CERN_CA_BUNDLE = '/etc/pki/tls/certs/ca-bundle.crt'
@@ -36,7 +36,7 @@ class JiraAPI:
       comment = self.connection.add_comment(issue.key, text)
 
    def check_duplicate(self):
-      # Summaries of my last 3 reported issues
+      # Summaries of my last 50 reported issues
       for issue in self.connection.search_issues('project=CMSALCA order by created desc', maxResults=50):
          labels = set(issue.fields.labels)
          if labels == set(self.args['Labels']):
@@ -56,11 +56,13 @@ def get_workflow_id_names():
    else:
       raise FileNotFoundError('Create %s by submitting relval for production' %file)
    campIDs = {'HLT': set(), 'PR': set(), 'EXPR': set()}
-   workflow_names = {'HLT': set(), 'PR': set(), 'EXPR': set()}
+   workflow_names = dict()
    for section in config.keys():
-      wtype = section.split('_')[0].strip()
-      campIDs[wtype].add(config[section]['Config']['Campaign'])
-      workflow_names[wtype].add(config[section]['workflow_name'])
+      sec = section.split('_')
+      ctype = sec[0].strip()
+      wtype = ('_').join((sec[0], sec[1][:5])).strip()
+      campIDs[ctype].add(config[section]['Config']['Campaign'])
+      workflow_names[wtype] = config[section]['workflow_name']
    return (campIDs, workflow_names)
 
 def submission_status(campIDs):
