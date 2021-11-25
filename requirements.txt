@@ -4,3 +4,4 @@ cernrequests
 runregistry
 unittest
 unittest-xml-reporting
+selenium
