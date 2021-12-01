@@ -1,0 +1,48 @@
+Title                   : Beamspot for CRAFT+PilotBeam re-reco validation
+
+Subsystem               : BeamSpot
+# Labels: List of labels separated by comma. Keep it unique for given validation
+#-------------------------------------------------------------------------------
+Labels                  : Week48, 2021, BeamSpot
+
+# Target GTs here
+#-------------------------------------------------------------------------------
+TargetGT_HLT            : 120X_dataRun3_HLTNew_TrackerAlign_w45_2021
+TargetGT_EXPRESS        : 120X_dataRun3_ExpressNew_TrackerAlign_w45_2021
+TargetGT_PROMPT         : 120X_dataRun3_PromptNew_BeamSpot_w48_2021
+
+# Reference GTs here
+#-------------------------------------------------------------------------------
+ReferenceGT_HLT         : 120X_dataRun3_HLT_v3
+ReferenceGT_EXPRESS     : 120X_dataRun3_Express_v2
+ReferenceGT_PROMPT      : 120X_dataRun3_Prompt_v2
+
+# List of Dataset. Comma(,) separated. NO space allowed in between
+#-------------------------------------------------------------------------------
+Dataset                 : /MinimumBias/Commissioning2021-v1/RAW
+
+# Run Number
+# Choose of the following example format
+# 344518
+# {"344518": [[1, 1892]]}
+#-------------------------------------------------------------------------------
+Run                     : {'346512': [[1, 612]]}
+
+# Yes, if you want to submit job for computation if local test is successful
+#-------------------------------------------------------------------------------
+Validate                : Yes
+
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+#------- OPTIONAL -------- OPTIONAL -------- OPTIONAL --------- OPTIONAL -------
+
+#-------------------------------------------------------------------------------
+Jira                    : None
+HLT_release             : None
+PR_release              : None
+Expr_release            : None
+b_field                 : None
+class                   : None
+hlt_key                 : None
+
+############
