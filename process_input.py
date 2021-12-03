@@ -7,7 +7,6 @@ import glob, os, sys, json, ast
 import runregistry, subprocess
 from datetime import datetime
 from collections import namedtuple
-from modules.jira_api import JiraAPI
 
 from argparse import ArgumentParser
 from getpass import getpass, getuser
@@ -26,7 +25,7 @@ def get_input():
 	files = glob.glob("Validations/*")
 	dlist = list()
 	for f in files: dlist.append(os.path.getmtime(f))
-	if len(set(dlist)) > 2: 
+	if len(set(dlist)) >= 2:
 		files.sort(key=os.path.getmtime)
 		return files[-1]
 	else:
@@ -69,16 +68,6 @@ def get_arguments():
 	iFile.close()
 	return args
 
-def get_mappings():
-	mappings = dict()
-	mappings['TargetGT_HLT'] 	 = 'newgt'
-	mappings['TargetGT_EXPRESS'] = 'newgt'
-	mappings['TargetGT_PROMPT']  = 'newgt'
-	mappings['ReferenceGT_HLT']  	= 'gt'
-	mappings['ReferenceGT_EXPRESS'] = 'gt'
-	mappings['ReferenceGT_PROMPT']  = 'gt'
-	mappings['Dataset']			= 'ds'
-
 def build_HLT_workflow(args):
 	hlt_dict = dict()
 	hlt_dict['HLT_release'] = args['HLT_release']
@@ -92,7 +81,7 @@ def build_HLT_workflow(args):
 	options['HLT'] 			 = args['HLT_Type']
 	options['Type'] 		 = "HLT+RECO"
 	options['ds']			 = args['Dataset']
-	options['basegt']		 = args['TargetGT_PROMPT']
+	options['basegt']		 = args['TargetGT_Prompt']
 	options['gt']			 = args['ReferenceGT_HLT']
 	options['newgt']		 = args['TargetGT_HLT']
 	options['runLs']		 = ast.literal_eval(args['Run'])
@@ -107,8 +96,8 @@ def build_Express_workflow(args):
 	if "Cosmics" in args['class']: options['cosmics'] = ""
 	options['Type'] 		 = "EXPR"
 	options['ds']			 = args['Dataset']
-	options['gt']			 = args['ReferenceGT_EXPRESS']
-	options['newgt']		 = args['TargetGT_EXPRESS']
+	options['gt']			 = args['ReferenceGT_Express']
+	options['newgt']		 = args['TargetGT_Express']
 	options['runLs']		 = ast.literal_eval(args['Run'])
 	options['jira']		 	 = args['Jira']
 	options['two_WFs']		 = ""
@@ -122,31 +111,29 @@ def build_Prompt_workflow(args):
 	if "Cosmics" in args['class']: options['cosmics'] = ""
 	options['Type'] 		 = "PR"
 	options['ds']			 = args['Dataset']
-	options['gt']			 = args['ReferenceGT_PROMPT']
-	options['newgt']		 = args['TargetGT_PROMPT']
+	options['gt']			 = args['ReferenceGT_Prompt']
+	options['newgt']		 = args['TargetGT_Prompt']
 	options['runLs']		 = ast.literal_eval(args['Run'])
 	options['jira']		 	 = str(args['Jira'])
 	options['two_WFs']		 = ""
 	return prompt_dict
 
 def compose_email(args):
-	title_text = "{Title} ({Week}, {Year})".format(Title = args['Title'], Week = args['Week'], Year = args['Year'])
-	emailSubject = "[HLT/Express/Prompt] Full track validation of {}".format(title_text)
-	emailBody = """Dear colleagues,
+	GTList = ''
+	for wf in args['WorkflowsToSubmit'].split('/'):
+		GTList += '\n- Target %s GT: %s\n'%(wf, args['TargetGT_%s'%wf])
+		GTList += '- Reference %s GT: %s\n'%(wf, args['ReferenceGT_%s'%wf])
+		if wf=='HLT': 
+			GTList += '- Common Prompt GT: %s\n'%(args['TargetGT_Prompt'])
+	
+	title_text = "{Title} (Week {no}, {Year})".format(Title = args['Title'], no = args['Week'].strip('Week'), Year = args['Year'])
+	emailSubject = "[{}] Full track validation of {}".format(args['WorkflowsToSubmit'], title_text)
+	emailBody = """Dear Colleagues,
 We are going to perform full track validation of {title_text}
-Details of the workflow:
-- Target HLT GT: {TargetGT_HLT}
-- Reference HLT GT: {ReferenceGT_HLT}
-
-- Target Express GT: {TargetGT_EXPRESS}
-- Reference Express GT: {ReferenceGT_EXPRESS}
-
-- Target Prompt GT: {TargetGT_PROMPT}
-- Reference Prompt GT: {ReferenceGT_PROMPT}
-
-- Run: {run_number} recorded on {start_date} with magnetic field {b_field}T
+Details of the workflow: {GTList}
+- Run: {run_number} recorded on {start_date} with magnetic field {b_field}T [1]
 - HLT Menu: {hlt_key}
-- CMSSW version: {HLT_release} for HLT/Express/Prompt
+- CMSSW version: {HLT_release} for {WorkflowsToSubmit}
 - Dataset: {Dataset}
 
 The cmsDriver configuration for the submission is accessible here [2].
@@ -160,7 +147,7 @@ Pritam, Amandeep, Tamas, Francesco, Helena (for AlCa/DB)
 [2] %s
 [3] https://twiki.cern.ch/twiki/bin/view/CMS/PdmVTriggerConditionValidation2021
 [4] https://its.cern.ch/jira/browse/CMSALCA-{Jira}
-""".format(title_text=title_text, **args)
+""".format(title_text=title_text, GTList=GTList, **args)
 	args['emailSubject'] = emailSubject
 	args['emailBody'] = emailBody
 	return args
@@ -216,6 +203,7 @@ def get_user():
 		parsedArgs.password = getpass(prompt="Password of user '%s' for Jira: "% parsedArgs.user)
 
 if __name__ == '__main__':
+	from modules.jira_api import JiraAPI
 	get_user()					# set user and password for Jira
 	args = get_arguments()
 	args = extract_keys(args)
@@ -237,6 +225,7 @@ if __name__ == '__main__':
 	prompt_dict  = build_Prompt_workflow(args)
 
 	for data, wid in zip([hlt_dict, express_dict, prompt_dict], ['HLT', 'Express', 'Prompt']):
+		if not wid in args['WorkflowsToSubmit']: continue
 		rfile = open("metadata_{}.json".format(wid), 'w')
 		json.dump(data, rfile, indent=2)
 		rfile.close()
