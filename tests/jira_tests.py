@@ -9,6 +9,7 @@ from process_input import *
 
 def get_project_permissions():
     """Logs into Jira and returns permissions of the user for CMSALCA project"""
+    from modules.jira_api import JiraAPI
     get_user()
     args = get_arguments()
     args = extract_keys(args)
@@ -22,7 +23,8 @@ def get_project_permissions():
 class TestJira(unittest.TestCase):
     access = get_project_permissions()
     def test_input(self):
-        input_files = ['metadata_HLT.json', 'metadata_Prompt.json', 'metadata_Express.json']
+        Dict = json.load(open('envs.json'))
+        input_files = ['metadata_%s.json'%wf for wf in Dict['WorkflowsToSubmit'].split('/')]
         for f in input_files:
             self.assertTrue(os.path.exists(f))
 
