@@ -25,19 +25,16 @@ def get_input():
 	files = glob.glob("Validations/*")
 	dlist = list()
 	for f in files: dlist.append(os.path.getmtime(f))
-	if len(set(dlist)) >= 2:
-		files.sort(key=os.path.getmtime)
-		return files[-1]
-	else:
-		File = namedtuple("File", ["path", "time"])
-		commit_dates = list()
-		for f in files:
-			raw_time = subprocess.getoutput("git log -n 1 --pretty=format:%cd {}".format(f))
-			Time = datetime.strptime(raw_time, '%a %b %d %H:%M:%S %Y %z').strftime('%Y-%m-%d %H:%M:%S')
-			pair = File(path=f, time=Time)
-			commit_dates.append(pair)
-		commit_dates.sort(key=lambda file: file.time)
-		return commit_dates[-1].path
+
+	File = namedtuple("File", ["path", "time"])
+	commit_dates = list()
+	for f in files:
+		raw_time = subprocess.getoutput("git log -n 1 --pretty=format:%cd {}".format(f))
+		Time = datetime.strptime(raw_time, '%a %b %d %H:%M:%S %Y %z').strftime('%Y-%m-%d %H:%M:%S')
+		pair = File(path=f, time=Time)
+		commit_dates.append(pair)
+	commit_dates.sort(key=lambda file: file.time)
+	return commit_dates[-1].path
 
 def get_run(run_number):
 	"""Returns run configuration in json format. Input param: run number"""
