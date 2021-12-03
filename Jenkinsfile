@@ -1,7 +1,7 @@
 pipeline {
   environment {
     //This variable need be tested as string
-    doTest = '1'
+    doTest = '0'
     TEST_RESULT = "/eos/home-a/alcauser/AlCaValidations"
   }
   agent {
@@ -255,12 +255,11 @@ pipeline {
         label "cs8-alcauser"
       }
       steps {
-        sh script: 'singularity build --sandbox ${TMPDIR}/selenium docker-archive:///eos/home-a/alcauser/selenium-docker.tar'
-        sh script: 'singularity shell --home "/home/jovyan" --writable --cleanenv --bind "${TMPDIR}/selenium/home/jovyan:/home/jovyan" -s ${TMPDIR}/selenium ${TMPDIR}/selenium'
         checkout scm
         unstash 'json'
         sh script: 'cp ${TEST_RESULT}/${Label}/workflow_config.json .'
-        sh script: 'python3.8 TWikiUpdate.py --headless', label: "Creating validation report on dedicated Twiki"
+        sh script: 'singularity build --sandbox ${TMPDIR}/selenium docker-archive:///eos/home-a/alcauser/selenium-docker.tar', label: "Creating environment for running TWiki script"
+        sh script: 'singularity exec --home "/home/jovyan" --writable --cleanenv --bind "${TMPDIR}/selenium/home/jovyan:/home/jovyan" ${TMPDIR}/selenium python3.8 TWikiUpdate.py --headless', label: "Creating validation report on dedicated Twiki"
       }
     }
   }
@@ -268,6 +267,5 @@ pipeline {
     always {
       sh script: "mail -s 'Jenkins Build ${currentBuild.currentResult}: Job ${JOB_NAME}' -r 'AlcaDB Team <alcadb.user@cern.ch>' -c '${env.COMMITTER_EMAIL}' physics.pritam@gmail.com <<< 'More info at: ${env.RUN_DISPLAY_URL}'", label: "Sending post-build email"
     }
-
   }
 }
