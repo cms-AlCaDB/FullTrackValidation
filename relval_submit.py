@@ -305,7 +305,8 @@ I will ask you some questions to fill the metadata file. For some of the questio
         metadata = json.loads(metadataFile.read())
         print('\nexecute the following commands:\n')
         commands = []
-        if 'HLT_release' in [x.encode('UTF8') for x in metadata.keys()]:
+        print(metadata.keys())
+        if 'HLT_release' in metadata.keys():
             commands.append('source bash/wmsetup.sh')
             commands.append('export SCRAM_ARCH=slc7_amd64_gcc900')
             commands.append('scramv1 project %s' % (metadata['HLT_release']))
@@ -317,7 +318,7 @@ I will ask you some questions to fill the metadata file. For some of the questio
             commands.append('cd -')
             if metadata['PR_release'] != metadata['HLT_release']:
                 commands.append('scramv1 project %s' % (metadata['PR_release']))
-        elif 'Expr_release' in [x.encode('UTF8') for x in metadata.keys()]:
+        elif 'Expr_release' in metadata.keys():
             commands.append('source bash/wmsetup.sh')
             commands.append('export SCRAM_ARCH=slc7_amd64_gcc900')
             commands.append('scramv1 project %s' % (metadata['Expr_release']))

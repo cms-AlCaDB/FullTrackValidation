@@ -1,4 +1,4 @@
-jira=3.1.1
+jira
 requests
 cernrequests
 runregistry
