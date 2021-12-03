@@ -79,16 +79,23 @@ def get_config_for_twiki():
 
 def compose_section(campID, wf_names, envs, dqm={}, **kwargs):
 	"""Compose twiki section"""
-	section = '\n\n---++ %s' %envs['Week']
+	dmytro = 'https://dmytro.web.cern.ch/dmytro/cmsprodmon/requests.php?campaign='
+	conddb = 'https://cms-conddb.cern.ch/cmsDbBrowser/list/Prod/gts/'
+	GTdiff = 'https://cms-conddb.cern.ch/cmsDbBrowser/diff/Prod/gts'
+	reqmgr = 'https://cmsweb.cern.ch/reqmgr2/fetch?rid='
+	HLT = ('HLT', str(*campID['HLT']))
+	PR = ('Prompt', str(*campID['PR']))
+	EXPR = ('Express', str(*campID['EXPR']))
+
+	section = '\n\n---++ Week %s' %envs['Week'].strip('Week').strip()
 	section += '\n---+++ %s\n' %envs['Title']
 	section += '\n*Description*: %s\n' %envs['emailSubject']
 	section += '\n%StartTwisty%'
 
-	dmytro = 'https://dmytro.web.cern.ch/dmytro/cmsprodmon/requests.php?campaign='
 	section += '\n*Campaign IDs and JIRA link*: '
-	section += '\n   * *HLT Campaign*: [[{0}{1}][{1}]]'.format(dmytro, str(*campID['HLT']))
-	section += '\n   * *Express Campaign*: [[{0}{1}][{1}]]'.format(dmytro, str(*campID['EXPR']))
-	section += '\n   * *Prompt Campaign*: [[{0}{1}][{1}]]'.format(dmytro, str(*campID['PR']))
+	for wf, campaign in (HLT, PR, EXPR): 
+		if not wf in envs['WorkflowsToSubmit'].split('/'): continue
+		section += '\n   * *{2} Campaign*: [[{0}{1}][{1}]]'.format(dmytro, campaign, wf)
 	section += '\n   * *Jira*: [[https://its.cern.ch/jira/browse/CMSALCA-{jira}][CMSALCA-{jira}]]\n'.format(jira=envs['Jira'])
 
 	section += '\n*Hypernews links*: '
@@ -97,44 +104,39 @@ def compose_section(campID, wf_names, envs, dqm={}, **kwargs):
 	section += '\n   * *Data-ops email after submission of relvals*: [[][]]'
 	section += '\n   * *Email after the new tag is deployed*: [[][]]'
 
-	# GT table
-	conddb = 'https://cms-conddb.cern.ch/cmsDbBrowser/list/Prod/gts/'
-	GTdiff = 'https://cms-conddb.cern.ch/cmsDbBrowser/diff/Prod/gts'
-	HLTdiff  = '{0}/{1}/{2}'.format(GTdiff, envs['TargetGT_HLT'], envs['ReferenceGT_HLT'])
-	PRdiff   = '{0}/{1}/{2}'.format(GTdiff, envs['TargetGT_PROMPT'], envs['ReferenceGT_PROMPT'])
-	EXPRdiff = '{0}/{1}/{2}'.format(GTdiff, envs['TargetGT_EXPRESS'], envs['ReferenceGT_EXPRESS'])
-	section += '\n*Details for the workflows*:  \n   * *Dataset*: %s' % envs['Dataset']
-	
+	section += '\n\n*Details for the workflows*:  \n   * *Dataset*: %s' % envs['Dataset']
 	for run, LS in ast.literal_eval(envs['Run']).items():
-		section += '\n   * *Run/s*: %s, LS: %s recorded on %s with B-field %s' % (run, LS, envs['start_date'], envs['b_field'])
+		section += '\n   * *Run/s*: %s, LS: %s recorded on %s with B-field %sT' % (run, LS, envs['start_date'], envs['b_field'])
 	section += '\n   * *HLT Key*: %s' % envs['hlt_key']
 	section += '\n   * *CMSSW*: %s\n' % envs['HLT_release']
-	section += '\n| *Conditions Type* | *HLT* | *Prompt* | *Express* |'
-	section += '\n| Target | [[{0}{1}][{1}]] | [[{0}{2}][{2}]] | [[{0}{3}][{3}]] |'.format(
-		conddb, envs['TargetGT_HLT'], envs['TargetGT_PROMPT'], envs['TargetGT_EXPRESS']
-		)
-	section += '\n| Reference | [[{0}{1}][{1}]] | [[{0}{2}][{2}]] | [[{0}{3}][{3}]] |'.format(
-		conddb, envs['ReferenceGT_HLT'], envs['ReferenceGT_PROMPT'], envs['ReferenceGT_EXPRESS']
-		)
-	section += '\n| Common | [[{0}{1}][{1}]] | | |'.format(conddb, envs['TargetGT_PROMPT'])
-	section += '\n| | [[{1}{0} | [[{2}{0}  | [[{3}{0} |'.format('][Target vs Reference]]', HLTdiff, PRdiff, EXPRdiff)
+
+	# GT table
+	c1 = '\n| *Conditions Type* |'; c2 = '\n| Target |'; c3 = '\n| Reference |'; c4 = '\n| Common |'; c5 = '\n| |'
+	for wf, campID in (HLT, PR, EXPR):
+		if not wf in envs['WorkflowsToSubmit']: continue
+		c1 += ' *%s* |'% wf
+		c2 += ' [[{0}{1}][{1}]] |'.format(conddb, envs['TargetGT_%s' % wf])
+		c3 += ' [[{0}{1}][{1}]] |'.format(conddb, envs['ReferenceGT_%s' % wf])
+		c4 += ' [[{0}{1}][{1}]] |'.format(conddb, envs['TargetGT_Prompt']) if wf=='HLT' else ''
+		c5 += ' [[{0}][{1}]] |'.format('%s/%s/%s' %(GTdiff, envs['TargetGT_%s' % wf], envs['ReferenceGT_%s' % wf]), 'Target vs Reference')
+	section += c1 + c2 + c3 + c4 + c5 if 'HLT' in envs['WorkflowsToSubmit'] else c1 + c2 + c3 + c5
 
 	# Request Manager Workflow table
-	reqmgr = 'https://cmsweb.cern.ch/reqmgr2/fetch?rid='
 	section += '\n\n| *Workflow* | *Description* | *PD* | *Workflow name* | *DQM Plots* | *Overlay* |'
 	count = 1
 	for dataset in envs['Dataset'].split(','):
 		for condition, ckey in [('HLT', 'HLT'), ('Express', 'EXPR'), ('Prompt', 'PR')]:
-			for Type in ('newconditions', 'reference'):
+			if not condition in envs['WorkflowsToSubmit']: continue
+			for Type in ('New Conditions', 'Reference Conditions'):
 				section += '\n|WF%s| %s %s | %s | %s | %s | %s |'%(
-					 count, 
-					 condition, 
-					 Type, 
-					 dataset if count%6==1 else '^', 
-					 '[[{0}{1}][{1}]]'.format(reqmgr, wf_names[ckey+'_'+Type[:5]]),
-					 '[[%s][%s]]' % (dqm[ckey+'_'+Type[:5]], 'DQM'),
-					 '[[%s][%s]]' % (dqm[ckey], 'Overlay plots') if count%2==1 else '^' 
-					)
+					count,
+					condition,
+					Type,
+					dataset if count%6==1 else '^',
+					'[[{0}{1}][{1}]]'.format(reqmgr, wf_names[ckey+'_'+Type.replace(' ', '').lower()[:5]]),
+					'[[%s][%s]]' % (dqm[ckey+'_'+Type.replace(' ', '').lower()[:5]], 'DQM'),
+					'[[%s][%s]]' % (dqm[ckey], 'Overlay plots') if count%2==1 else '^' 
+				)
 				count += 1
 	section += '\n%ENDTWISTY%'
 	section += '\n%MyButtons%'
@@ -166,7 +168,8 @@ def get_DQM_links(envs, **kwargs):
 	for key in links.keys():
 		s2 = 'dataset=%s;' % dataset[key]
 		links[key] = s1 + s2 + s3
-	for key in ('HLT', 'EXPR', 'PR'):
+	for key, wf in [('HLT', 'HLT'), ('EXPR', 'Express'), ('PR', 'Prompt')]:
+		if not wf in envs['WorkflowsToSubmit']: continue
 		s2 = 'dataset=%s;' % dataset[key+'_newco']
 		s5 = 'referenceobj1=other%3A%3A{}%3A%3A;'.format(dataset[key+'_refer'])
 		links[key.split('_')[0].strip()] = s1 + s2 + s4 + s5 + s3 
@@ -176,17 +179,19 @@ def get_DQM_links(envs, **kwargs):
 #--------------------------------------------------------------------------
 
 if __name__ == '__main__':
-	instance = AccessFirefox()
-	print("Trying to open TWiki.cern.ch")
-	instance.login(url)
-	OrignalTopic = instance.copy_page_content()
+	try:
+		instance = AccessFirefox()
+		print("Trying to open TWiki.cern.ch")
+		instance.login(url)
+		OrignalTopic = instance.copy_page_content()
 
-	config = get_config_for_twiki()
-	links = get_DQM_links(**config)
-	NewSection = compose_section(**config, dqm=links)
-	instance.append_section(NewSection)
-	instance.browser.quit()
-
+		config = get_config_for_twiki()
+		links = get_DQM_links(**config)
+		NewSection = compose_section(**config, dqm=links)
+		instance.append_section(NewSection)
+	except Exception as e:
+		print(e)
+	finally:
+		instance.browser.quit()
 
 	#------------------------------------------------------------------------
-

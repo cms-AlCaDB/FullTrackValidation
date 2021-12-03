@@ -65,15 +65,15 @@ def get_workflow_id_names():
       workflow_names[wtype] = config[section]['workflow_name']
    return (campIDs, workflow_names)
 
-def submission_status(campIDs):
+def submission_status(campIDs, args):
    dmytro = 'https://dmytro.web.cern.ch/dmytro/cmsprodmon/requests.php?campaign='
    links = ''
    HLT = ('HLT', str(*campIDs['HLT']))
    PR = ('Prompt', str(*campIDs['PR']))
    EXPR = ('Express', str(*campIDs['EXPR']))
-   for title, ID in [HLT, PR, EXPR]:
-      if ID != '':
-         links += '\n{title}: [{ID}|{dmytro}{ID}]'.format(title=title, ID=ID, dmytro=dmytro) 
+   for wf, ID in [HLT, PR, EXPR]:
+      if not wf in args['WorkflowsToSubmit']: continue
+      links += '\n{title}: [{ID}|{dmytro}{ID}]'.format(title=wf, ID=ID, dmytro=dmytro) 
 
    comment = """Hi All,
    You can monitor status of the submission using following campaign ids:{link}
@@ -105,7 +105,7 @@ if __name__ == '__main__':
    jira = api.connection
    if parsedArgs.comment:
       campIDs, workflow_names = get_workflow_id_names()
-      comment = submission_status(campIDs)
+      comment = submission_status(campIDs, args)
       print('>> Alert!!! You going to comment on CMSALCA-%s. \
            \n>> Make sure you are doing it deliberately' %args['Jira'])
       print('>> You have 15 seconds to quit')
