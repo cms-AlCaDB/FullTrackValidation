@@ -67,16 +67,19 @@ def get_workflow_id_names():
 
 def submission_status(campIDs):
    dmytro = 'https://dmytro.web.cern.ch/dmytro/cmsprodmon/requests.php?campaign='
+   links = ''
+   HLT = ('HLT', str(*campIDs['HLT']))
+   PR = ('Prompt', str(*campIDs['PR']))
+   EXPR = ('Express', str(*campIDs['EXPR']))
+   for title, ID in [HLT, PR, EXPR]:
+      if ID != '':
+         links += '\n{title}: [{ID}|{dmytro}{ID}]'.format(title=title, ID=ID, dmytro=dmytro) 
+
    comment = """Hi All,
-   You can monitor status of the submission using following campaign ids:
-   HLT: [{hlt}|{dmytro}{hlt}]
-   Prompt: [{prompt}|{dmytro}{prompt}]
-   Express: [{express}|{dmytro}{express}]
+   You can monitor status of the submission using following campaign ids:{link}
 
    Best,
-   AlCaDB Team""".format(hlt=str(*campIDs['HLT']), 
-                              prompt=str(*campIDs['PR']), 
-                              express=str(*campIDs['EXPR']), dmytro=dmytro)
+   AlCaDB Team""".format(link=links)
    return comment
 
 def countdown(time_sec):
