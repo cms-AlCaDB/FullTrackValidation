@@ -5,7 +5,7 @@
 ## Author: Pritam Kalbhor (physics.pritam@gmail.com)
 ##
 
-import os, sys, glob, time, json
+import os, sys, glob, time, json, pdb, ast
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
@@ -25,8 +25,10 @@ options.setAcceptUntrustedCertificates = True
 options.setAssumeUntrustedCertificateIssuer = False
 options.headless = args.headless
 
+# options.binary = os.path.join(os.environ['HOME'], ".local/firefox/firefox") 
 # provide path of geckodriver for firefox
-sys.path.append(os.path.join(os.environ['HOME'], ".local/bin"))
+# sys.path.append(os.path.join(os.environ['HOME'], ".local/bin"))
+
 url = "https://twiki.cern.ch/twiki/bin/viewauth/CMS/PdmVTriggerConditionValidation2021"
 
 class AccessFirefox:
@@ -49,6 +51,7 @@ class AccessFirefox:
 		"""Require SSL certificate for login"""
 		self.browser.get(url)
 		xpath = '//*[@id="ctl00_ctl00_NICEMasterPageBodyContent_SiteContentPlaceholder_hlCertificateAuth"]'
+		text = '//*[ text() = "Sign in using your CERN Certificate" ]'
 		self.wait.until(presence_of_element_located((By.XPATH, xpath)))
 		self.browser.find_element(By.XPATH, xpath).click()
 		print("Login done!")
@@ -61,9 +64,12 @@ class AccessFirefox:
 		return topic
 
 	def append_section(self, section):
+		OriginalText = self.browser.find_element(By.XPATH, '//*[@id="topic"]').get_attribute("value")
+		OriginalText = OriginalText.strip().strip("%MyButtons%")
+		NewText = OriginalText + section
 		topic = self.browser.find_element(By.XPATH, '//*[@id="topic"]')
-		topic.send_keys(section)
-		self.browser.find_element(By.XPATH, '//*[@id="save"]').click()
+		self.browser.execute_script("arguments[0].value=arguments[1];", topic, NewText)
+		topic.submit()
 
 def get_config_for_twiki():
 	from modules.jira_api import get_workflow_id_names
@@ -75,20 +81,21 @@ def compose_section(campID, wf_names, envs, dqm={}, **kwargs):
 	"""Compose twiki section"""
 	section = '\n\n---++ %s' %envs['Week']
 	section += '\n---+++ %s\n' %envs['Title']
-	section += '\nDescription: %s\n' %envs['emailSubject']
+	section += '\n*Description*: %s\n' %envs['emailSubject']
+	section += '\n%StartTwisty%'
 
 	dmytro = 'https://dmytro.web.cern.ch/dmytro/cmsprodmon/requests.php?campaign='
-	section += '\nCampaign IDs and JIRA link: '
-	section += '\n   * HLT Campaign: [[{0}{1}][{1}]]'.format(dmytro, str(*campID['HLT']))
-	section += '\n   * Express Campaign: [[{0}{1}][{1}]]'.format(dmytro, str(*campID['EXPR']))
-	section += '\n   * Prompt Campaign: [[{0}{1}][{1}]]'.format(dmytro, str(*campID['PR']))
-	section += '\n   * Jira: [[https://its.cern.ch/jira/browse/CMSALCA-{jira}][CMSALCA-{jira}]]\n'.format(jira=envs['Jira'])
+	section += '\n*Campaign IDs and JIRA link*: '
+	section += '\n   * *HLT Campaign*: [[{0}{1}][{1}]]'.format(dmytro, str(*campID['HLT']))
+	section += '\n   * *Express Campaign*: [[{0}{1}][{1}]]'.format(dmytro, str(*campID['EXPR']))
+	section += '\n   * *Prompt Campaign*: [[{0}{1}][{1}]]'.format(dmytro, str(*campID['PR']))
+	section += '\n   * *Jira*: [[https://its.cern.ch/jira/browse/CMSALCA-{jira}][CMSALCA-{jira}]]\n'.format(jira=envs['Jira'])
 
-	section += '\nHypernews links: '
-	section += '\n   * New tag validation request: [[][]]'
-	section += '\n   * Request email with full details about validation: [[][]]'
-	section += '\n   * Data-ops email after submission of relvals: [[][]]'
-	section += '\n   * Email after the new tag is deployed: [[][]]'
+	section += '\n*Hypernews links*: '
+	section += '\n   * *New tag validation request*: [[][]]'
+	section += '\n   * *Request email with full details about validation*: [[][]]'
+	section += '\n   * *Data-ops email after submission of relvals*: [[][]]'
+	section += '\n   * *Email after the new tag is deployed*: [[][]]'
 
 	# GT table
 	conddb = 'https://cms-conddb.cern.ch/cmsDbBrowser/list/Prod/gts/'
@@ -96,8 +103,12 @@ def compose_section(campID, wf_names, envs, dqm={}, **kwargs):
 	HLTdiff  = '{0}/{1}/{2}'.format(GTdiff, envs['TargetGT_HLT'], envs['ReferenceGT_HLT'])
 	PRdiff   = '{0}/{1}/{2}'.format(GTdiff, envs['TargetGT_PROMPT'], envs['ReferenceGT_PROMPT'])
 	EXPRdiff = '{0}/{1}/{2}'.format(GTdiff, envs['TargetGT_EXPRESS'], envs['ReferenceGT_EXPRESS'])
-	section += '\nDetails for the workflows:  \n   * Dataset : %s' % envs['Dataset']
-	section += '\n   * Run/s: %s\n' % envs['Run']
+	section += '\n*Details for the workflows*:  \n   * *Dataset*: %s' % envs['Dataset']
+	
+	for run, LS in ast.literal_eval(envs['Run']).items():
+		section += '\n   * *Run/s*: %s, LS: %s recorded on %s with B-field %s' % (run, LS, envs['start_date'], envs['b_field'])
+	section += '\n   * *HLT Key*: %s' % envs['hlt_key']
+	section += '\n   * *CMSSW*: %s\n' % envs['HLT_release']
 	section += '\n| *Conditions Type* | *HLT* | *Prompt* | *Express* |'
 	section += '\n| Target | [[{0}{1}][{1}]] | [[{0}{2}][{2}]] | [[{0}{3}][{3}]] |'.format(
 		conddb, envs['TargetGT_HLT'], envs['TargetGT_PROMPT'], envs['TargetGT_EXPRESS']
@@ -125,6 +136,8 @@ def compose_section(campID, wf_names, envs, dqm={}, **kwargs):
 					 '[[%s][%s]]' % (dqm[ckey], 'Overlay plots') if count%2==1 else '^' 
 					)
 				count += 1
+	section += '\n%ENDTWISTY%'
+	section += '\n%MyButtons%'
 	return section
 
 def get_DQM_links(envs, **kwargs):
@@ -166,12 +179,14 @@ if __name__ == '__main__':
 	instance = AccessFirefox()
 	print("Trying to open TWiki.cern.ch")
 	instance.login(url)
-	topic = instance.copy_page_content()
+	OrignalTopic = instance.copy_page_content()
 
 	config = get_config_for_twiki()
 	links = get_DQM_links(**config)
-	section = compose_section(**config, dqm=links)
-	instance.append_section(section)
+	NewSection = compose_section(**config, dqm=links)
+	instance.append_section(NewSection)
 	instance.browser.quit()
 
+
 	#------------------------------------------------------------------------
+
