@@ -1,7 +1,7 @@
 pipeline {
   environment {
     //This variable need be tested as string
-    doTest = '0'
+    doTest = '1'
     TEST_RESULT = "/eos/home-a/alcauser/AlCaValidations"
   }
   agent {
@@ -10,6 +10,7 @@ pipeline {
   options {
     // This is required if you want to clean before build
     skipDefaultCheckout(true)
+    preserveStashes()
   }
   stages {
     stage('Input Processing') {
@@ -243,21 +244,21 @@ pipeline {
         success {
           archiveArtifacts(artifacts: 'workflow_config.json', fingerprint: true)
           sh script: 'mkdir -p ${TEST_RESULT}/${Label} && cp *.json ${TEST_RESULT}/${Label}/', label: "Moving json files to eos area"
-          stash includes: 'workflow_config.json', name: 'json'
         }
       }
     }
     stage('Twiki update') {
       when {
-        expression { env.Validate == 'No' }
+        expression { env.Validate == 'Yes' }
       }
       agent {
         label "cs8-alcauser"
       }
       steps {
+        cleanWs()
         checkout scm
         unstash 'json'
-        sh script: 'cp ${TEST_RESULT}/${Label}/workflow_config.json .'
+        sh script: 'cp ${TEST_RESULT}/${Label}/workflow_config.json .', label: "Copy config file containing workflow information"
         sh script: 'singularity build -F --sandbox ${TMPDIR}/selenium docker-archive:///eos/home-a/alcauser/selenium-docker.tar', label: "Creating environment for running TWiki script"
         sh script: 'singularity exec --home "/home/jovyan" --writable --cleanenv --bind "${TMPDIR}/selenium/home/jovyan:/home/jovyan" ${TMPDIR}/selenium python3.8 TWikiUpdate.py --headless', label: "Creating validation report on dedicated Twiki"
       }
