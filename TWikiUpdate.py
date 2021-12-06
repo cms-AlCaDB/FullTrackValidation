@@ -101,7 +101,6 @@ def compose_section(campID, wf_names, envs, dqm={}, **kwargs):
 	section += '\n*Hypernews links*: '
 	section += '\n   * *New tag validation request*: [[][]]'
 	section += '\n   * *Request email with full details about validation*: [[][]]'
-	section += '\n   * *Data-ops email after submission of relvals*: [[][]]'
 	section += '\n   * *Email after the new tag is deployed*: [[][]]'
 
 	section += '\n\n*Details for the workflows*:  \n   * *Dataset*: %s' % envs['Dataset']
@@ -117,7 +116,7 @@ def compose_section(campID, wf_names, envs, dqm={}, **kwargs):
 		c1 += ' *%s* |'% wf
 		c2 += ' [[{0}{1}][{1}]] |'.format(conddb, envs['TargetGT_%s' % wf])
 		c3 += ' [[{0}{1}][{1}]] |'.format(conddb, envs['ReferenceGT_%s' % wf])
-		c4 += ' [[{0}{1}][{1}]] |'.format(conddb, envs['TargetGT_Prompt']) if wf=='HLT' else ''
+		c4 += ' [[{0}{1}][{1}]] |'.format(conddb, envs['TargetGT_Prompt']) if wf=='HLT' else ' |'
 		c5 += ' [[{0}][{1}]] |'.format('%s/%s/%s' %(GTdiff, envs['TargetGT_%s' % wf], envs['ReferenceGT_%s' % wf]), 'Target vs Reference')
 	section += c1 + c2 + c3 + c4 + c5 if 'HLT' in envs['WorkflowsToSubmit'] else c1 + c2 + c3 + c5
 
