@@ -403,18 +403,23 @@ def getDriverDetails(Type, release, ds, B0T, HIon, pA, cosmics, recoRelease):
 
 #-------------------------------------------------------------------------------
 def step1(options):
+    """Collect list of input files, needed for dry run"""
     dfile.write("\n# Step1: create list of input files\n")
-
-    run = str(options.runLs).split(":")[0].strip("{u").strip("'")
-    value2 = list(options.runLs.items())[0][1]
+    run = options.run[0] if options.run else str(options.runLs).split(":")[0].strip("{u").strip("'")
+    value2 = None if options.run else list(options.runLs.items())[0][1]
     command1 = "echo '' > step1_files.txt\n"
     execme(command1, echo=False)
     for dataset in options.ds:
-        execme("dasgoclient --limit 0 --format json --query 'lumi,file dataset={} run={}' | \
-            das-selected-lumis.py {} | sort -u >> step1_files.txt\n".format(dataset, run, \
-            "%s,%s"%(value2[0][0],value2[0][1]) ), echo=False)
-    command3 = 'echo \'{}\' > step1_lumi_ranges.txt\n'.format("{\""+run+"\": %s}"%(value2))
-    execme(command3, echo=False)
+        dasgo0 = "dasgoclient --limit 10 --format json --query 'lumi,file dataset={} run={}'"
+        if options.runLs:
+            dasgo = dasgo0 + " | das-selected-lumis.py {} | sort -u >> step1_files.txt\n"
+            execme(dasgo.format(dataset, run, "%s,%s"%(value2[0][0],value2[0][1]) ), echo=False)
+        else:
+            dasgo = "dasgoclient --limit 10 --format list --query 'file dataset={} run={}' >> step1_files.txt"
+            execme(dasgo.format(dataset, run), echo=False)
+    if options.runLs:
+        command3 = 'echo \'{}\' > step1_lumi_ranges.txt\n'.format("{\""+run+"\": %s}"%(value2))
+        execme(command3, echo=False)
 
 def splitOptions(command, echo = True):
     if echo: dfile.write("\n")
@@ -537,7 +542,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                 driver_command += "--runUnscheduled "
         if details['magfield'] != "":
             driver_command += '--magField %s ' % (details['magfield'])
-        if details['lumiToProcess'] != "":
+        if details['lumiToProcess'] != "" and options.runLs:
             driver_command += "--lumiToProcess 'step1_lumi_ranges.txt' "
         if details['inputcommands'] != "":
             driver_command += '--inputCommands "%s" ' % (details['inputcommands'])
@@ -627,7 +632,6 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
 
             if recodqm['era'] != "":
                 driver_command += "--era %s " % (recodqm['era'])
-
             if options.recoCmsswDir:
                 cmssw_command = "cd %s; eval `scramv1 runtime -sh`; cd -" % (options.recoCmsswDir)
                 upload_command = "./wmupload.py -u %s -g PPD -l %s %s" % (os.getenv('USER'),
