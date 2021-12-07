@@ -1,7 +1,7 @@
 pipeline {
   environment {
     //This variable need be tested as string
-    doTest = '1'
+    doTest = '0'
     TEST_RESULT = "/eos/home-a/alcauser/AlCaValidations"
   }
   agent {
@@ -207,7 +207,7 @@ pipeline {
     }
     stage('Email') {
       when {
-        expression { env.Validate == 'Yes' }
+        expression { env.Validate == 'No' }
       }
       steps {
         echo "Sending email request to AlCa Hypernews"
