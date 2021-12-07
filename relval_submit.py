@@ -305,7 +305,6 @@ I will ask you some questions to fill the metadata file. For some of the questio
         metadata = json.loads(metadataFile.read())
         print('\nexecute the following commands:\n')
         commands = []
-        print(metadata.keys())
         if 'HLT_release' in metadata.keys():
             commands.append('source bash/wmsetup.sh')
             commands.append('export SCRAM_ARCH=slc7_amd64_gcc900')
@@ -401,11 +400,11 @@ I will ask you some questions to fill the metadata file. For some of the questio
                         commands.append("cd %s; eval `scramv1 runtime -sh`; cd -" % metadata['HLT_release'])
                         commands.append('cmsRun NEWCONDITIONS0.py')
                         commands.append("cd %s; eval `scramv1 runtime -sh`; cd -" % metadata['PR_release'])
-                        commands.append('cmsRun recodqm.py')
+                        commands.append('cmsRun recodqm_newco.py')
                         commands.append('cmsRun step4_newco_HARVESTING.py')
                     else:
                         commands.append('cmsRun NEWCONDITIONS0.py')
-                        commands.append('cmsRun recodqm.py')
+                        commands.append('cmsRun recodqm_newco.py')
                         commands.append('cmsRun step4_newco_HARVESTING.py')
                     commands.append('mv DQM*.root {}_newco_DQMoutput.root'.format(metadata['options']['Type'].split('+')[0]))
                 elif arguments.refer:
@@ -414,12 +413,12 @@ I will ask you some questions to fill the metadata file. For some of the questio
                         commands.append("cd %s; eval `scramv1 runtime -sh`; cd -" % metadata['HLT_release'])
                         commands.append('cmsRun REFERENCE.py')
                         commands.append("cd %s; eval `scramv1 runtime -sh`; cd -" % metadata['PR_release'])
-                        commands.append('cmsRun recodqm.py')
+                        commands.append('cmsRun recodqm_refer.py')
                         commands.append('cmsRun step4_refer_HARVESTING.py')
                     else:
-                        commands.append('cmsRun NEWCONDITIONS0.py')
-                        commands.append('cmsRun recodqm.py')
-                        commands.append('cmsRun step4_newco_HARVESTING.py')
+                        commands.append('cmsRun REFERENCE.py')
+                        commands.append('cmsRun recodqm_refer.py')
+                        commands.append('cmsRun step4_refer_HARVESTING.py')
                     commands.append('mv DQM*.root {}_refer_DQMoutput.root'.format(metadata['options']['Type'].split('+')[0]))
             elif metadata['options']['Type'] == 'EXPR':
                 commands.append('cp cmsDrivers.sh cmsDrivers_EXPR.sh')
