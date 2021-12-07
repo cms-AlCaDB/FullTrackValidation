@@ -18,6 +18,20 @@ group.add_argument('--pat', action="store_true", help='use PAT')
 parser.add_argument('--url', type=str, help='Put url for Jenkins build')
 parsedArgs = parser.parse_known_args()[0]
 
+def GetNumberOfEvents(DataSet, RunNumber, LumiSec=''):
+    """Returns number of events for given Dataset, RunNumber"""
+    os.environ["X509_USER_PROXY"] = os.popen('voms-proxy-info -path').read().strip()
+    if LumiSec == '':
+        query=DataSet+'&run_num='+RunNumber
+    else:
+        query=DataSet+'&run_num='+RunNumber+'&lumi_list='+LumiSec
+    from modules import wma
+    dbs = wma.ConnectionWrapper()
+    output = dbs.api('files', 'dataset', query, detail=True)
+    nEvent = 0
+    for nFile in output: nEvent += nFile['event_count']
+    return int(nEvent)
+
 def get_input():
 	"""Retrieve most recently edited input template. 
 	   Commit time will be recorded.
@@ -30,7 +44,10 @@ def get_input():
 	commit_dates = list()
 	for f in files:
 		raw_time = subprocess.getoutput("git log -n 1 --pretty=format:%cd {}".format(f))
-		Time = datetime.strptime(raw_time, '%a %b %d %H:%M:%S %Y %z').strftime('%Y-%m-%d %H:%M:%S')
+		if raw_time == '': 
+			Time = datetime.fromtimestamp(os.path.getmtime(f)).strftime('%Y-%m-%d %H:%M:%S')
+		else:
+			Time = datetime.strptime(raw_time, '%a %b %d %H:%M:%S %Y %z').strftime('%Y-%m-%d %H:%M:%S')
 		pair = File(path=f, time=Time)
 		commit_dates.append(pair)
 	commit_dates.sort(key=lambda file: file.time)
@@ -57,6 +74,7 @@ def get_arguments():
 		args[line.split(':')[0].strip()] = ":".join(line.split(':')[1:]).strip()
 	args['Labels'] = [v.strip() for v in args['Labels'].split(',')]
 	args['run_number'] = args['Run'].split(":")[0].strip("{").strip("'")
+	args['LumiSec'] = args['Run'].split(":")[1].strip("}").strip() if ':' in args['Run'] else ''
 	week = [v for v in args['Labels'] if 'Week' in v]
 	year = [v for v in args['Labels'] if '202' in v]
 	args['Week']  = "{}".format(week[0])
@@ -81,7 +99,7 @@ def build_HLT_workflow(args):
 	options['basegt']		 = args['TargetGT_Prompt']
 	options['gt']			 = args['ReferenceGT_HLT']
 	options['newgt']		 = args['TargetGT_HLT']
-	options['runLs']		 = ast.literal_eval(args['Run'])
+	options['runLs' if ':' in args['Run'] else 'run'] = ast.literal_eval(args['Run'])
 	options['jira']		 	 = args['Jira']
 	return hlt_dict
 
@@ -95,7 +113,7 @@ def build_Express_workflow(args):
 	options['ds']			 = args['Dataset']
 	options['gt']			 = args['ReferenceGT_Express']
 	options['newgt']		 = args['TargetGT_Express']
-	options['runLs']		 = ast.literal_eval(args['Run'])
+	options['runLs' if ':' in args['Run'] else 'run'] = ast.literal_eval(args['Run'])
 	options['jira']		 	 = args['Jira']
 	options['two_WFs']		 = ""
 	return express_dict
@@ -110,19 +128,21 @@ def build_Prompt_workflow(args):
 	options['ds']			 = args['Dataset']
 	options['gt']			 = args['ReferenceGT_Prompt']
 	options['newgt']		 = args['TargetGT_Prompt']
-	options['runLs']		 = ast.literal_eval(args['Run'])
+	options['runLs' if ':' in args['Run'] else 'run'] = ast.literal_eval(args['Run'])
 	options['jira']		 	 = str(args['Jira'])
 	options['two_WFs']		 = ""
 	return prompt_dict
 
 def compose_email(args):
-	GTList = ''
+	GTList = ''; 	datasetList = ''
 	for wf in args['WorkflowsToSubmit'].split('/'):
 		GTList += '\n- Target %s GT: %s\n'%(wf, args['TargetGT_%s'%wf])
 		GTList += '- Reference %s GT: %s\n'%(wf, args['ReferenceGT_%s'%wf])
 		if wf=='HLT': 
 			GTList += '- Common Prompt GT: %s\n'%(args['TargetGT_Prompt'])
-	
+	for ds in args['Dataset'].strip().split(','):
+		datasetList += '\n- Dataset: %s with Events # %s' %(ds, args['nEvents_'+ds.split('/')[1]])
+
 	title_text = "{Title} (Week {no}, {Year})".format(Title = args['Title'], no = args['Week'].strip('Week'), Year = args['Year'])
 	emailSubject = "[{}] Full track validation of {}".format(args['WorkflowsToSubmit'], title_text)
 	emailBody = """Dear Colleagues,
@@ -130,8 +150,7 @@ We are going to perform full track validation of {title_text}
 Details of the workflow: {GTList}
 - Run: {run_number} recorded on {start_date} with magnetic field {b_field}T [1]
 - HLT Menu: {hlt_key}
-- CMSSW version: {HLT_release} for {WorkflowsToSubmit}
-- Dataset: {Dataset}
+- CMSSW version: {HLT_release} for {WorkflowsToSubmit} {datasetList}
 
 The cmsDriver configuration for the submission is accessible here [2].
 Validation details will be documented at [3].
@@ -144,7 +163,7 @@ Pritam, Amandeep, Tamas, Francesco, Helena (for AlCa/DB)
 [2] %s
 [3] https://twiki.cern.ch/twiki/bin/view/CMS/PdmVTriggerConditionValidation2021
 [4] https://its.cern.ch/jira/browse/CMSALCA-{Jira}
-""".format(title_text=title_text, GTList=GTList, **args)
+""".format(title_text=title_text, GTList=GTList, datasetList=datasetList, **args)
 	args['emailSubject'] = emailSubject
 	args['emailBody'] = emailBody
 	return args
@@ -204,6 +223,10 @@ if __name__ == '__main__':
 	get_user()					# set user and password for Jira
 	args = get_arguments()
 	args = extract_keys(args)
+	for dataset in args['Dataset'].split(','):
+		nEvents = GetNumberOfEvents(dataset.strip(), args['run_number'], LumiSec=args['LumiSec'].replace(' ', ''))
+		print('Dataset', dataset, 'has', nEvents, 'Events', 'for run', args['run_number'], 'and LumiSection', args['LumiSec'])
+		args.update({'nEvents_'+dataset.split('/')[1]: nEvents})
 	try:
 		api = JiraAPI(args, parsedArgs.user, parsedArgs.password)
 		ticket = api.check_duplicate()
