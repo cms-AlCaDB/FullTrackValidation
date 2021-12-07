@@ -34,7 +34,7 @@ Validate                : Yes
 
 # Choices: ['HLT', 'Prompt', 'Express', 'HLT/Prompt', 'HLT/Express', 'Prompt/Express' 'HLT/Prompt/Express']
 #-------------------------------------------------------------------------------
-WorkflowsToSubmit       : HLT/Prompt/Express
+WorkflowsToSubmit       : Prompt/Express
 
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
