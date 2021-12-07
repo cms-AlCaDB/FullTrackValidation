@@ -262,8 +262,7 @@ def getDriverDetails(Type, release, ds, B0T, HIon, pA, cosmics, recoRelease):
                 "era":str_era_hlt,
                 #"custcommands":'process.schedule.remove( process.HLTriggerFirstPath )',
                 "custcommands":"process.load('Configuration.StandardSequences.Reconstruction_cff'); " +\
-                               "process.hltTrackRefitterForSiStripMonitorTrack.src = 'generalTracks'; " +\
-                               "\ntry:\n\tif process.RatesMonitoring in process.schedule: process.schedule.remove( process.RatesMonitoring );\nexcept: pass",
+                               "process.hltTrackRefitterForSiStripMonitorTrack.src = 'generalTracks'; ",
                 "custconditions":"JetCorrectorParametersCollection_CSA14_V4_MC_AK4PF,JetCorrectionsRecord,frontier://FrontierProd/CMS_CONDITIONS,AK4PF",
                 "magfield":"",
                 "dumppython":False,
@@ -297,7 +296,7 @@ def getDriverDetails(Type, release, ds, B0T, HIon, pA, cosmics, recoRelease):
     elif Type in ['HLT+RECO','HLT+RECO+ALCA', 'EXPR+RECO']:
         if options.HLT:
             HLTBase.update({"steps":"L1REPACK,HLT:%s" % (options.HLT),
-                            "custcommands":"\ntry:\n\tif process.RatesMonitoring in process.schedule: process.schedule.remove( process.RatesMonitoring );\nexcept: pass",
+                            "custcommands": "",
                             "custconditions":"",
                             #"output":'[{"e":"RAW","t":"RAW","o":["drop FEDRawDataCollection_rawDataCollector__LHC"]}]',
                             "output":'',
@@ -308,7 +307,7 @@ def getDriverDetails(Type, release, ds, B0T, HIon, pA, cosmics, recoRelease):
 
         else:
             HLTBase.update({"steps":"L1REPACK,HLT",
-                            "custcommands":"\ntry:\n\tif process.RatesMonitoring in process.schedule: process.schedule.remove( process.RatesMonitoring );\nexcept: pass",
+                            "custcommands":"",
                             "custconditions":"",
                             #"datatier":"RAW",
                             #"eventcontent":"RAW",
@@ -548,7 +547,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
             driver_command += '--inputCommands "%s" ' % (details['inputcommands'])
         if details['custconditions'] != "":
             driver_command += '--custom_conditions="%s" ' % (details['custconditions'])
-        if details['custcommands'] != "" and not DRYRUN:
+        if details['custcommands'] != "":
             driver_command += "--customise_commands='%s' " % (details['custcommands'])
 
         #Temporary changes
