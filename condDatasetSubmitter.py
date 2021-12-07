@@ -287,7 +287,7 @@ def getDriverDetails(Type, release, ds, B0T, HIon, pA, cosmics, recoRelease):
 
     if options.HLT:
         HLTBase.update({"steps":"L1REPACK,HLT:%s,DQM" % (options.HLT),
-                "dumppython":True})
+                "dumppython":False})
 
     if Type == 'HLT':
         return HLTBase
@@ -303,7 +303,7 @@ def getDriverDetails(Type, release, ds, B0T, HIon, pA, cosmics, recoRelease):
                             "output":'',
                             #"datatier":"RAW",
                             #"eventcontent":"RAW",
-                            "dumppython":True,
+                            "dumppython":False,
                             "lumiToProcess":"step1_lumi_ranges.txt"})
 
         else:
@@ -589,7 +589,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                             "--hltProcess HLT2 " +\
                             "--filein=file:step2.root " +\
                             "--fileout=file:step3.root " +\
-                            "--python_filename recodqm.py " +\
+                            "--python_filename recodqm_%s.py "% (label) +\
                             "--no_exec " +\
                             "-n 100 "
 
@@ -605,6 +605,13 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                 driver_command += "--magField %s " % (recodqm['magfield'])
             if recodqm['custcommands'] != "":
                 driver_command += "--customise_commands='%s' " % (recodqm['custcommands'])
+
+            #Temporary changes
+            if 'newco' in cfgname.lower(): 
+                driver_command += '--procModifiers siPixelQualityRawToDigi '
+            driver_command += '--customise "Configuration/DataProcessing/RecoTLR.customisePostEra_Run3" '
+            # ---------
+
             if options.recoCmsswDir:
                 cmssw_command = "cd %s; eval `scramv1 runtime -sh`; cd -" % (options.recoCmsswDir)
                 upload_command = "./wmupload.py -u %s -g PPD -l %s %s" % (os.getenv('USER'),
@@ -797,7 +804,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                                     'req_name = %s_%s_RelVal_%s\n' % (details['reqtype'], label, onerun) +\
                                     'globaltag = %s\n' % (refsubgtshort) +\
                                     'step%d_output = %s\n' % (task, 'FEVTDEBUGoutput' if options.cosmics else 'FEVTDEBUGHLToutput') +\
-                                    'step%d_cfg = recodqm.py\n' % (task) +\
+                                    'step%d_cfg = recodqm_%s.py\n' % (task, label) +\
                                     'step%d_lumisperjob = 1\n' % (task) +\
                                     'step%d_globaltag = %s \n' % (task, gtshort) +\
                                     'step%d_processstring = %s_%s_%s \n' % (task, processing_string, details['reqtype']+label, refsubgtshort) +\
@@ -837,7 +844,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                                 'req_name = %s_%s_RelVal_%s\n' % (details['reqtype'], label, onerun) +\
                                 'globaltag = %s\n' % (subgtshort) +\
                                 'step%d_output = %s\n' % (task, 'FEVTDEBUGoutput' if options.cosmics else 'FEVTDEBUGHLToutput') +\
-                                'step%d_cfg = recodqm.py\n' % (task) +\
+                                'step%d_cfg = recodqm_%s.py\n' % (task, label) +\
                                 'step%d_lumisperjob = 1\n' % (task) +\
                                 'step%d_globaltag = %s \n' % (task, gtshort) +\
                                 'step%d_processstring = %s_%s_%s \n' % (task, processing_string, details['reqtype']+label, subgtshort) +\
