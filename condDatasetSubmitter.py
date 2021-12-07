@@ -551,6 +551,12 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
         if details['custcommands'] != "" and not DRYRUN:
             driver_command += "--customise_commands='%s' " % (details['custcommands'])
 
+        #Temporary changes
+        if 'newco' in cfgname.lower(): 
+            driver_command += '--procModifiers siPixelQualityRawToDigi '
+        driver_command += '--customise "Configuration/DataProcessing/RecoTLR.customisePostEra_Run3" '
+        # ---------
+
         cmssw_command = "cd %s; eval `scramv1 runtime -sh`; cd -" % (options.hltCmsswDir)
         upload_command = "./wmupload.py -u %s -g PPD -l %s %s"% (os.getenv('USER'), cfgname, cfgname)
         if ('NEW' in cfgname and options.recoCmsswDir):
