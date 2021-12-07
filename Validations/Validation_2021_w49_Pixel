@@ -1,0 +1,52 @@
+Title                   : the new pixel quality condition with label `forRawToDigi`
+
+Subsystem               : Pixel
+# Labels: List of labels separated by comma. Keep it unique for given validation
+#-------------------------------------------------------------------------------
+Labels                  : Week49, 2021, Pixel
+
+# Target GTs here
+#-------------------------------------------------------------------------------
+TargetGT_HLT            : 121X_dataRun3_HLTNew_PixelQuality_w49_2021
+TargetGT_Prompt         : 121X_dataRun3_PromptNew_PixelQuality_w49_2021
+TargetGT_Express        : 121X_dataRun3_ExpressNew_PixelQuality_w49_2021
+
+# Reference GTs here
+#-------------------------------------------------------------------------------
+ReferenceGT_HLT         : 121X_dataRun3_HLT_v13
+ReferenceGT_Prompt      : 121X_dataRun3_Prompt_v11
+ReferenceGT_Express     : 121X_dataRun3_Express_v12
+
+# List of Dataset. Comma(,) separated. NO space allowed in between
+#-------------------------------------------------------------------------------
+Dataset                 : /MinimumBias/Commissioning2021-v1/RAW,/ZeroBias/Commissioning2021-v1/RAW
+
+# Run Number
+# Choose of the following example format
+# 344518
+# {"344518": [[1, 1892]]}
+#-------------------------------------------------------------------------------
+Run                     : {'346512': [[1, 500]]}
+
+# Yes/No. Yes, if you want to submit job for computation if local test is successful
+#-------------------------------------------------------------------------------
+Validate                : Yes
+
+# Choices: ['HLT', 'Prompt', 'Express', 'HLT/Prompt', 'HLT/Express', 'Prompt/Express' 'HLT/Prompt/Express']
+#-------------------------------------------------------------------------------
+WorkflowsToSubmit       : HLT/Prompt/Express
+
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+#------- OPTIONAL -------- OPTIONAL -------- OPTIONAL --------- OPTIONAL -------
+
+#-------------------------------------------------------------------------------
+Jira                    : None
+HLT_release             : CMSSW_12_1_1
+PR_release              : CMSSW_12_1_1
+Expr_release            : CMSSW_12_1_1
+b_field                 : None
+class                   : None
+hlt_key                 : None
+
+############

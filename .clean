@@ -9,5 +9,5 @@ step*
 *.log
 NEWCONDITIONS0.py
 REFERENCE.py
-recodqm.py
+recodqm_*.py
 _NewValidation.txt
