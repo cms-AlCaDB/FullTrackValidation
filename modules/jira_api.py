@@ -97,6 +97,7 @@ if __name__ == '__main__':
    sys.path.append(str(Path(directory).parent.parent))
    from process_input import *
    parser.add_argument('--comment', action='store_true', help='Comment status of sumission to the JIRA')
+   parser.add_argument('--scan', action='store_true', help='Scan for matching ticket')
    parsedArgs = parser.parse_known_args()[0]
 
    get_user()
@@ -112,3 +113,11 @@ if __name__ == '__main__':
       countdown(15)
       status = api.add_comment(comment)
       print('>> Comment added:\n', comment)
+
+   if parsedArgs.scan:
+      ticket = api.check_duplicate()
+      if ticket:
+         sys.exit('1')
+      else:
+         print(">> No ticket is matching with give set of labels. You can create the new one")
+         sys.exit('0')
