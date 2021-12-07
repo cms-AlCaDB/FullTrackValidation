@@ -17,6 +17,7 @@ pipeline {
       steps{
         cleanWs()
         checkout scm
+        sh script: 'voms-proxy-init --rfc --voms cms', label: "Generate VOMS proxy certificate"
         sh script: './process_input.py --pat', label: "Processing input template"
         stash includes: '*.json', name: 'json'
         script {
