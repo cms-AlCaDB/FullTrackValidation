@@ -57,6 +57,7 @@ class AccessFirefox:
 		print("Login done!")
 
 	def copy_page_content(self):
+		print(">> Copying page content ...")
 		edit_key = '/html/body/div/div/div/div[1]/div/div[1]/div[1]/div[2]/div[1]/span[2]/span[1]/a'
 		self.wait.until(presence_of_element_located((By.XPATH, edit_key)))
 		self.browser.find_element(By.XPATH, edit_key).click()
@@ -83,6 +84,7 @@ def compose_section(campID, wf_names, envs, dqm={}, **kwargs):
 	conddb = 'https://cms-conddb.cern.ch/cmsDbBrowser/list/Prod/gts/'
 	GTdiff = 'https://cms-conddb.cern.ch/cmsDbBrowser/diff/Prod/gts'
 	reqmgr = 'https://cmsweb.cern.ch/reqmgr2/fetch?rid='
+	daslink= 'https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod/global&input=summary+dataset='
 	HLT = ('HLT', str(*campID['HLT']))
 	PR = ('Prompt', str(*campID['PR']))
 	EXPR = ('Express', str(*campID['EXPR']))
@@ -99,7 +101,7 @@ def compose_section(campID, wf_names, envs, dqm={}, **kwargs):
 	section += '\n   * *Jira*: [[https://its.cern.ch/jira/browse/CMSALCA-{jira}][CMSALCA-{jira}]]\n'.format(jira=envs['Jira'])
 
 	section += '\n*Hypernews links*: '
-	section += '\n   * *New tag validation request*: [[][]]'
+	section += '\n   * *New tag validation request*: [[{0}][{0}]]'.format(envs['ValidationRequest'])
 	section += '\n   * *Request email with full details about validation*: [[][]]'
 	section += '\n   * *Email after the new tag is deployed*: [[][]]'
 
@@ -110,6 +112,7 @@ def compose_section(campID, wf_names, envs, dqm={}, **kwargs):
 	section += '\n   * *CMSSW*: %s\n' % envs['HLT_release']
 
 	# GT table
+	section += '%TABLE{ caption="Conditions Table" valign="middle" headeralign="center"}%'
 	c1 = '\n| *Conditions Type* |'; c2 = '\n| Target |'; c3 = '\n| Reference |'; c4 = '\n| Common |'; c5 = '\n| |'
 	for wf, campID in (HLT, PR, EXPR):
 		if not wf in envs['WorkflowsToSubmit']: continue
@@ -121,20 +124,22 @@ def compose_section(campID, wf_names, envs, dqm={}, **kwargs):
 	section += c1 + c2 + c3 + c4 + c5 if 'HLT' in envs['WorkflowsToSubmit'] else c1 + c2 + c3 + c5
 
 	# Request Manager Workflow table
-	section += '\n\n| *Workflow* | *Description* | *PD* | *Workflow name* | *DQM Plots* | *Overlay* |'
-	count = 1
+	section += '%TABLE{ caption="Workflows Table" valign="middle" headeralign="center" dataalign="center,left,left,left,center,center"}%'
+	section += '\n\n| *Index* | *PD* | *Description* | *Workflow name* | *DQM Plots* | *Overlay* |'
+	count = 1; pd_sect = len(envs['WorkflowsToSubmit'].split('/'))*2
 	for dataset in envs['Dataset'].split(','):
+		dname = dataset.split('/')[1].strip()
 		for condition, ckey in [('HLT', 'HLT'), ('Express', 'EXPR'), ('Prompt', 'PR')]:
 			if not condition in envs['WorkflowsToSubmit']: continue
 			for Type in ('New Conditions', 'Reference Conditions'):
-				section += '\n|WF%s| %s %s | %s | %s | %s | %s |'%(
+				section += '\n|WF%s| %s | %s %s | %s | %s | %s |'%(
 					count,
+					'[[{0}{1}+run={2}][{1}]]'.format(daslink, dataset, envs['run_number']) if count%pd_sect==1 else '^',
 					condition,
 					Type,
-					dataset if count%6==1 else '^',
-					'[[{0}{1}][{1}]]'.format(reqmgr, wf_names[ckey+'_'+Type.replace(' ', '').lower()[:5]]),
-					'[[%s][%s]]' % (dqm[ckey+'_'+Type.replace(' ', '').lower()[:5]], 'DQM'),
-					'[[%s][%s]]' % (dqm[ckey], 'Overlay plots') if count%2==1 else '^' 
+					'[[{0}{1}][{1}]]'.format(reqmgr, wf_names[ckey+'_'+Type.replace(' ', '').lower()[:5]+'_'+dname]),
+					'[[%s][%s]]' % (dqm[ckey+'_'+Type.replace(' ', '').lower()[:5]+'_'+dname], 'DQM'),
+					'[[%s][%s]]' % (dqm[condition+'_'+dname], 'Overlay plots') if count%2==1 else '^' 
 				)
 				count += 1
 	section += '\n%ENDTWISTY%'
@@ -153,8 +158,8 @@ def get_DQM_links(envs, **kwargs):
 
 	dataset = dict()
 	for section in config.keys():
-		sec = section.split('_')[:2]
-		wtype = ('_').join((sec[0], sec[1][:5])).strip()
+		sec = section.split('_')[:3]
+		wtype = ('_').join([sec[0], sec[1][:5], sec[2]]).strip()
 		cmssw = config[section]['Config']['CMSSWVersion']
 		pstring = config[section]['Config']['ProcessingString']
 		dname = config[section]['Config']['Task1']['InputDataset'].split('/')[1].strip()
@@ -167,12 +172,14 @@ def get_DQM_links(envs, **kwargs):
 	for key in links.keys():
 		s2 = 'dataset=%s;' % dataset[key]
 		links[key] = s1 + s2 + s3
-	for key, wf in [('HLT', 'HLT'), ('EXPR', 'Express'), ('PR', 'Prompt')]:
-		if not wf in envs['WorkflowsToSubmit']: continue
-		s2 = 'dataset=%s;' % dataset[key+'_newco']
-		s5 = 'referenceobj1=other%3A%3A{}%3A%3A;'.format(dataset[key+'_refer'])
-		links[key.split('_')[0].strip()] = s1 + s2 + s4 + s5 + s3 
 
+	for ds in envs['Dataset'].split(','):
+		dname = ds.split('/')[1].strip()
+		for key, wf in [('HLT', 'HLT'), ('EXPR', 'Express'), ('PR', 'Prompt')]:
+			if not wf in envs['WorkflowsToSubmit']: continue
+			s2 = 'dataset=%s;' % dataset[key+'_newco_'+dname]
+			s5 = 'referenceobj1=other%3A%3A{}%3A%3A;'.format(dataset[key+'_refer_'+dname])
+			links[wf+'_'+dname] = s1 + s2 + s4 + s5 + s3 
 	return links
 
 #--------------------------------------------------------------------------
@@ -186,7 +193,7 @@ if __name__ == '__main__':
 
 		config = get_config_for_twiki()
 		links = get_DQM_links(**config)
-		NewSection = compose_section(**config, dqm=links)
+		NewSection = compose_section(dqm=links, **config)
 		instance.append_section(NewSection)
 	except Exception as e:
 		print(e)
