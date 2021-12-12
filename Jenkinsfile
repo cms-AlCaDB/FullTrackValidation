@@ -15,6 +15,7 @@ pipeline {
   stages {
     stage('Input Processing') {
       steps{
+        echo "Stage getting executed @ ${NODE_NAME}. Workspace: ${WORKSPACE}"
         cleanWs()
         checkout scm
         sh script: 'voms-proxy-init --rfc --voms cms', label: "Generate VOMS proxy certificate"
@@ -24,7 +25,7 @@ pipeline {
             def dict = readJSON file: 'envs.json'
             dict.each { key, value -> env."${key}"= value }
             buildName "${env.Label}"
-            buildDescription "${env.emailSubject} Executed @ ${NODE_NAME}"
+            buildDescription "${env.emailSubject}"
         }
       }
     }
@@ -36,7 +37,7 @@ pipeline {
             label "lxplus7 && slc7 && user-alcauser"
           }
           steps {
-            echo "Stage getting executed @ ${NODE_NAME}"
+            echo "Stage getting executed @ ${NODE_NAME}. Workspace: ${WORKSPACE}"
             cleanWs()
             checkout scm
             unstash 'json'
@@ -54,7 +55,7 @@ pipeline {
             label "lxplus7 && slc7 && user-alcauser"
           }
           steps {
-            echo "Stage getting executed @ ${NODE_NAME}"
+            echo "Stage getting executed @ ${NODE_NAME}. Workspace: ${WORKSPACE}"
             cleanWs()
             checkout scm
             unstash 'json'
@@ -81,7 +82,7 @@ pipeline {
             label "lxplus7 && slc7 && user-alcauser"
           }
           steps {
-            echo "Stage getting executed @ ${NODE_NAME}"
+            echo "Stage getting executed @ ${NODE_NAME}. Workspace: ${WORKSPACE}"
             cleanWs()
             checkout scm
             unstash 'json'
@@ -105,7 +106,7 @@ pipeline {
             label "lxplus7 && slc7 && user-alcauser"
           }
           steps {
-            echo "Stage getting executed @ ${NODE_NAME}"
+            echo "Stage getting executed @ ${NODE_NAME}. Workspace: ${WORKSPACE}"
             cleanWs()
             checkout scm
             unstash 'json'
@@ -124,7 +125,7 @@ pipeline {
             label "lxplus7 && slc7 && user-alcauser"
           }
           steps {
-            echo "Stage getting executed @ ${NODE_NAME}"
+            echo "Stage getting executed @ ${NODE_NAME}. Workspace: ${WORKSPACE}"
             cleanWs()
             checkout scm
             unstash 'json'
@@ -148,7 +149,7 @@ pipeline {
             label "lxplus7 && slc7 && user-alcauser"
           }
           steps {
-            echo "Stage getting executed @ ${NODE_NAME}"
+            echo "Stage getting executed @ ${NODE_NAME}. Workspace: ${WORKSPACE}"
             cleanWs()
             checkout scm
             unstash 'json'
@@ -167,7 +168,7 @@ pipeline {
             label "lxplus7 && slc7 && user-alcauser"
           }
           steps {
-            echo "Stage getting executed @ ${NODE_NAME}"
+            echo "Stage getting executed @ ${NODE_NAME}. Workspace: ${WORKSPACE}"
             cleanWs()
             checkout scm  
             unstash 'json'
@@ -191,7 +192,7 @@ pipeline {
             label "lxplus7 && slc7 && user-alcauser"
           }
           steps {
-            echo "Stage getting executed @ ${NODE_NAME}"
+            echo "Stage getting executed @ ${NODE_NAME}. Workspace: ${WORKSPACE}"
             cleanWs()
             checkout scm
             unstash 'json'
@@ -211,11 +212,11 @@ pipeline {
         expression { env.Validate == 'Yes' }
       }
       steps {
-        echo "Stage getting executed @ ${NODE_NAME}"
+        echo "Stage getting executed @ ${NODE_NAME}. Workspace: ${WORKSPACE}"
         unstash 'json'
         script {
           env.Ticket_Matched = sh(script: 'echo $(python3 modules/jira_api.py --scan --pat 2>&1 > /dev/null)', returnStdout: true).toString().trim()
-          if ( env.Ticket_Matched == '1' ) {
+          if ( env.Ticket_Matched == '0' ) {
             echo "Sending email request to AlCa Hypernews"
             echo "${env.emailSubject}"
             echo "${env.emailBody}"
@@ -237,10 +238,10 @@ pipeline {
     }
     stage('Submission') {
       when {
-        expression { env.Validate == 'Yes' }
+        expression { env.Validate == 'No' }
       }
       steps {
-        echo "Stage getting executed @ ${NODE_NAME}"
+        echo "Stage getting executed @ ${NODE_NAME}. Workspace: ${WORKSPACE}"
         cleanWs()
         checkout scm  
         unstash 'json'
@@ -277,11 +278,11 @@ pipeline {
         label "cs8 && x86_64 && user-alcauser"
       }
       steps {
-        echo "Stage getting executed @ ${NODE_NAME}"
+        echo "Stage getting executed @ ${NODE_NAME}. Workspace: ${WORKSPACE}"
         cleanWs()
         checkout scm
         unstash 'json'
-        unstash 'WorkflowStash'
+        sh script: 'cp ${TEST_RESULT}/${Label}/workflow_config.json .', label: "Copy json file containing workflow configuration"
         sh script: 'singularity build -F --sandbox ${TMPDIR}/selenium docker-archive:///eos/home-a/alcauser/selenium-docker.tar', label: "Creating environment for running TWiki script"
         sh script: 'singularity exec --home "/home/jovyan" --writable --cleanenv --bind "${TMPDIR}/selenium/home/jovyan:/home/jovyan" ${TMPDIR}/selenium python3.8 TWikiUpdate.py --headless', label: "Creating validation report on dedicated Twiki"
       }
