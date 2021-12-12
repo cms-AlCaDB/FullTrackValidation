@@ -58,9 +58,9 @@ def get_workflow_id_names():
    campIDs = {'HLT': set(), 'PR': set(), 'EXPR': set()}
    workflow_names = dict()
    for section in config.keys():
-      sec = section.split('_')
+      sec = section.split('_')[:3]
       ctype = sec[0].strip()
-      wtype = ('_').join((sec[0], sec[1][:5])).strip()
+      wtype = '_'.join([sec[0], sec[1][:5], sec[2]]).strip()
       campIDs[ctype].add(config[section]['Config']['Campaign'])
       workflow_names[wtype] = config[section]['workflow_name']
    return (campIDs, workflow_names)
