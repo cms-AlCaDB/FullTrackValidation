@@ -20,6 +20,8 @@ parsedArgs = parser.parse_known_args()[0]
 
 def GetNumberOfEvents(DataSet, RunNumber, LumiSec=''):
     """Returns number of events for given Dataset, RunNumber"""
+    if not os.popen('voms-proxy-info -path').read().strip():
+        os.system('voms-proxy-init --rfc --voms cms')
     os.environ["X509_USER_PROXY"] = os.popen('voms-proxy-info -path').read().strip()
     if LumiSec == '':
         query=DataSet+'&run_num='+RunNumber
@@ -37,14 +39,12 @@ def get_input():
 	   Commit time will be recorded.
 	   Avoid commiting more than one templates"""
 	files = glob.glob("Validations/*")
-	dlist = list()
-	for f in files: dlist.append(os.path.getmtime(f))
 
 	File = namedtuple("File", ["path", "time"])
 	commit_dates = list()
 	for f in files:
 		raw_time = subprocess.getoutput("git log -n 1 --pretty=format:%cd {}".format(f))
-		if raw_time == '': 
+		if raw_time == '':
 			Time = datetime.fromtimestamp(os.path.getmtime(f)).strftime('%Y-%m-%d %H:%M:%S')
 		else:
 			Time = datetime.strptime(raw_time, '%a %b %d %H:%M:%S %Y %z').strftime('%Y-%m-%d %H:%M:%S')
@@ -146,7 +146,8 @@ def compose_email(args):
 	title_text = "{Title} (Week {no}, {Year})".format(Title = args['Title'], no = args['Week'].strip('Week'), Year = args['Year'])
 	emailSubject = "[{}] Full track validation of {}".format(args['WorkflowsToSubmit'], title_text)
 	emailBody = """Dear Colleagues,
-We are going to perform full track validation of {title_text}
+We are going to perform full track validation of {title_text}.
+Request email for this validation is [0].
 Details of the workflow: {GTList}
 - Run: {run_number} recorded on {start_date} with magnetic field {b_field}T [1]
 - HLT Menu: {hlt_key}
@@ -159,6 +160,7 @@ Once the workflows are ready, we will ask the {Subsystem} validators to report t
 Best regards,
 Pritam, Amandeep, Tamas, Francesco, Helena (for AlCa/DB)
 
+[0] {ValidationRequest}
 [1] https://cmsoms.cern.ch/cms/runs/report?cms_run={run_number}&cms_run_sequence=GLOBAL-RUN
 [2] %s
 [3] https://twiki.cern.ch/twiki/bin/view/CMS/PdmVTriggerConditionValidation2021
