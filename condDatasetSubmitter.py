@@ -551,6 +551,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
             driver_command += "--customise_commands='%s' " % (details['custcommands'])
 
         #Temporary changes
+        driver_command += '--procModifiers siPixelQualityRawToDigi '
         driver_command += '--customise "Configuration/DataProcessing/RecoTLR.customisePostEra_Run3" '
         # ---------
 
@@ -610,6 +611,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                 driver_command += "--customise_commands='%s' " % (recodqm['custcommands'])
 
             #Temporary changes
+            driver_command += '--procModifiers siPixelQualityRawToDigi '
             driver_command += '--customise "Configuration/DataProcessing/RecoTLR.customisePostEra_Run3" '
             # ---------
 
