@@ -11,8 +11,7 @@ def get_project_permissions():
     """Logs into Jira and returns permissions of the user for CMSALCA project"""
     from modules.jira_api import JiraAPI
     get_user()
-    args = get_arguments()
-    args = extract_keys(args)
+    args = json.load(open('envs.json'))
     api = JiraAPI(args, parsedArgs.user, parsedArgs.password)
     ticket = api.check_duplicate()
     jira = api.connection
