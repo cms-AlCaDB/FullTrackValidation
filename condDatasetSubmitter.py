@@ -94,6 +94,10 @@ def createOptionParser():
                         help="Prevents the site check to be operated",
                         default=False,
                         action='store_true')
+    parser.add_option("--NewOrReference",
+                        help="Specify if you want to submit only new or reference workflows. By default both will be submitted",
+                        choices=['New', 'Reference', 'Both'],
+                        default='Both')
 
     (options,args) = parser.parse_args()
 
@@ -132,13 +136,13 @@ def createOptionParser():
 
 #-------------------------------------------------------------------------------
 
-def getConfCondDictionary(conditions_filename):
-    ConfCondList = [('REFERENCE.py', options.gt)]
-    ConfCondDictionary = {'REFERENCE.py':options.gt}
-
-    ConfCondDictionary['NEWCONDITIONS0.py'] = options.newgt
-    ConfCondList.append(('NEWCONDITIONS0.py', options.newgt))
-    #return ConfCondDictionary
+def getConfCondDictionary(options):
+    if options.NewOrReference == 'New':
+        ConfCondList = [('NEWCONDITIONS0.py', options.newgt)]
+    elif options.NewOrReference == 'Reference':
+        ConfCondList = [('REFERENCE.py', options.gt)]
+    else:
+        ConfCondList = [('REFERENCE.py', options.gt), ('NEWCONDITIONS0.py', options.newgt)]
     return ConfCondList
 
 #-------------------------------------------------------------------------------
@@ -551,7 +555,8 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
             driver_command += "--customise_commands='%s' " % (details['custcommands'])
 
         #Temporary changes
-        driver_command += '--procModifiers siPixelQualityRawToDigi '
+        if 'newco' in cfgname.lower(): 
+            driver_command += '--procModifiers siPixelQualityRawToDigi '
         driver_command += '--customise "Configuration/DataProcessing/RecoTLR.customisePostEra_Run3,RecoLocalCalo/Configuration/customiseHBHEreco.hbheUseM0FullRangePhase1" '
         # ---------
 
@@ -611,7 +616,8 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                 driver_command += "--customise_commands='%s' " % (recodqm['custcommands'])
 
             #Temporary changes
-            driver_command += '--procModifiers siPixelQualityRawToDigi '
+            if 'newco' in cfgname.lower(): 
+                driver_command += '--procModifiers siPixelQualityRawToDigi '
             driver_command += '--customise "Configuration/DataProcessing/RecoTLR.customisePostEra_Run3,RecoLocalCalo/Configuration/customiseHBHEreco.hbheUseM0FullRangePhase1" '
             # ---------
 
@@ -759,25 +765,9 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
     elif recodqm:
         pass
     else:
-        for ds in options.ds :
-            ds_name = ds[:1].replace("/","") + ds[1:].replace("/","_")
-            ds_name = ds_name.replace("-","_")
-            label   = cfgname.lower().replace('.py', '')[0:5]
-            wmcconf_text += '[%s_reference_%s]\n' % (details['reqtype'],ds_name) +\
-                            'input_name = %s\n' % (ds) +\
-                            'request_id = %s__ALCA_%s-%s_%s_%srefer\n' % (options.release,options.jira,datetime.datetime.now().strftime("%Y_%m_%d_%H_%M"),ds_name, details['reqtype']) +\
-                            'keep_step1 = True\n' +\
-                            'time_event = 10\n' +\
-                            'size_memory = 8000\n' +\
-                            'step1_lumisperjob = 1\n' +\
-                            'processing_string = %s_%sref_%s \n' % (processing_string, details['reqtype'], refgtshort) +\
-                            'cfg_path = REFERENCE.py\n' +\
-                            'req_name = %s_reference_RelVal_%s\n' % (details['reqtype'], onerun) +\
-                            'globaltag = %s\n' % (refgtshort) +\
-                            'harvest_cfg=step4_refer_HARVESTING.py\n\n' # this is ugly and depends on [0:5]; can't be easliy fixed w/o reorganization
+        pass
 
     task = 2
-    print(confCondList)
     for (i, c) in enumerate(confCondList):
         cfgname = c[0]
         if "REFERENCE" in cfgname:
@@ -796,28 +786,44 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                     label = cfgname.lower().replace('.py', '')[0:5]
                     ReqLabel = details['reqtype']+label
                     wmcconf_text += '\n[%s_%s_%s]\n' % (details['reqtype'], label, ds_name) +\
-                                    'input_name = %s\n' % (ds) +\
-                                    'request_id=%s__ALCA_%s-%s_%s_%s\n' % (options.release,options.jira,datetime.datetime.now().strftime("%Y_%m_%d_%H_%M"),ds_name,ReqLabel) +\
-                                    'keep_step%d = True\n' % (task) +\
-                                    'time_event = 1\n' +\
-                                    'size_memory = 8000\n' +\
-                                    'step1_lumisperjob = 1\n' +\
-                                    'processing_string = %s_%s_%s \n' % (processing_string, details['reqtype']+label, refsubgtshort) +\
-                                    'cfg_path = %s\n' % (cfgname) +\
-                                    'req_name = %s_%s_RelVal_%s\n' % (details['reqtype'], label, onerun) +\
-                                    'globaltag = %s\n' % (refsubgtshort) +\
-                                    'step%d_output = %s\n' % (task, 'FEVTDEBUGoutput' if options.cosmics else 'FEVTDEBUGHLToutput') +\
-                                    'step%d_cfg = recodqm_%s.py\n' % (task, label) +\
-                                    'step%d_lumisperjob = 1\n' % (task) +\
-                                    'step%d_globaltag = %s \n' % (task, gtshort) +\
-                                    'step%d_processstring = %s_%s_%s \n' % (task, processing_string, details['reqtype']+label, refsubgtshort) +\
-                                    'step%d_input = Task1\n' % (task) +\
-                                    'step%d_timeevent = 10\n' % (task)
+                        'input_name = %s\n' % (ds) +\
+                        'request_id=%s__ALCA_%s-%s_%s_%s\n' % (options.release,options.jira,datetime.datetime.now().strftime("%Y_%m_%d_%H_%M"),ds_name,ReqLabel) +\
+                        'keep_step%d = True\n' % (task) +\
+                        'time_event = 1\n' +\
+                        'size_memory = 8000\n' +\
+                        'step1_lumisperjob = 1\n' +\
+                        'processing_string = %s_%s_%s \n' % (processing_string, details['reqtype']+label, refsubgtshort) +\
+                        'cfg_path = %s\n' % (cfgname) +\
+                        'req_name = %s_%s_RelVal_%s\n' % (details['reqtype'], label, onerun) +\
+                        'globaltag = %s\n' % (refsubgtshort) +\
+                        'step%d_output = %s\n' % (task, 'FEVTDEBUGoutput' if options.cosmics else 'FEVTDEBUGHLToutput') +\
+                        'step%d_cfg = recodqm_%s.py\n' % (task, label) +\
+                        'step%d_lumisperjob = 1\n' % (task) +\
+                        'step%d_globaltag = %s \n' % (task, gtshort) +\
+                        'step%d_processstring = %s_%s_%s \n' % (task, processing_string, details['reqtype']+label, refsubgtshort) +\
+                        'step%d_input = Task1\n' % (task) +\
+                        'step%d_timeevent = 10\n' % (task)
 
                     if options.recoRelease:
                         wmcconf_text += 'step%d_release = %s \n' % (task, options.recoRelease)
                     wmcconf_text += 'harvest_cfg=step4_%s_HARVESTING.py\n\n' %(label)
             else:
+                for ds in options.ds :
+                    ds_name = ds[:1].replace("/","") + ds[1:].replace("/","_")
+                    ds_name = ds_name.replace("-","_")
+                    label   = cfgname.lower().replace('.py', '')[0:5]
+                    wmcconf_text += '[%s_reference_%s]\n' % (details['reqtype'],ds_name) +\
+                        'input_name = %s\n' % (ds) +\
+                        'request_id = %s__ALCA_%s-%s_%s_%srefer\n' % (options.release,options.jira,datetime.datetime.now().strftime("%Y_%m_%d_%H_%M"),ds_name, details['reqtype']) +\
+                        'keep_step1 = True\n' +\
+                        'time_event = 10\n' +\
+                        'size_memory = 8000\n' +\
+                        'step1_lumisperjob = 1\n' +\
+                        'processing_string = %s_%sref_%s \n' % (processing_string, details['reqtype'], refgtshort) +\
+                        'cfg_path = REFERENCE.py\n' +\
+                        'req_name = %s_reference_RelVal_%s\n' % (details['reqtype'], onerun) +\
+                        'globaltag = %s\n' % (refgtshort) +\
+                        'harvest_cfg=step4_refer_HARVESTING.py\n\n' # this is ugly and depends on [0:5]; can't be easliy fixed w/o reorganization
                 continue
         if base:
             wmcconf_text += '\n\n' +\

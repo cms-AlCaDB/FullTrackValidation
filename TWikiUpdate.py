@@ -61,7 +61,11 @@ class AccessFirefox:
 		edit_key = '/html/body/div/div/div/div[1]/div/div[1]/div[1]/div[2]/div[1]/span[2]/span[1]/a'
 		self.wait.until(presence_of_element_located((By.XPATH, edit_key)))
 		self.browser.find_element(By.XPATH, edit_key).click()
-		topic = self.browser.find_element(By.XPATH, '//*[@id="topic"]').get_attribute("value")
+		try:
+			topic = self.browser.find_element(By.XPATH, '//*[@id="topic"]').get_attribute("value")
+		except:
+			self.browser.find_element(By.XPATH, '/html/body/div/div/div/div[1]/div[1]/div/div/div[2]/form[2]/input[4]').click()
+			topic = self.browser.find_element(By.XPATH, '//*[@id="topic"]').get_attribute("value")
 		return topic
 
 	def append_section(self, section):
@@ -112,7 +116,7 @@ def compose_section(campID, wf_names, envs, dqm={}, **kwargs):
 	section += '\n   * *CMSSW*: %s\n' % envs['HLT_release']
 
 	# GT table
-	section += '%TABLE{ caption="Conditions Table" valign="middle" headeralign="center"}%'
+	section += '\n%TABLE{ caption="Conditions Table" valign="middle" headeralign="center"}%'
 	c1 = '\n| *Conditions Type* |'; c2 = '\n| Target |'; c3 = '\n| Reference |'; c4 = '\n| Common |'; c5 = '\n| |'
 	for wf, campID in (HLT, PR, EXPR):
 		if not wf in envs['WorkflowsToSubmit']: continue
@@ -124,22 +128,24 @@ def compose_section(campID, wf_names, envs, dqm={}, **kwargs):
 	section += c1 + c2 + c3 + c4 + c5 if 'HLT' in envs['WorkflowsToSubmit'] else c1 + c2 + c3 + c5
 
 	# Request Manager Workflow table
-	section += '%TABLE{ caption="Workflows Table" valign="middle" headeralign="center" dataalign="center,left,left,left,center,center"}%'
-	section += '\n\n| *Index* | *PD* | *Description* | *Workflow name* | *DQM Plots* | *Overlay* |'
-	count = 1; pd_sect = len(envs['WorkflowsToSubmit'].split('/'))*2
+	section += '\n\n%TABLE{ caption="Workflows Table" valign="middle" headeralign="center" dataalign="center,left,left,left,center,center"}%'
+	section += '\n| *Index* | *PD* | *Description* | *Workflow name* | *DQM Plots* | *Overlay* |'
+
+	CondList = ['New Conditions', 'Reference Conditions'] if envs['NewOrReference']=='Both' else ['New Conditions'] if envs['NewOrReference']=='New' else ['Reference Conditions']
+	count = 1; pd_sect = len(envs['WorkflowsToSubmit'].split('/'))*len(CondList)
 	for dataset in envs['Dataset'].split(','):
 		dname = dataset.split('/')[1].strip()
 		for condition, ckey in [('HLT', 'HLT'), ('Express', 'EXPR'), ('Prompt', 'PR')]:
 			if not condition in envs['WorkflowsToSubmit']: continue
-			for Type in ('New Conditions', 'Reference Conditions'):
+			for Type in CondList:
 				section += '\n|WF%s| %s | %s %s | %s | %s | %s |'%(
 					count,
-					'[[{0}{1}+run={2}][{1}]]'.format(daslink, dataset, envs['run_number']) if count%pd_sect==1 else '^',
+					'[[{0}{1}+run={2}][{1}]]'.format(daslink, dataset, envs['run_number']) if (count%pd_sect==1 or pd_sect==1) else '^',
 					condition,
 					Type,
 					'[[{0}{1}][{1}]]'.format(reqmgr, wf_names[ckey+'_'+Type.replace(' ', '').lower()[:5]+'_'+dname]),
 					'[[%s][%s]]' % (dqm[ckey+'_'+Type.replace(' ', '').lower()[:5]+'_'+dname], 'DQM'),
-					'[[%s][%s]]' % (dqm[condition+'_'+dname], 'Overlay plots') if count%2==1 else '^' 
+					'[[%s][%s]]' % (dqm[condition+'_'+dname], 'Overlay plots') if (count%len(CondList)==1 and len(CondList)==2) else '^' 
 				)
 				count += 1
 	section += '\n%ENDTWISTY%'
@@ -173,13 +179,14 @@ def get_DQM_links(envs, **kwargs):
 		s2 = 'dataset=%s;' % dataset[key]
 		links[key] = s1 + s2 + s3
 
-	for ds in envs['Dataset'].split(','):
-		dname = ds.split('/')[1].strip()
-		for key, wf in [('HLT', 'HLT'), ('EXPR', 'Express'), ('PR', 'Prompt')]:
-			if not wf in envs['WorkflowsToSubmit']: continue
-			s2 = 'dataset=%s;' % dataset[key+'_newco_'+dname]
-			s5 = 'referenceobj1=other%3A%3A{}%3A%3A;'.format(dataset[key+'_refer_'+dname])
-			links[wf+'_'+dname] = s1 + s2 + s4 + s5 + s3 
+	if envs['NewOrReference']=='Both':
+		for ds in envs['Dataset'].split(','):
+			dname = ds.split('/')[1].strip()
+			for key, wf in [('HLT', 'HLT'), ('EXPR', 'Express'), ('PR', 'Prompt')]:
+				if not wf in envs['WorkflowsToSubmit']: continue
+				s2 = 'dataset=%s;' % dataset[key+'_newco_'+dname]
+				s5 = 'referenceobj1=other%3A%3A{}%3A%3A;'.format(dataset[key+'_refer_'+dname])
+				links[wf+'_'+dname] = s1 + s2 + s4 + s5 + s3
 	return links
 
 #--------------------------------------------------------------------------
