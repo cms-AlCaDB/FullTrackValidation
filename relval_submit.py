@@ -335,7 +335,8 @@ I will ask you some questions to fill the metadata file. For some of the questio
 
         cond_submit_command = './condDatasetSubmitter.py '
         for key, val in metadata['options'].items():
-            # cond_submit_command += '--%s %s ' % ( key, val )
+            # Override NewOrReference argument if speficified `new` or `refer` in options
+            if key=='NewOrReference': val = 'New' if arguments.new else 'Reference' if arguments.refer else val
             if isinstance(val, list):
                 cond_submit_command += '--%s "' % (key)
                 for u in val:
@@ -394,8 +395,8 @@ I will ask you some questions to fill the metadata file. For some of the questio
             commands.append('chmod +x cmsDrivers.sh')
             commands.append('./cmsDrivers.sh')
             if metadata['options']['Type']=='EXPR+RECO' or metadata['options']['Type']=='HLT+RECO':
-                commands.append('cp cmsDrivers.sh cmsDrivers_{}.sh'.format(metadata['options']['Type'].split('+')[0]))
                 if arguments.new:
+                    commands.append('cp cmsDrivers.sh cmsDrivers_{}.sh'.format(metadata['options']['Type'].split('+')[0]+'_newco'))
                     if metadata['PR_release'] != metadata['HLT_release']:
                         commands.append("cd %s; eval `scramv1 runtime -sh`; cd -" % metadata['HLT_release'])
                         commands.append('cmsRun NEWCONDITIONS0.py')
@@ -408,6 +409,7 @@ I will ask you some questions to fill the metadata file. For some of the questio
                         commands.append('cmsRun step4_newco_HARVESTING.py')
                     commands.append('mv DQM*.root {}_newco_DQMoutput.root'.format(metadata['options']['Type'].split('+')[0]))
                 elif arguments.refer:
+                    commands.append('cp cmsDrivers.sh cmsDrivers_{}.sh'.format(metadata['options']['Type'].split('+')[0]+'_refer'))
                     commands.append('rm -f step*.root')
                     if metadata['PR_release'] != metadata['HLT_release']:
                         commands.append("cd %s; eval `scramv1 runtime -sh`; cd -" % metadata['HLT_release'])
@@ -421,23 +423,25 @@ I will ask you some questions to fill the metadata file. For some of the questio
                         commands.append('cmsRun step4_refer_HARVESTING.py')
                     commands.append('mv DQM*.root {}_refer_DQMoutput.root'.format(metadata['options']['Type'].split('+')[0]))
             elif metadata['options']['Type'] == 'EXPR':
-                commands.append('cp cmsDrivers.sh cmsDrivers_EXPR.sh')
                 if arguments.new:
+                    commands.append('cp cmsDrivers.sh cmsDrivers_EXPR_newco.sh')
                     commands.append('cmsRun NEWCONDITIONS0.py')
                     commands.append('cmsRun step4_newco_HARVESTING.py')
                     commands.append('mv DQM*.root EXPR_newco_DQMoutput.root')
                 elif arguments.refer:
+                    commands.append('cp cmsDrivers.sh cmsDrivers_EXPR_refer.sh')
                     commands.append('rm -f step*.root')
                     commands.append('cmsRun REFERENCE.py')
                     commands.append('cmsRun step4_refer_HARVESTING.py')
                     commands.append('mv DQM*.root EXPR_refer_DQMoutput.root')
             elif metadata['options']['Type']=='PR':
-                commands.append('cp cmsDrivers.sh cmsDrivers_PR.sh')
                 if arguments.new:
+                    commands.append('cp cmsDrivers.sh cmsDrivers_PR_newco.sh')
                     commands.append('cmsRun NEWCONDITIONS0.py')
                     commands.append('cmsRun step4_newco_HARVESTING.py')
                     commands.append('mv DQM*.root PR_newco_DQMoutput.root')
                 elif arguments.refer:
+                    commands.append('cp cmsDrivers.sh cmsDrivers_PR_refer.sh')
                     commands.append('rm -f step*.root')
                     commands.append('cmsRun REFERENCE.py')
                     commands.append('cmsRun step4_refer_HARVESTING.py')
