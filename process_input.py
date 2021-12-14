@@ -53,12 +53,6 @@ def get_input():
 	commit_dates.sort(key=lambda file: file.time)
 	return commit_dates[-1].path
 
-def get_run(run_number):
-	"""Returns run configuration in json format. Input param: run number"""
-	# import urllib3; urllib3.disable_warnings()
-	run = runregistry.get_run(run_number=int(run_number))
-	return run
-
 def get_arguments():
 	"""Returns input arguments after processing input template in dictionary format"""
 	print(">> We will be processing lastly edited template: ", get_input())
@@ -191,17 +185,25 @@ def check_requirements():
 		if not pkg in packages:
 			os.system("pip3 install {} --user".format(pkg))
 
-def extract_keys(args):
+def extract_keys_from_oms(oms, args):
+	oms_data = oms.get_run_details(args['run_number'], args['LumiSec'])
+	return oms_data
+
+def extract_keys_from_runregistry(args):
+	"""Returns run configuration in json format. Input param: run number"""
+	# import urllib3; urllib3.disable_warnings()
+	rr_data = runregistry.get_run(run_number=int(args['run_number']))
+	return rr_data
+
+def extract_keys(args, run_args, oms):
 	"""Extract keys from run-registry"""
 	def get_date(raw_time):
 		return datetime.strptime(raw_time, '%Y-%m-%dT%H:%M:%SZ').strftime('%b-%d %Y')
-	run = get_run(args['run_number'])
-	oms = run['oms_attributes']
 	args['cmssw_version'] = oms['cmssw_version']
 	args['b_field']     = float(oms['b_field'])
 	args['start_time']  = oms['start_time']
 	args['start_date']  = get_date(oms['start_time'])
-	args['class']		= run['class']
+	args['class']		= run_args['class']
 	if not 'CMSSW' in args['HLT_release'] : args['HLT_release'] = oms['cmssw_version']
 	if not 'CMSSW' in args['PR_release']  : args['PR_release']  = oms['cmssw_version']
 	if not 'CMSSW' in args['Expr_release']: args['Expr_release']  = oms['cmssw_version']
@@ -221,15 +223,33 @@ def get_user():
 		parsedArgs.password = getpass(prompt="Password of user '%s' for Jira: "% parsedArgs.user)
 
 if __name__ == '__main__':
-	from modules.jira_api import JiraAPI
 	get_user()					# set user and password for Jira
 	args = get_arguments()
-	args = extract_keys(args)
+
+	# Retrieve number of events you are about to process
+	from modules.oms_api import OMSAPI
+	oms = OMSAPI()
+
+	# Extract some data from run-registry(RR). Or from OMS in case of RR is down
+	try:
+		rr_args = extract_keys_from_runregistry(args)
+		args = extract_keys(args, rr_args, rr_args['oms_attributes'])
+	except Exception as e:
+		oms_args = extract_keys_from_oms(oms, args)
+		args = extract_keys(args, oms_args['data'], oms_args['data']['attributes'])
+
+	# Retrieve number of events for the dataset
 	for dataset in args['Dataset'].split(','):
-		nEvents = GetNumberOfEvents(dataset.strip(), args['run_number'], LumiSec=args['LumiSec'].replace(' ', ''))
+		try:
+			nEvents = oms.get_nEvents(dataset.split('/')[1], args['run_number'], LumiSec=args['LumiSec'])
+		except Exception as e:
+			nEvents = GetNumberOfEvents(dataset.strip(), args['run_number'], LumiSec=args['LumiSec'].replace(' ', ''))
 		print('Dataset', dataset, 'has', nEvents, 'Events', 'for run', args['run_number'], 'and LumiSection', args['LumiSec'])
 		args.update({'nEvents_'+dataset.split('/')[1]: nEvents})
+
+	# Retrieve Jira-ticket number for the validation
 	try:
+		from modules.jira_api import JiraAPI
 		api = JiraAPI(args, parsedArgs.user, parsedArgs.password)
 		ticket = api.check_duplicate()
 		if not ticket:
@@ -242,6 +262,7 @@ if __name__ == '__main__':
 			raise ValueError("Check Error message. Provide ticket number in input template if you are facing error accessing Jira site")
 		print(">> Jira site is not accessible. Ticket number is taken from input template. CMSALCA-%s" %args["Jira"])
 
+	# Generate Workflow specific dictionaries
 	hlt_dict 	 = build_HLT_workflow(args)
 	express_dict = build_Express_workflow(args)
 	prompt_dict  = build_Prompt_workflow(args)
@@ -252,6 +273,7 @@ if __name__ == '__main__':
 		json.dump(data, rfile, indent=2)
 		rfile.close()
 
+	# Compose email text and save all arguments to json file
 	args = compose_email(args)
 	jsonfile = open('envs.json', 'w')
 	json.dump(args, jsonfile, indent=2)
