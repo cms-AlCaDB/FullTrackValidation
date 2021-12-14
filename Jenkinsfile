@@ -76,7 +76,7 @@ pipeline {
       parallel {
         stage('HLT New') {
           when {
-            expression { WorkflowsToSubmit.contains('HLT') }
+            expression { WorkflowsToSubmit.contains('HLT') && (NewOrReference.contains('New') || NewOrReference.contains('Both')) }
           }
           agent {
             label "lxplus7 && slc7 && user-alcauser"
@@ -100,7 +100,7 @@ pipeline {
 
         stage('HLT Reference') {
           when {
-            expression { WorkflowsToSubmit.contains('HLT') }
+            expression { WorkflowsToSubmit.contains('HLT') && (NewOrReference.contains('Reference') || NewOrReference.contains('Both')) }
           }
           agent {
             label "lxplus7 && slc7 && user-alcauser"
@@ -119,7 +119,7 @@ pipeline {
 
         stage('Express New') {
           when {
-            expression { WorkflowsToSubmit.contains('Express') }
+            expression { WorkflowsToSubmit.contains('Express') && (NewOrReference.contains('New') || NewOrReference.contains('Both')) }
           }
           agent {
             label "lxplus7 && slc7 && user-alcauser"
@@ -143,7 +143,7 @@ pipeline {
 
         stage('Express Reference') {
           when {
-            expression { WorkflowsToSubmit.contains('Express') }
+            expression { WorkflowsToSubmit.contains('Express') && (NewOrReference.contains('Reference') || NewOrReference.contains('Both')) }
           }
           agent {
             label "lxplus7 && slc7 && user-alcauser"
@@ -162,7 +162,7 @@ pipeline {
 
         stage('Prompt New') {
           when {
-            expression { WorkflowsToSubmit.contains('Prompt') }
+            expression { WorkflowsToSubmit.contains('Prompt') && (NewOrReference.contains('New') || NewOrReference.contains('Both')) }
           }
           agent {
             label "lxplus7 && slc7 && user-alcauser"
@@ -186,7 +186,7 @@ pipeline {
 
         stage('Prompt Reference') {
           when {
-            expression { WorkflowsToSubmit.contains('Prompt') }
+            expression { WorkflowsToSubmit.contains('Prompt') && (NewOrReference.contains('Reference') || NewOrReference.contains('Both')) }
           }
           agent {
             label "lxplus7 && slc7 && user-alcauser"
@@ -238,7 +238,7 @@ pipeline {
     }
     stage('Submission') {
       when {
-        expression { env.Validate == 'No' }
+        expression { env.Validate == 'Yes' }
       }
       steps {
         echo "Stage getting executed @ ${NODE_NAME}. Workspace: ${WORKSPACE}"

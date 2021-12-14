@@ -39,6 +39,10 @@ Validate                : Yes
 #-------------------------------------------------------------------------------
 WorkflowsToSubmit       : Prompt
 
+# Choose the type of condition to submit. 
+# Choices--> New, Reference, Both
+NewOrReference          : New
+
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 #------- OPTIONAL -------- OPTIONAL -------- OPTIONAL --------- OPTIONAL -------
@@ -53,7 +57,7 @@ Expr_release            : CMSSW_12_1_1
 # Put NEW jira ticket number in case jira server is down
 Jira                    : None
 
-# Fill below details in case of run-registry server is down
+# Fill below details in case of both run-registry and OMS server server are down
 b_field                 : None
 class                   : None
 hlt_key                 : None
