@@ -19,7 +19,7 @@ parser.add_argument('--url', type=str, help='Put url for Jenkins build')
 parsedArgs = parser.parse_known_args()[0]
 
 def GetNumberOfEvents(DataSet, RunNumber, LumiSec=''):
-    """Returns number of events for given Dataset, RunNumber"""
+    """Returns number of events for given Dataset, RunNumber (from DBS3)"""
     if not os.popen('voms-proxy-info -path').read().strip():
         os.system('voms-proxy-init --rfc --voms cms')
     os.environ["X509_USER_PROXY"] = os.popen('voms-proxy-info -path').read().strip()
@@ -95,6 +95,7 @@ def build_HLT_workflow(args):
 	options['newgt']		 = args['TargetGT_HLT']
 	options['runLs' if ':' in args['Run'] else 'run'] = ast.literal_eval(args['Run'])
 	options['jira']		 	 = args['Jira']
+	options['NewOrReference'] = args['NewOrReference']
 	return hlt_dict
 
 def build_Express_workflow(args):
@@ -110,6 +111,7 @@ def build_Express_workflow(args):
 	options['runLs' if ':' in args['Run'] else 'run'] = ast.literal_eval(args['Run'])
 	options['jira']		 	 = args['Jira']
 	options['two_WFs']		 = ""
+	options['NewOrReference'] = args['NewOrReference']
 	return express_dict
 
 def build_Prompt_workflow(args):
@@ -125,6 +127,7 @@ def build_Prompt_workflow(args):
 	options['runLs' if ':' in args['Run'] else 'run'] = ast.literal_eval(args['Run'])
 	options['jira']		 	 = str(args['Jira'])
 	options['two_WFs']		 = ""
+	options['NewOrReference'] = args['NewOrReference']
 	return prompt_dict
 
 def compose_email(args):
