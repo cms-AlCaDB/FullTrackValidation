@@ -12,9 +12,9 @@ Labels                  : Week5, 2022, Pixel
 
 # Target GTs here
 #-------------------------------------------------------------------------------
-TargetGT_HLT            : 121X_dataRun3_HLTNew_Pixel2DTempl_w5_2022
-TargetGT_Express        : 121X_dataRun3_ExpressNew_Pixel2DTempl_w5_2022
-TargetGT_Prompt         : 121X_dataRun3_PromptNew_Pixel2DTemplate_w5_2022
+TargetGT_HLT            : 121X_dataRun3_HLTNew_Pixel2DTempl_w5_2022_v2
+TargetGT_Express        : 121X_dataRun3_ExpressNew_Pixel2DTempl_w5_2022_v2
+TargetGT_Prompt         : 121X_dataRun3_PromptNew_Pixel2DTempl_w5_2022_v2
 
 # Reference GTs here
 #-------------------------------------------------------------------------------
