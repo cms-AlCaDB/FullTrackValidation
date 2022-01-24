@@ -18,9 +18,9 @@ TargetGT_Prompt         : 122X_dataRun3_PromptNew_EOYTkAli_w6_2022_v1
 
 # Reference GTs here
 #-------------------------------------------------------------------------------
-ReferenceGT_HLT         : 122X_dataRun3_HLT_v1
-ReferenceGT_Express     : 122X_dataRun3_Express_v1
-ReferenceGT_Prompt      : 122X_dataRun3_Prompt_v1
+ReferenceGT_HLT         : 122X_dataRun3_HLT_v2
+ReferenceGT_Express     : 122X_dataRun3_Express_v2
+ReferenceGT_Prompt      : 122X_dataRun3_Prompt_v2
 
 # List of Dataset. Comma(,) separated. NO space allowed in between
 #-------------------------------------------------------------------------------
