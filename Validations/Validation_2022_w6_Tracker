@@ -1,0 +1,66 @@
+# Email/HN link through which this validation is requested.
+# Put is None in case you don't have any link
+ValidationRequest       : https://cms-talk.web.cern.ch/t/full-track-validation-eoy-tracker-alignment-conditions-using-cruzet-craft-minbias-data/4537
+
+Title                   : EOY Tracker Alignment conditions using CRUZET+CRAFT+MinBias data
+
+Subsystem               : Tracker
+
+# Labels: List of labels separated by comma. Keep it unique for given validation
+#-------------------------------------------------------------------------------
+Labels                  : Week6, 2022, Tracker
+
+# Target GTs here
+#-------------------------------------------------------------------------------
+TargetGT_HLT            : 122X_dataRun3_HLTNew_EOYTkAli_w6_2022_v1
+TargetGT_Express        : 122X_dataRun3_ExpressNew_EOYTkAli_w6_2022_v1
+TargetGT_Prompt         : 122X_dataRun3_PromptNew_EOYTkAli_w6_2022_v1
+
+# Reference GTs here
+#-------------------------------------------------------------------------------
+ReferenceGT_HLT         : 122X_dataRun3_HLT_v2
+ReferenceGT_Express     : 122X_dataRun3_Express_v2
+ReferenceGT_Prompt      : 122X_dataRun3_Prompt_v2
+
+# List of Dataset. Comma(,) separated. NO space allowed in between
+#-------------------------------------------------------------------------------
+Dataset                 : /MinimumBias/Commissioning2021-v1/RAW,/ZeroBias/Commissioning2021-v1/RAW
+
+# Put run-number in JSON format. e.g. {'344518': [[1, 1892]]}
+# Multiple run numbers are NOT supported at the moment
+#-------------------------------------------------------------------------------
+Run                     : {'346512': [[1, 500]]}
+
+# Yes/No. Yes, if you want to submit job for computation if local test is successful
+#-------------------------------------------------------------------------------
+Validate                : Yes
+
+# Choices--> HLT, Prompt, Express, HLT/Prompt, HLT/Express, Prompt/Express, HLT/Prompt/Express
+#-------------------------------------------------------------------------------
+WorkflowsToSubmit       : HLT/Prompt/Express
+
+# Choose the type of condition to submit. 
+# Choices--> New, Reference, Both
+#-------------------------------------------------------------------------------
+NewOrReference          : Both
+
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+#------- OPTIONAL -------- OPTIONAL -------- OPTIONAL --------- OPTIONAL -------
+
+#-------------------------------------------------------------------------------
+
+# Put CMSSW version of your choice. If None then production version will be used
+HLT_release             : CMSSW_12_2_0
+PR_release              : CMSSW_12_2_0
+Expr_release            : CMSSW_12_2_0
+
+# Put NEW jira ticket number in case jira server is down
+Jira                    : None
+
+# Fill below details in case of run-registry server is down
+b_field                 : None
+class                   : None
+hlt_key                 : None
+
+################################################################################
