@@ -12,9 +12,9 @@ Labels                  : Week4, 2022, ECAL, EGM, PF
 
 # Target GTs here
 #-------------------------------------------------------------------------------
-TargetGT_HLT            : 122X_dataRun3_HLTNew_ECAL_EGM_PF_w4_2022_v1
-TargetGT_Express        : 122X_dataRun3_ExpressNew_ECAL_EGM_PF_w4_2022_v1
-TargetGT_Prompt         : 122X_dataRun3_PromptNew_ECAL_EGM_PF_w4_2022_v1
+TargetGT_HLT            : 122X_dataRun3_HLTNew_ECAL_EGM_PF_w4_2022_v2
+TargetGT_Express        : 122X_dataRun3_ExpressNew_ECAL_EGM_PF_w4_2022_v2
+TargetGT_Prompt         : 122X_dataRun3_PromptNew_ECAL_EGM_PF_w4_2022_v2
 
 # Reference GTs here
 #-------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ WorkflowsToSubmit       : HLT/Prompt/Express
 # Choose the type of condition to submit. 
 # Choices--> New, Reference, Both
 #-------------------------------------------------------------------------------
-NewOrReference          : Both
+NewOrReference          : New
 
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
