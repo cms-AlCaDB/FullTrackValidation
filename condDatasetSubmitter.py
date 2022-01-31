@@ -555,6 +555,8 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
             driver_command += "--customise_commands='%s' " % (details['custcommands'])
 
         #Temporary changes
+        driver_command += '--procModifiers siPixelQualityRawToDigi '
+        driver_command += '--customise "Configuration/DataProcessing/RecoTLR.customisePostEra_Run3,RecoLocalCalo/Configuration/customiseHBHEreco.hbheUseM0FullRangePhase1" '
         # ---------
 
         cmssw_command = "cd %s; eval `scramv1 runtime -sh`; cd -" % (options.hltCmsswDir)
@@ -613,6 +615,8 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                 driver_command += "--customise_commands='%s' " % (recodqm['custcommands'])
 
             #Temporary changes
+            driver_command += '--procModifiers siPixelQualityRawToDigi '
+            driver_command += '--customise "Configuration/DataProcessing/RecoTLR.customisePostEra_Run3,RecoLocalCalo/Configuration/customiseHBHEreco.hbheUseM0FullRangePhase1" '
             # ---------
 
             if options.recoCmsswDir:
