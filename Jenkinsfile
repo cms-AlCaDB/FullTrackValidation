@@ -115,6 +115,11 @@ pipeline {
             sh script: './commands_in_one_go.sh', label: "Create and run cmsDriver steps"
             sh script: 'mkdir -p ${TEST_RESULT}/${Label} && cp HLT_refer*.root ${TEST_RESULT}/${Label}/', label: "Moving output files to eos area"
           }
+          post {
+            success {
+              archiveArtifacts(artifacts: 'cmsDrivers_*.sh', fingerprint: true)
+            }
+          }
         }
 
         stage('Express New') {
@@ -158,6 +163,11 @@ pipeline {
             sh script: './commands_in_one_go.sh', label: "Create and run cmsDriver steps"
             sh script: 'mkdir -p ${TEST_RESULT}/${Label} && cp EXPR_refer*.root ${TEST_RESULT}/${Label}/', label: "Moving output files to eos area"
           }
+          post {
+            success {
+              archiveArtifacts(artifacts: 'cmsDrivers_*.sh', fingerprint: true)
+            }
+          }
         }
 
         stage('Prompt New') {
@@ -200,6 +210,11 @@ pipeline {
             sh script: './relval_submit.py -f metadata_Prompt.json --dry --refer', label: "Collect commands to create cmsDriver steps"
             sh script: './commands_in_one_go.sh', label: "Create and run cmsDriver steps"
             sh script: 'mkdir -p ${TEST_RESULT}/${Label} && cp PR_refer*.root ${TEST_RESULT}/${Label}/', label: "Moving output files to eos area"
+          }
+          post {
+            success {
+              archiveArtifacts(artifacts: 'cmsDrivers_*.sh', fingerprint: true)
+            }
           }
         }
 

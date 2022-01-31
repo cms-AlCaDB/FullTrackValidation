@@ -29,7 +29,7 @@ Dataset                 : /MinimumBias/Commissioning2021-v1/RAW,/ZeroBias/Commis
 # Put run-number in JSON format. e.g. {'344518': [[1, 1892]]}
 # Multiple run numbers are NOT supported at the moment
 #-------------------------------------------------------------------------------
-Run                     : {'346512': [[1, 500]]}
+Run                     : {'346512': [[1, 400]]}
 
 # Yes/No. Yes, if you want to submit job for computation if local test is successful
 #-------------------------------------------------------------------------------
@@ -51,9 +51,9 @@ NewOrReference          : Both
 #-------------------------------------------------------------------------------
 
 # Put CMSSW version of your choice. If None then production version will be used
-HLT_release             : CMSSW_12_2_0
-PR_release              : CMSSW_12_2_0
-Expr_release            : CMSSW_12_2_0
+HLT_release             : CMSSW_12_2_0_patch1
+PR_release              : CMSSW_12_2_0_patch1
+Expr_release            : CMSSW_12_2_0_patch1
 
 # Put NEW jira ticket number in case jira server is down
 Jira                    : None
