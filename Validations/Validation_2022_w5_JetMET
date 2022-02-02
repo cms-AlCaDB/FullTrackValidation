@@ -4,15 +4,15 @@ ValidationRequest       : https://hypernews.cern.ch/HyperNews/CMS/get/calibratio
 
 Title                   : JEC tag for Run3 
 
-Subsystem               : HCal
+Subsystem               : JetMET
 
 # Labels: List of labels separated by comma. Keep it unique for given validation
 #-------------------------------------------------------------------------------
-Labels                  : Week5, 2022, HCal
+Labels                  : Week5, 2022, JetMET
 
 # Target GTs here
 #-------------------------------------------------------------------------------
-TargetGT_HLT            : 122X_dataRun3_HLTNew_HCal_w5_2022_v1
+TargetGT_HLT            : 122X_dataRun3_HLTNew_JetMET_w5_2022_v1
 TargetGT_Express        : None
 TargetGT_Prompt         : None
 
