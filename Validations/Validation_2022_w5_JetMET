@@ -14,7 +14,7 @@ Labels                  : Week5, 2022, JetMET
 #-------------------------------------------------------------------------------
 TargetGT_HLT            : 122X_dataRun3_HLTNew_JetMET_w5_2022_v1
 TargetGT_Express        : None
-TargetGT_Prompt         : None
+TargetGT_Prompt         : 122X_dataRun3_Prompt_v2
 
 # Reference GTs here
 #-------------------------------------------------------------------------------
