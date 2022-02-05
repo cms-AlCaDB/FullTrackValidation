@@ -25,11 +25,8 @@ options.setAcceptUntrustedCertificates = True
 options.setAssumeUntrustedCertificateIssuer = False
 options.headless = args.headless
 
-# options.binary = os.path.join(os.environ['HOME'], ".local/firefox/firefox") 
-# provide path of geckodriver for firefox
-# sys.path.append(os.path.join(os.environ['HOME'], ".local/bin"))
-
-url = "https://twiki.cern.ch/twiki/bin/viewauth/CMS/PdmVTriggerConditionValidation2021"
+import config.environment
+url = os.getenv('TWIKI')
 
 class AccessFirefox:
 	def __init__(self):

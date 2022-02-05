@@ -10,6 +10,7 @@ from collections import namedtuple
 
 from argparse import ArgumentParser
 from getpass import getpass, getuser
+import config.environment 
 parser = ArgumentParser(description="Options for batch run")
 parser.add_argument('-u', '--user', type=str, dest='user', help='user name')
 group = parser.add_mutually_exclusive_group()
@@ -75,6 +76,8 @@ def get_arguments():
 	args['Year']  = "{}".format(year[0])
 	args['Label'] = "{}".format("_".join(args['Labels']))
 	iFile.close()
+
+	args['EOS_PATH'] = os.getenv('FOLDER_PATH')
 	return args
 
 def build_HLT_workflow(args):
@@ -155,14 +158,14 @@ Validation details will be documented at [3].
 Once the workflows are ready, we will ask the {Subsystem} validators to report the outcome of the checks at JIRA [4].
 
 Best regards,
-Pritam, Amandeep, Tamas, Francesco, Helena (for AlCa/DB)
+{ALCADB_TEAM}
 
 [0] {ValidationRequest}
 [1] https://cmsoms.cern.ch/cms/runs/report?cms_run={run_number}&cms_run_sequence=GLOBAL-RUN
 [2] %s
-[3] https://twiki.cern.ch/twiki/bin/view/CMS/PdmVTriggerConditionValidation2021
+[3] {TWIKI}
 [4] https://its.cern.ch/jira/browse/CMSALCA-{Jira}
-""".format(title_text=title_text, GTList=GTList, datasetList=datasetList, **args)
+""".format(title_text=title_text, GTList=GTList, datasetList=datasetList, **args, **dict(os.environ))
 	args['emailSubject'] = emailSubject
 	args['emailBody'] = emailBody
 	return args

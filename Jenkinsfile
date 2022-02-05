@@ -2,7 +2,6 @@ pipeline {
   environment {
     //This variable need be tested as string
     doTest = '1'
-    TEST_RESULT = "/eos/home-a/alcauser/AlCaValidations"
   }
   agent {
     label "lxplus7 && slc7 && user-alcauser"
@@ -89,7 +88,7 @@ pipeline {
             sh script: 'voms-proxy-init --rfc --voms cms', label: "Generate VOMS proxy certificate"
             sh script: './relval_submit.py -f metadata_HLT.json --dry --new', label: "Collect commands to create cmsDriver steps"
             sh script: './commands_in_one_go.sh', label: "Create and run cmsDriver steps"
-            sh script: 'mkdir -p ${TEST_RESULT}/${Label} && cp HLT_new*.root ${TEST_RESULT}/${Label}/', label: "Moving output files to eos area"
+            sh script: 'mkdir -p ${EOS_PATH}/${Label} && cp HLT_new*.root ${EOS_PATH}/${Label}/', label: "Moving output files to eos area"
           }
           post {
             success {
@@ -113,7 +112,7 @@ pipeline {
             sh script: 'voms-proxy-init --rfc --voms cms', label: "Generate VOMS proxy certificate"
             sh script: './relval_submit.py -f metadata_HLT.json --dry --refer', label: "Collect commands to create cmsDriver steps"
             sh script: './commands_in_one_go.sh', label: "Create and run cmsDriver steps"
-            sh script: 'mkdir -p ${TEST_RESULT}/${Label} && cp HLT_refer*.root ${TEST_RESULT}/${Label}/', label: "Moving output files to eos area"
+            sh script: 'mkdir -p ${EOS_PATH}/${Label} && cp HLT_refer*.root ${EOS_PATH}/${Label}/', label: "Moving output files to eos area"
           }
           post {
             success {
@@ -137,7 +136,7 @@ pipeline {
             sh script: 'voms-proxy-init --rfc --voms cms', label: "Generate VOMS proxy certificate"
             sh script: './relval_submit.py -f metadata_Express.json --dry --new', label: "Collect commands to create cmsDriver steps"
             sh script: './commands_in_one_go.sh', label: "Create and run cmsDriver steps"
-            sh script: 'mkdir -p ${TEST_RESULT}/${Label} && cp EXPR_new*.root ${TEST_RESULT}/${Label}/', label: "Moving output files to eos area"
+            sh script: 'mkdir -p ${EOS_PATH}/${Label} && cp EXPR_new*.root ${EOS_PATH}/${Label}/', label: "Moving output files to eos area"
           }
           post {
             success {
@@ -161,7 +160,7 @@ pipeline {
             sh script: 'voms-proxy-init --rfc --voms cms', label: "Generate VOMS proxy certificate"
             sh script: './relval_submit.py -f metadata_Express.json --dry --refer', label: "Collect commands to create cmsDriver steps"
             sh script: './commands_in_one_go.sh', label: "Create and run cmsDriver steps"
-            sh script: 'mkdir -p ${TEST_RESULT}/${Label} && cp EXPR_refer*.root ${TEST_RESULT}/${Label}/', label: "Moving output files to eos area"
+            sh script: 'mkdir -p ${EOS_PATH}/${Label} && cp EXPR_refer*.root ${EOS_PATH}/${Label}/', label: "Moving output files to eos area"
           }
           post {
             success {
@@ -185,7 +184,7 @@ pipeline {
             sh script: 'voms-proxy-init --rfc --voms cms', label: "Generate VOMS proxy certificate"
             sh script: './relval_submit.py -f metadata_Prompt.json --dry --new', label: "Collect commands to create cmsDriver steps"
             sh script: './commands_in_one_go.sh', label: "Create and run cmsDriver steps"
-            sh script: 'mkdir -p ${TEST_RESULT}/${Label} && cp PR_new*.root ${TEST_RESULT}/${Label}/', label: "Moving output files to eos area"
+            sh script: 'mkdir -p ${EOS_PATH}/${Label} && cp PR_new*.root ${EOS_PATH}/${Label}/', label: "Moving output files to eos area"
           }
           post {
             success {
@@ -209,7 +208,7 @@ pipeline {
             sh script: 'voms-proxy-init --rfc --voms cms', label: "Generate VOMS proxy certificate"
             sh script: './relval_submit.py -f metadata_Prompt.json --dry --refer', label: "Collect commands to create cmsDriver steps"
             sh script: './commands_in_one_go.sh', label: "Create and run cmsDriver steps"
-            sh script: 'mkdir -p ${TEST_RESULT}/${Label} && cp PR_refer*.root ${TEST_RESULT}/${Label}/', label: "Moving output files to eos area"
+            sh script: 'mkdir -p ${EOS_PATH}/${Label} && cp PR_refer*.root ${EOS_PATH}/${Label}/', label: "Moving output files to eos area"
           }
           post {
             success {
@@ -235,7 +234,7 @@ pipeline {
             echo "Sending email request to AlCa Hypernews"
             echo "${env.emailSubject}"
             echo "${env.emailBody}"
-            sh script: 'mail -s "${emailSubject}" -r "AlcaDB Team <alcadb.user@cern.ch>" -c "alcadb.user@cern.ch" hn-cms-alca@cern.ch <<< "${emailBody}"', label: "Sending announcement email"
+            sh script: 'mail -s "${emailSubject}" -r "AlcaDB Team <alcadb.user@cern.ch>" -c "alcadb.user@cern.ch" cmstalk+alca@dovecotmta.cern.ch <<< "${emailBody}"', label: "Sending announcement email"
           } else {
             echo 'Jira ticket exists for given set of labels. So email will not be sent assuming it was sent while creating Jira ticket'
           }
@@ -281,7 +280,7 @@ pipeline {
         success {
           archiveArtifacts(artifacts: 'workflow_config.json', fingerprint: true)
           stash includes: 'workflow_config.json', name: 'WorkflowStash'
-          sh script: 'mkdir -p ${TEST_RESULT}/${Label} && cp *.json ${TEST_RESULT}/${Label}/', label: "Moving json files to eos area"
+          sh script: 'mkdir -p ${EOS_PATH}/${Label} && cp *.json ${EOS_PATH}/${Label}/', label: "Moving json files to eos area"
         }
       }
     }
@@ -297,7 +296,7 @@ pipeline {
         cleanWs()
         checkout scm
         unstash 'json'
-        sh script: 'cp ${TEST_RESULT}/${Label}/workflow_config.json .', label: "Copy json file containing workflow configuration"
+        sh script: 'cp ${EOS_PATH}/${Label}/workflow_config.json .', label: "Copy json file containing workflow configuration"
         sh script: 'singularity build -F --sandbox ${TMPDIR}/selenium docker-archive:///eos/home-a/alcauser/selenium-docker.tar', label: "Creating environment for running TWiki script"
         sh script: 'singularity exec --home "/home/jovyan" --writable --cleanenv --bind "${TMPDIR}/selenium/home/jovyan:/home/jovyan" ${TMPDIR}/selenium python3.8 TWikiUpdate.py --headless', label: "Creating validation report on dedicated Twiki"
       }
