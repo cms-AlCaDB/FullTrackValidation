@@ -896,7 +896,8 @@ def build_params_dict(section,cfg):
             "ConfigCacheUrl": wma.COUCH_DB_ADDRESS,
             #"EnableHarvesting" : False
             "ProcessingString": processing_string,
-            "Multicore": multicore}
+            "Multicore": multicore,
+            "EventStreams": 2}
 
     for theVar in ['processing_string', 'step1_processstring','step2_processstring', 'step3_processstring']:
         thePrStr =  cfg.get_param(theVar,'',section)

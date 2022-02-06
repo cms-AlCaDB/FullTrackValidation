@@ -750,7 +750,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
     if (options.runLs):
         wmcconf_text += 'lumi_list=%s\n' % (options.runLs)
 
-    wmcconf_text+='multicore=4\n'
+    wmcconf_text+='multicore=8\n'
     wmcconf_text += 'enableharvesting = True\n'
     wmcconf_text += 'dqmuploadurl = https://cmsweb.cern.ch/dqm/relval\n'
     wmcconf_text += 'subreq_type = RelVal\n\n'
@@ -788,7 +788,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                         'request_id=%s__ALCA_%s-%s_%s_%s\n' % (options.release,options.jira,datetime.datetime.now().strftime("%Y_%m_%d_%H_%M"),ds_name,ReqLabel) +\
                         'keep_step%d = True\n' % (task) +\
                         'time_event = 1\n' +\
-                        'size_memory = 8000\n' +\
+                        'size_memory = 16000\n' +\
                         'step1_lumisperjob = 1\n' +\
                         'processing_string = %s_%s_%s \n' % (processing_string, details['reqtype']+label, refsubgtshort) +\
                         'cfg_path = %s\n' % (cfgname) +\
@@ -815,7 +815,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                         'request_id = %s__ALCA_%s-%s_%s_%srefer\n' % (options.release,options.jira,datetime.datetime.now().strftime("%Y_%m_%d_%H_%M"),ds_name, details['reqtype']) +\
                         'keep_step1 = True\n' +\
                         'time_event = 10\n' +\
-                        'size_memory = 8000\n' +\
+                        'size_memory = 16000\n' +\
                         'step1_lumisperjob = 1\n' +\
                         'processing_string = %s_%sref_%s \n' % (processing_string, details['reqtype'], refgtshort) +\
                         'cfg_path = REFERENCE.py\n' +\
@@ -844,7 +844,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                                 'request_id=%s__ALCA_%s-%s_%s_%s\n' % (options.release,options.jira,datetime.datetime.now().strftime("%Y_%m_%d_%H_%M"),ds_name,ReqLabel) +\
                                 'keep_step%d = True\n' % (task) +\
                                 'time_event = 1\n' +\
-                                'size_memory = 8000\n' +\
+                                'size_memory = 16000\n' +\
                                 'step1_lumisperjob = 1\n' +\
                                 'processing_string = %s_%s_%s \n' % (processing_string, details['reqtype']+label, subgtshort) +\
                                 'cfg_path = %s\n' % (cfgname) +\
@@ -872,7 +872,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                                     'request_id=%s__ALCA_%s-%s_%s_%s\n' % (options.release,options.jira,datetime.datetime.now().strftime("%Y_%m_%d_%H_%M"),ds_name,ReqLabel) +\
                                     'keep_step1 = True\n' +\
                                     'time_event = 10\n' +\
-                                    'size_memory = 8000\n' +\
+                                    'size_memory = 16000\n' +\
                                     'step1_lumisperjob = 1\n' +\
                                     'processing_string = %s_%s_%s \n' % (processing_string, details['reqtype']+label, gtshort) +\
                                     'cfg_path = %s\n' % (cfgname) +\
