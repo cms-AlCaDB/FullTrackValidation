@@ -45,7 +45,7 @@ def get_input():
 	commit_dates = list()
 	for f in files:
 		raw_time = subprocess.getoutput("git log -n 1 --pretty=format:%cd {}".format(f))
-		if raw_time == '':
+		if (not raw_time) or (f in subprocess.getoutput("git diff --name-only master").split('\n')):
 			Time = datetime.fromtimestamp(os.path.getmtime(f)).strftime('%Y-%m-%d %H:%M:%S')
 		else:
 			Time = datetime.strptime(raw_time, '%a %b %d %H:%M:%S %Y %z').strftime('%Y-%m-%d %H:%M:%S')
