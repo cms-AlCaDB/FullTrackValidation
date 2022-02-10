@@ -24,12 +24,12 @@ ReferenceGT_Prompt      : 122X_dataRun3_Prompt_v2
 
 # List of Dataset. Comma(,) separated. NO space allowed in between
 #-------------------------------------------------------------------------------
-Dataset                 : /MinimumBias/Commissioning2021-v1/RAW,/ZeroBias/Commissioning2021-v1/RAW
+Dataset                 : /HLTPhysics/Commissioning2021-v1/RAW
 
 # Put run-number in JSON format. e.g. {'344518': [[1, 1892]]}
 # Multiple run numbers are NOT supported at the moment
 #-------------------------------------------------------------------------------
-Run                     : {'346512': [[1, 400]]}
+Run                     : {'346512': [[1, 600]]}
 
 # Yes/No. Yes, if you want to submit job for computation if local test is successful
 #-------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ WorkflowsToSubmit       : HLT
 # Choose the type of condition to submit. 
 # Choices--> New, Reference, Both
 #-------------------------------------------------------------------------------
-NewOrReference          : New
+NewOrReference          : Both
 
 #-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
