@@ -12,7 +12,7 @@ Labels                  : Week6, 2022, HCAL
 
 # Target GTs here
 #-------------------------------------------------------------------------------
-TargetGT_HLT            : 122X_dataRun3_HLTNew_HCAL_w6_2022_v1
+TargetGT_HLT            : 122X_dataRun3_HLTNew_HCAL_w6_2022_v2
 TargetGT_Express        : 122X_dataRun3_ExpressNew_HCAL_w6_2022_v1
 TargetGT_Prompt         : 122X_dataRun3_PromptNew_HCAL_w6_2022_v1
 
