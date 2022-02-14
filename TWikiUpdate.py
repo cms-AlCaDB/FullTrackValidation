@@ -24,6 +24,7 @@ options.setAcceptInsecureCerts = True
 options.setAcceptUntrustedCertificates = True
 options.setAssumeUntrustedCertificateIssuer = False
 options.headless = args.headless
+options.set_preference('security.sandbox.content.level', 3)
 
 import config.environment
 url = os.getenv('TWIKI')

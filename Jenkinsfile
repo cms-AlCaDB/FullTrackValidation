@@ -289,7 +289,7 @@ pipeline {
         expression { env.Validate == 'Yes' }
       }
       agent {
-        label "cs8 && x86_64 && user-alcauser"
+        label "lxplus7 && slc7 && user-alcauser"
       }
       steps {
         echo "Stage getting executed @ ${NODE_NAME}. Workspace: ${WORKSPACE}"
@@ -298,7 +298,7 @@ pipeline {
         unstash 'json'
         sh script: 'cp ${EOS_PATH}/${Label}/workflow_config.json .', label: "Copy json file containing workflow configuration"
         sh script: 'singularity build -F --sandbox ${TMPDIR}/selenium docker-archive:///eos/home-a/alcauser/selenium-docker.tar', label: "Creating environment for running TWiki script"
-        sh script: 'singularity exec --home "/home/jovyan" --writable --cleanenv --bind "${TMPDIR}/selenium/home/jovyan:/home/jovyan" ${TMPDIR}/selenium python3.8 TWikiUpdate.py --headless', label: "Creating validation report on dedicated Twiki"
+        sh script: 'singularity exec --home "/home/jovyan"  --no-home --cleanenv --bind "${TMPDIR}/selenium/home/jovyan:/home/jovyan" ${TMPDIR}/selenium python3.8 TWikiUpdate.py --headless', label: "Creating validation report on dedicated Twiki"
       }
     }
   }
