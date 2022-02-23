@@ -86,7 +86,7 @@ def build_HLT_workflow(args):
 	hlt_dict['PR_release'] = args['PR_release']
 	options = hlt_dict['options'] = dict()
 	if round(args['b_field'])==0: options['B0T'] = ""
-	if "Commissioning" or "Cosmics" in args['class']: options['cosmics'] = ""
+	if "Cosmics" in args['class']: options['cosmics'] = ""
 	if args['HLT_release'] != args['PR_release']: 
 		options['recoCmsswDir'] = args['PR_release']
 	options['HLTCustomMenu'] = None if args['HLT_Type'] == 'GRun' else "orcoff:"+args['hlt_key']
@@ -106,7 +106,7 @@ def build_Express_workflow(args):
 	express_dict['Expr_release'] = args['Expr_release']
 	options = express_dict['options'] = dict()
 	if round(args['b_field'])==0: options['B0T'] = ""
-	if "Commissioning" or "Cosmics" in args['class']: options['cosmics'] = ""
+	if "Cosmics" in args['class']: options['cosmics'] = ""
 	options['Type'] 		 = "EXPR"
 	options['ds']			 = args['Dataset']
 	options['gt']			 = args['ReferenceGT_Express']
@@ -122,7 +122,7 @@ def build_Prompt_workflow(args):
 	prompt_dict['PR_release'] = args['PR_release']
 	options = prompt_dict['options'] = dict()
 	if round(args['b_field'])==0: options['B0T'] = ""
-	if "Commissioning" or "Cosmics" in args['class']: options['cosmics'] = ""
+	if "Cosmics" in args['class']: options['cosmics'] = ""
 	options['Type'] 		 = "PR"
 	options['ds']			 = args['Dataset']
 	options['gt']			 = args['ReferenceGT_Prompt']
