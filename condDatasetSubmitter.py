@@ -415,7 +415,7 @@ def step1(options):
     for dataset in options.ds:
         dasgo0 = "dasgoclient --limit 10 --format json --query 'lumi,file dataset={} run={}'"
         if options.runLs:
-            dasgo = dasgo0 + " | das-selected-lumis.py {} | sort -u >> step1_files.txt\n"
+            dasgo = dasgo0 + " | ./das-selected-lumis.py {} | sort -u >> step1_files.txt\n"
             execme(dasgo.format(dataset, run, "%s,%s"%(value2[0][0],value2[0][1]) ), echo=False)
         else:
             dasgo = "dasgoclient --limit 10 --format list --query 'file dataset={} run={}' >> step1_files.txt"
