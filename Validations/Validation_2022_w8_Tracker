@@ -51,9 +51,9 @@ NewOrReference          : Both
 #-------------------------------------------------------------------------------
 
 # Put CMSSW version of your choice. If None then production version will be used
-HLT_release             : None
-PR_release              : None
-Expr_release            : None
+HLT_release             : CMSSW_12_2_1
+PR_release              : CMSSW_12_2_1
+Expr_release            : CMSSW_12_2_1
 
 # Put NEW jira ticket number in case jira server is down
 Jira                    : None
