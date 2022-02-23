@@ -289,7 +289,7 @@ def getDriverDetails(Type, release, ds, B0T, HIon, pA, cosmics, recoRelease):
                     "custcommands":''}
 
     if options.HLT:
-        HLTBase.update({"steps":"L1REPACK,HLT:%s,DQM" % (options.HLT),
+        HLTBase.update({"steps":"L1REPACK:Full,HLT:%s,DQM" % (options.HLT),
                 "dumppython":False})
 
     if Type == 'HLT':
@@ -299,7 +299,7 @@ def getDriverDetails(Type, release, ds, B0T, HIon, pA, cosmics, recoRelease):
         return HLTBase
     elif Type in ['HLT+RECO','HLT+RECO+ALCA', 'EXPR+RECO']:
         if options.HLT:
-            HLTBase.update({"steps":"L1REPACK,HLT:%s" % (options.HLT),
+            HLTBase.update({"steps":"L1REPACK:FUll,HLT:%s" % (options.HLT),
                             "custcommands": "",
                             "custconditions":"",
                             #"output":'[{"e":"RAW","t":"RAW","o":["drop FEDRawDataCollection_rawDataCollector__LHC"]}]',
@@ -310,7 +310,7 @@ def getDriverDetails(Type, release, ds, B0T, HIon, pA, cosmics, recoRelease):
                             "lumiToProcess":"step1_lumi_ranges.txt"})
 
         else:
-            HLTBase.update({"steps":"L1REPACK,HLT",
+            HLTBase.update({"steps":"L1REPACK:Full,HLT",
                             "custcommands":"",
                             "custconditions":"",
                             #"datatier":"RAW",
