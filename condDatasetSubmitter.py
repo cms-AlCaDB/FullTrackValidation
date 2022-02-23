@@ -229,7 +229,7 @@ def getCMSSWReleaseFromPath(thePath):
     raise ValueError('%s does not contain a slash-separated path to a CMSSW release. ERRROR.' % (thePath))
 
 def getDriverDetails(Type, release, ds, B0T, HIon, pA, cosmics, recoRelease):
-    str_era_hlt = 'Run2_2018'
+    str_era_hlt = 'Run3'
     if release.find("10_")!= -1:
         for ds_name in ds:
             if ds_name.find("2018")!=-1:
@@ -243,7 +243,7 @@ def getDriverDetails(Type, release, ds, B0T, HIon, pA, cosmics, recoRelease):
             if ds_name.find("2021")!=-1:
                 str_era_hlt="Run3"
 
-    str_era_pr="Run2_2018"
+    str_era_pr="Run3"
     if recoRelease.find("10_")!= -1:
         for ds_name in ds:
             if ds_name.find("2018")!=-1:
@@ -556,7 +556,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
 
         #Temporary changes
         driver_command += '--procModifiers siPixelQualityRawToDigi '
-        driver_command += '--customise "Configuration/DataProcessing/RecoTLR.customisePostEra_Run3,RecoLocalCalo/Configuration/customiseHBHEreco.hbheUseM0FullRangePhase1" '
+        # driver_command += '--customise "Configuration/DataProcessing/RecoTLR.customisePostEra_Run3,RecoLocalCalo/Configuration/customiseHBHEreco.hbheUseM0FullRangePhase1" '
         # ---------
 
         cmssw_command = "cd %s; eval `scramv1 runtime -sh`; cd -" % (options.hltCmsswDir)
@@ -616,7 +616,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
 
             #Temporary changes
             driver_command += '--procModifiers siPixelQualityRawToDigi '
-            driver_command += '--customise "Configuration/DataProcessing/RecoTLR.customisePostEra_Run3,RecoLocalCalo/Configuration/customiseHBHEreco.hbheUseM0FullRangePhase1" '
+            # driver_command += '--customise "Configuration/DataProcessing/RecoTLR.customisePostEra_Run3,RecoLocalCalo/Configuration/customiseHBHEreco.hbheUseM0FullRangePhase1" '
             # ---------
 
             if options.recoCmsswDir:
