@@ -12,15 +12,15 @@ Labels                  : Week8, 2022, Tracker
 
 # Target GTs here
 #-------------------------------------------------------------------------------
-TargetGT_HLT            : 122X_dataRun3_HLTNew_TkAli_w8_2022_v1
-TargetGT_Express        : 122X_dataRun3_ExpressNew_TkAli_w8_2022_v1
-TargetGT_Prompt         : 122X_dataRun3_PromptNew_TkAli_w8_2022_v1
+TargetGT_HLT            : 122X_dataRun3_HLTNew_TkAli_w8_2022_v2
+TargetGT_Express        : 122X_dataRun3_ExpressNew_TkAli_w8_2022_v2
+TargetGT_Prompt         : 122X_dataRun3_PromptNew_TkAli_w8_2022_v2
 
 # Reference GTs here
 #-------------------------------------------------------------------------------
-ReferenceGT_HLT         : 122X_dataRun3_HLT_v4
-ReferenceGT_Express     : 122X_dataRun3_Express_v3
-ReferenceGT_Prompt      : 122X_dataRun3_Prompt_v3
+ReferenceGT_HLT         : 122X_dataRun3_HLTRef_TkAli_w8_2022_v1
+ReferenceGT_Express     : 122X_dataRun3_ExpressRef_TkAli_w8_2022_v1
+ReferenceGT_Prompt      : 122X_dataRun3_PromptRef_TkAli_w8_2022_v1
 
 # List of Dataset. Comma(,) separated. NO space allowed in between
 #-------------------------------------------------------------------------------
