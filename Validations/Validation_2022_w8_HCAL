@@ -18,7 +18,7 @@ TargetGT_Prompt         : 122X_dataRun3_PromptNew_HCAL_w8_2022_v1
 
 # Reference GTs here
 #-------------------------------------------------------------------------------
-ReferenceGT_HLT         : 122X_dataRun3_HLT_v3
+ReferenceGT_HLT         : 122X_dataRun3_HLT_v4
 ReferenceGT_Express     : 122X_dataRun3_Express_v3
 ReferenceGT_Prompt      : 122X_dataRun3_Prompt_v3
 
