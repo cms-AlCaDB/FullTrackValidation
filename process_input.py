@@ -213,15 +213,15 @@ def extract_keys(args, run_args, oms):
 	args['start_time']  = oms['start_time']
 	args['start_date']  = get_date(oms['start_time'])
 	args['class']		= run_args['class']
-	if not 'CMSSW' in args['HLT_release'] : args['HLT_release'] = oms['cmssw_version']
-	if not 'CMSSW' in args['PR_release']  : args['PR_release']  = oms['cmssw_version']
-	if not 'CMSSW' in args['Expr_release']: args['Expr_release']  = oms['cmssw_version']
-	if args['HLT_release'] != oms['cmssw_version']: 
+	if ast.literal_eval(args['HLT_release']): 
 		args['HLT_Type'] = "GRun"
 		args['hlt_key']  = "the GRun menu for %s" %args['HLT_release']
 	else:
 		args['HLT_Type'] = "Custom"
 		args['hlt_key']  = oms['hlt_key']
+	if not 'CMSSW' in args['HLT_release'] : args['HLT_release'] = oms['cmssw_version']
+	if not 'CMSSW' in args['PR_release']  : args['PR_release']  = oms['cmssw_version']
+	if not 'CMSSW' in args['Expr_release']: args['Expr_release']  = oms['cmssw_version']
 	return args
 
 def get_user():
