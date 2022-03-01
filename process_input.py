@@ -213,7 +213,7 @@ def extract_keys(args, run_args, oms):
 	args['start_time']  = oms['start_time']
 	args['start_date']  = get_date(oms['start_time'])
 	args['class']		= run_args['class']
-	if ast.literal_eval(args['HLT_release']): 
+	if args['HLT_release'] != 'None': 
 		args['HLT_Type'] = "GRun"
 		args['hlt_key']  = "the GRun menu for %s" %args['HLT_release']
 	else:
