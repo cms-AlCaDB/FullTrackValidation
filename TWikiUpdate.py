@@ -87,9 +87,9 @@ def compose_section(campID, wf_names, envs, dqm={}, **kwargs):
 	GTdiff = 'https://cms-conddb.cern.ch/cmsDbBrowser/diff/Prod/gts'
 	reqmgr = 'https://cmsweb.cern.ch/reqmgr2/fetch?rid='
 	daslink= 'https://cmsweb.cern.ch/das/request?view=list&limit=50&instance=prod/global&input=summary+dataset='
-	HLT = ('HLT', str(*campID['HLT']))
-	PR = ('Prompt', str(*campID['PR']))
-	EXPR = ('Express', str(*campID['EXPR']))
+	HLT = ('HLT', campID['HLT'])
+	PR = ('Prompt', campID['PR'])
+	EXPR = ('Express', campID['EXPR'])
 
 	section = '\n\n---++ Week %s' %envs['Week'].strip('Week').strip()
 	section += '\n---+++ %s\n' %envs['Title']
@@ -99,7 +99,8 @@ def compose_section(campID, wf_names, envs, dqm={}, **kwargs):
 	section += '\n*Campaign IDs and JIRA link*: '
 	for wf, campaign in (HLT, PR, EXPR): 
 		if not wf in envs['WorkflowsToSubmit'].split('/'): continue
-		section += '\n   * *{2} Campaign*: [[{0}{1}][{1}]]'.format(dmytro, campaign, wf)
+		for ID in campaign:
+			section += '\n   * *{2} Campaign*: [[{0}{1}][{1}]]'.format(dmytro, ID, wf)
 	section += '\n   * *Jira*: [[https://its.cern.ch/jira/browse/CMSALCA-{jira}][CMSALCA-{jira}]]\n'.format(jira=envs['Jira'])
 
 	section += '\n*Hypernews links*: '

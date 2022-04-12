@@ -68,12 +68,13 @@ def get_workflow_id_names():
 def submission_status(campIDs, args):
    dmytro = 'https://dmytro.web.cern.ch/dmytro/cmsprodmon/requests.php?campaign='
    links = ''
-   HLT = ('HLT', str(*campIDs['HLT']))
-   PR = ('Prompt', str(*campIDs['PR']))
-   EXPR = ('Express', str(*campIDs['EXPR']))
-   for wf, ID in [HLT, PR, EXPR]:
+   HLT = ('HLT', campIDs['HLT'])
+   PR = ('Prompt', campIDs['PR'])
+   EXPR = ('Express', campIDs['EXPR'])
+   for wf, IDset in [HLT, PR, EXPR]:
       if not wf in args['WorkflowsToSubmit']: continue
-      links += '\n{title}: [{ID}|{dmytro}{ID}]'.format(title=wf, ID=ID, dmytro=dmytro) 
+      for ID in IDset:
+        links += '\n{title}: [{ID}|{dmytro}{ID}]'.format(title=wf, ID=ID, dmytro=dmytro) 
 
    comment = """Hi All,
    You can monitor status of the submission using following campaign ids:{link}
