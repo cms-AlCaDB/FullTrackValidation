@@ -458,7 +458,7 @@ def execme(command, echo = True):
 #-------------------------------------------------------------------------------
 def collect_commands(options):
     command = []
-    command.append("export SCRAM_ARCH=slc7_amd64_gcc900")
+    command.append("export SCRAM_ARCH=slc7_amd64_gcc10")
     command.append("scramv1 project %s" %(options.release))
     command.append("cd %s/src" %(options.release))
     command.append("eval `scramv1 runtime -sh`")
@@ -555,8 +555,8 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
             driver_command += "--customise_commands='%s' " % (details['custcommands'])
 
         #Temporary changes
-        # driver_command += '--procModifiers siPixelQualityRawToDigi '
-        # driver_command += '--customise "Configuration/DataProcessing/RecoTLR.customisePostEra_Run3,RecoLocalCalo/Configuration/customiseHBHEreco.hbheUseM0FullRangePhase1" '
+        driver_command += '--procModifiers siPixelQualityRawToDigi '
+        driver_command += '--customise "Configuration/DataProcessing/RecoTLR.customisePostEra_Run3,RecoLocalCalo/Configuration/customiseHBHEreco.hbheUseM0FullRangePhase1,L1Trigger/Configuration/customiseUtils.L1TGlobalMenuXML" '
         # ---------
 
         cmssw_command = "cd %s; eval `scramv1 runtime -sh`; cd -" % (options.hltCmsswDir)
@@ -615,8 +615,8 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                 driver_command += "--customise_commands='%s' " % (recodqm['custcommands'])
 
             #Temporary changes
-            # driver_command += '--procModifiers siPixelQualityRawToDigi '
-            # driver_command += '--customise "Configuration/DataProcessing/RecoTLR.customisePostEra_Run3,RecoLocalCalo/Configuration/customiseHBHEreco.hbheUseM0FullRangePhase1" '
+            driver_command += '--procModifiers siPixelQualityRawToDigi '
+            driver_command += '--customise "Configuration/DataProcessing/RecoTLR.customisePostEra_Run3,RecoLocalCalo/Configuration/customiseHBHEreco.hbheUseM0FullRangePhase1" '
             # ---------
 
             if options.recoCmsswDir:

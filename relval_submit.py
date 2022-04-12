@@ -185,7 +185,7 @@ I will ask you some questions to fill the metadata file. For some of the questio
                 Runs_forcheck = ''
                 Lumisec_forcheck = ''
 
-                os.system("export SCRAM_ARCH=slc7_amd64_gcc900") 
+                os.system("export SCRAM_ARCH=slc7_amd64_gcc10") 
                 os.environ["X509_USER_PROXY"] = os.popen('voms-proxy-info -path').read().strip()
                 execme("source /cvmfs/cms.cern.ch/common/crab-setup.sh")
                 # do some type recognition and set run or runLs accordingly
@@ -307,7 +307,7 @@ I will ask you some questions to fill the metadata file. For some of the questio
         commands = []
         if 'HLT_release' in metadata.keys():
             commands.append('source bash/wmsetup.sh')
-            commands.append('export SCRAM_ARCH=slc7_amd64_gcc900')
+            commands.append('export SCRAM_ARCH=slc7_amd64_gcc10')
             commands.append('scramv1 project %s' % (metadata['HLT_release']))
             commands.append('cd %s/src' % (metadata['HLT_release']))
             commands.append('eval `scramv1 runtime -sh`')
@@ -319,7 +319,7 @@ I will ask you some questions to fill the metadata file. For some of the questio
                 commands.append('scramv1 project %s' % (metadata['PR_release']))
         elif 'Expr_release' in metadata.keys():
             commands.append('source bash/wmsetup.sh')
-            commands.append('export SCRAM_ARCH=slc7_amd64_gcc900')
+            commands.append('export SCRAM_ARCH=slc7_amd64_gcc10')
             commands.append('scramv1 project %s' % (metadata['Expr_release']))
             commands.append('cd %s/src' % (metadata['Expr_release']))
             commands.append('eval `scramv1 runtime -sh`')
@@ -327,7 +327,7 @@ I will ask you some questions to fill the metadata file. For some of the questio
             commands.append('cd -')
         else:
             commands.append('source bash/wmsetup.sh') #subSetupAuto.sh') #subSetup_slc6.sh')
-            commands.append('export SCRAM_ARCH=slc7_amd64_gcc900')
+            commands.append('export SCRAM_ARCH=slc7_amd64_gcc10')
             commands.append('scramv1 project %s' % (metadata['PR_release']))
             commands.append('cd %s/src' % (metadata['PR_release']))
             commands.append('eval `scramv1 runtime -sh`')
