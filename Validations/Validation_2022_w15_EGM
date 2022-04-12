@@ -1,0 +1,66 @@
+# Email/HN link through which this validation is requested.
+# Put is None in case you don't have any link
+ValidationRequest       : https://cms-talk.web.cern.ch/t/full-track-validation-hlt-update-of-egm-hlt-regression-tags-for-run3-collisions/9133
+
+Title                   : Update of EGM HLT regression tags for Run3 collisions
+
+Subsystem               : EGM
+
+# Labels: List of labels separated by comma. Keep it unique for given validation
+#-------------------------------------------------------------------------------
+Labels                  : Week15, 2022, EGM
+
+# Target GTs here
+#-------------------------------------------------------------------------------
+TargetGT_HLT            : 123X_dataRun3_HLTNew_EGM_w15_2022_v1
+TargetGT_Express        : None
+TargetGT_Prompt         : auto:run3_data_prompt
+
+# Reference GTs here
+#-------------------------------------------------------------------------------
+ReferenceGT_HLT         : 123X_dataRun3_HLT_v7
+ReferenceGT_Express     : None
+ReferenceGT_Prompt      : None
+
+# List of Dataset. Comma(,) separated. NO space allowed in between
+#-------------------------------------------------------------------------------
+Dataset                 : /HLTPhysics/Commissioning2021-v1/RAW,/MinimumBias/Commissioning2021-v1/RAW
+
+# Put run-number in JSON format. e.g. {'344518': [[1, 1892]]}
+# Multiple run numbers are NOT supported at the moment
+#-------------------------------------------------------------------------------
+Run                     : {'346512': [[1, 400]]}
+
+# Yes/No. Yes, if you want to submit job for computation if local test is successful
+#-------------------------------------------------------------------------------
+Validate                : Yes
+
+# Choices--> HLT, Prompt, Express, HLT/Prompt, HLT/Express, Prompt/Express, HLT/Prompt/Express
+#-------------------------------------------------------------------------------
+WorkflowsToSubmit       : HLT
+
+# Choose the type of condition to submit. 
+# Choices--> New, Reference, Both
+#-------------------------------------------------------------------------------
+NewOrReference          : Both
+
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+#------- OPTIONAL -------- OPTIONAL -------- OPTIONAL --------- OPTIONAL -------
+
+#-------------------------------------------------------------------------------
+
+# Put CMSSW version of your choice. If None then production version will be used
+HLT_release             : CMSSW_12_3_0
+PR_release              : CMSSW_12_3_0
+Expr_release            : CMSSW_12_3_0
+
+# Put NEW jira ticket number in case jira server is down
+Jira                    : None
+
+# Fill below details in case of run-registry server is down
+b_field                 : None
+class                   : None
+hlt_key                 : None
+
+################################################################################
