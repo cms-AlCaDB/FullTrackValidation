@@ -14,7 +14,7 @@ Labels                  : Week15, 2022, EGM
 #-------------------------------------------------------------------------------
 TargetGT_HLT            : 123X_dataRun3_HLTNew_EGM_w15_2022_v1
 TargetGT_Express        : None
-TargetGT_Prompt         : auto:run3_data_prompt
+TargetGT_Prompt         : 123X_dataRun3_Prompt_v6
 
 # Reference GTs here
 #-------------------------------------------------------------------------------
