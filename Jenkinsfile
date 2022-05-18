@@ -1,7 +1,7 @@
 pipeline {
   environment {
     //This variable need be tested as string
-    doTest = '1'
+    doTest = '0'
   }
   agent {
     label "lxplus7 && slc7 && user-alcauser"
