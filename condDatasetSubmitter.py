@@ -359,7 +359,7 @@ def getDriverDetails(Type, release, ds, B0T, HIon, pA, cosmics, recoRelease):
 
     elif Type in ['PR', 'PR+ALCA', 'EXPR']:
         theDetails = {"reqtype":"PR",
-                        "steps":"RAW2DIGI,L1Reco,RECO,EI,PAT,DQM",
+                        "steps":"RAW2DIGI,L1Reco,RECO,DQM",
                         "procname":"reRECO",
                         "datatier":"RECO,DQMIO ",
                         "output":'',
@@ -556,8 +556,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
 
         #Temporary changes
         driver_command += '--procModifiers siPixelQualityRawToDigi '
-        driver_command += '--customise "Configuration/DataProcessing/RecoTLR.customisePostEra_Run3,RecoLocalCalo/Configuration/customiseHBHEreco.hbheUseM0FullRangePhase1,L1Trigger/Configuration/customiseUtils.L1TGlobalMenuXML" '
-        driver_command += '--customise_commands=\'process.load(\"RecoEcal.EgammaClusterProducers.particleFlowSuperClusterECAL_cff\"); process.hltParticleFlowSuperClusterECALL1Seeded.regressionConfig.regTrainedWithPS = cms.bool(True); process.hltParticleFlowSuperClusterECALUnseeded.regressionConfig.regTrainedWithPS = cms.bool(True)\''
+        driver_command += '--customise "Configuration/DataProcessing/RecoTLR.customisePostEra_Run3,RecoLocalCalo/Configuration/customiseHBHEreco.hbheUseM0FullRangePhase1" '
         # ---------
 
         cmssw_command = "cd %s; eval `scramv1 runtime -sh`; cd -" % (options.hltCmsswDir)
