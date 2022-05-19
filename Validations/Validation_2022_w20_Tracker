@@ -1,0 +1,66 @@
+# Email/HN link through which this validation is requested.
+# Put is None in case you don't have any link
+ValidationRequest       : https://cms-talk.web.cern.ch/t/full-track-validation-to-update-tkal-alignment-conditions-derived-using-craft-2022-along-with-apes-sds-for-collisions/10649
+
+Title                   : To update Tracker alignment conditions derived using CRAFT 2022 along with SDs and APEs for collisions
+
+Subsystem               : Tracker
+
+# Labels: List of labels separated by comma. Keep it unique for given validation
+#-------------------------------------------------------------------------------
+Labels                  : Week20, 2022, Tracker
+
+# Target GTs here
+#-------------------------------------------------------------------------------
+TargetGT_HLT            : 123X_dataRun3_HLTNew_TkAli_w20_2022_v1
+TargetGT_Express        : 123X_dataRun3_ExpressNew_TkAli_w20_2022_v1
+TargetGT_Prompt         : 123X_dataRun3_PromptNew_TkAli_w20_2022_v1
+
+# Reference GTs here
+#-------------------------------------------------------------------------------
+ReferenceGT_HLT         : 123X_dataRun3_HLT_v7
+ReferenceGT_Express     : 123X_dataRun3_Express_v5
+ReferenceGT_Prompt      : 123X_dataRun3_Prompt_v7
+
+# List of Dataset. Comma(,) separated. NO space allowed in between
+#-------------------------------------------------------------------------------
+Dataset                 : /Cosmics/Commissioning2022-v1/RAW
+
+# Put run-number in JSON format. e.g. {'344518': [[1, 1892]]}
+# Multiple run numbers are NOT supported at the moment
+#-------------------------------------------------------------------------------
+Run                     : {'349840': [[1, 100]]}
+
+# Yes/No. Yes, if you want to submit job for computation if local test is successful
+#-------------------------------------------------------------------------------
+Validate                : Yes
+
+# Choices--> HLT, Prompt, Express, HLT/Prompt, HLT/Express, Prompt/Express, HLT/Prompt/Express
+#-------------------------------------------------------------------------------
+WorkflowsToSubmit       : HLT/Prompt/Express
+
+# Choose the type of condition to submit. 
+# Choices--> New, Reference, Both
+#-------------------------------------------------------------------------------
+NewOrReference          : Both
+
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+#------- OPTIONAL -------- OPTIONAL -------- OPTIONAL --------- OPTIONAL -------
+
+#-------------------------------------------------------------------------------
+
+# Put CMSSW version of your choice. If None then production version will be used
+HLT_release             : CMSSW_12_3_2_patch1
+PR_release              : CMSSW_12_3_2_patch1
+Expr_release            : CMSSW_12_3_2_patch1
+
+# Put NEW jira ticket number in case jira server is down
+Jira                    : None
+
+# Fill below details in case of run-registry server is down
+b_field                 : None
+class                   : None
+hlt_key                 : None
+
+################################################################################
