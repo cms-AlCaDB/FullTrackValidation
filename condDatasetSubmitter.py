@@ -787,7 +787,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                         'input_name = %s\n' % (ds) +\
                         'request_id=%s__ALCA_%s-%s_%s_%s\n' % (options.release,options.jira,datetime.datetime.now().strftime("%Y_%m_%d_%H_%M"),ds_name,ReqLabel) +\
                         'keep_step%d = True\n' % (task) +\
-                        'time_event = 1\n' +\
+                        'time_event = 10\n' +\
                         'size_memory = 16000\n' +\
                         'step1_lumisperjob = 1\n' +\
                         'processing_string = %s_%s_%s \n' % (processing_string, details['reqtype']+label, refsubgtshort) +\
@@ -843,7 +843,7 @@ def createCMSSWConfigs(options,confCondDictionary,allRunsAndBlocks):
                                 'input_name = %s\n' % (ds) +\
                                 'request_id=%s__ALCA_%s-%s_%s_%s\n' % (options.release,options.jira,datetime.datetime.now().strftime("%Y_%m_%d_%H_%M"),ds_name,ReqLabel) +\
                                 'keep_step%d = True\n' % (task) +\
-                                'time_event = 1\n' +\
+                                'time_event = 10\n' +\
                                 'size_memory = 16000\n' +\
                                 'step1_lumisperjob = 1\n' +\
                                 'processing_string = %s_%s_%s \n' % (processing_string, details['reqtype']+label, subgtshort) +\
